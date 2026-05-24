@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Comunidade Hoteleira | Malanje - Chat Turístico</title>
+    <!-- Bootstrap 5 + Icons + Fonts -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Particles JS -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <!-- html2canvas para screenshot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        body {
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+            transition: background 0.3s ease;
+        }
+
+        body.light-theme { background: #f0f2f5; }
+        body.dark-theme { background: #0a0c12; }
+
+        .bg-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        .bg-img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: filter 0.3s ease;
+            filter: brightness(0.7) saturate(0.9);
+        }
+        body.light-theme .bg-img { filter: brightness(1.1) saturate(0.8) blur(0.5px); }
+        body.dark-theme .bg-img { filter: brightness(0.4) saturate(0.7); }
+        
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+        #chat-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            border-radius: inherit;
+        }
+        .chat-messages { position: relative; z-index: 1; }
+        .app-container {
+            position: relative;
+            z-index: 2;
+            height: 100vh;
+            padding: 16px;
+        }
+        .glass-panel {
+            background: rgba(30, 35, 48, 0.4);
+            backdrop-filter: blur(16px);
+            border-radius: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 25px 45px rgba(0,0,0,0.2);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        body.light-theme .glass-panel {
+            background: rgba(250, 250, 255, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 25px 40px rgba(0,0,0,0.08);
+        }
+        .chat-sidebar {
+            background: rgba(15, 17, 24, 0.5);
+            backdrop-filter: blur(12px);
+            border-right: 1px solid rgba(255,255,255,0.15);
+            border-radius: 24px 0 0 24px;
+            height: 100%;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+        body.light-theme .chat-sidebar {
+            background: rgba(255, 255, 255, 0.65);
+            border-right: 1px solid rgba(0,0,0,0.08);
+        }
+        body.light-theme .chat-sidebar .text-white,
+        body.light-theme .chat-sidebar .text-white-50,
+        body.light-theme .chat-sidebar h5,
+        body.light-theme .chat-sidebar .fw-semibold {
+            color: #1a1a2e !important;
+        }
+        .chat-area {
+            background: rgba(10, 12, 18, 0.35);
+            backdrop-filter: blur(12px);
+            border-radius: 0 24px 24px 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        body.light-theme .chat-area { background: rgba(245, 248, 250, 0.55); }
+        .conv-item {
+            background: transparent;
+            transition: all 0.2s ease;
+            border-radius: 20px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .conv-item:active {
+            transform: scale(0.98);
+        }
+        .conv-item:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: rgba(255,255,255,0.3);
+            transform: scale(0.98);
+            box-shadow: 0 0 12px rgba(0,200,255,0.15);
+        }
+        body.light-theme .conv-item:hover {
+            background: rgba(0,0,0,0.05);
+            border-color: rgba(0,0,0,0.1);
+        }
+        .conv-active {
+            background: rgba(0, 200, 255, 0.2);
+            border-left: 3px solid #0ff;
+            box-shadow: 0 0 8px rgba(0,255,255,0.3);
+        }
+        body.light-theme .conv-active {
+            background: rgba(0, 150, 255, 0.12);
+            border-left-color: #0088ff;
+        }
+        .avatar-small {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2a6f8f, #1f4e6e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.3rem;
+            color: white;
+        }
+        .message-wrapper {
+            position: relative;
+            transition: all 0.2s;
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+        .message-wrapper.user-message { align-items: flex-end; }
+        .message-wrapper.bot-message { align-items: flex-start; }
+        .message-wrapper:hover .msg-actions { display: flex !important; }
+        .message-bubble {
+            padding: 10px 16px;
+            border-radius: 24px;
+            word-wrap: break-word;
+            white-space: normal;
+            display: inline-block;
+            max-width: 85%;
+            width: auto;
+            min-width: 60px;
+            animation: fadeSlideUp 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        .msg-user {
+            background: linear-gradient(145deg, #0078ff, #005ecb);
+            color: white;
+            border-bottom-right-radius: 6px;
+            margin-left: auto;
+            margin-right: 0;
+            box-shadow: 0 0 12px rgba(0,120,255,0.3);
+        }
+        .msg-bot {
+            background: rgba(40, 38, 60, 0.75);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(200,200,255,0.2);
+            color: #f0f0f0;
+            border-bottom-left-radius: 6px;
+            margin-right: auto;
+            margin-left: 0;
+        }
+        body.light-theme .msg-bot {
+            background: rgba(210, 210, 230, 0.85);
+            color: #1a1a2e;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        .msg-actions {
+            position: absolute;
+            top: -32px;
+            right: 5px;
+            gap: 8px;
+            background: rgba(0,0,0,0.85);
+            border-radius: 20px;
+            padding: 5px 12px;
+            display: none !important;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .message-wrapper:hover .msg-actions { display: flex !important; }
+        body.light-theme .msg-actions {
+            background: rgba(255,255,255,0.95);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .msg-actions button {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        body.light-theme .msg-actions button { color: #333; }
+        .msg-actions button:hover {
+            background: rgba(255,255,255,0.25);
+            transform: scale(1.05);
+        }
+        body.light-theme .msg-actions button:hover { background: rgba(0,0,0,0.1); }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+            z-index: 1;
+            -webkit-overflow-scrolling: touch;
+        }
+        .input-group-custom {
+            padding: 12px 20px;
+            background: rgba(30,32,44,0.7);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        body.light-theme .input-group-custom {
+            background: rgba(235, 238, 245, 0.8);
+            border-top: 1px solid rgba(0,0,0,0.08);
+        }
+        .input-glass {
+            background: rgba(20,22,35,0.85);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 40px;
+            color: white;
+            padding: 14px 22px;
+            font-size: 1rem;
+            flex: 1;
+            transition: all 0.2s;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .input-glass:focus {
+            background: rgba(30,32,45,1);
+            border-color: cyan;
+            box-shadow: 0 0 15px rgba(0,255,255,0.3);
+            outline: none;
+        }
+        body.light-theme .input-glass {
+            background: white;
+            color: #1a1a2e;
+            border: 1px solid #ccc;
+        }
+        body.light-theme .input-glass:focus {
+            border-color: #0088ff;
+            box-shadow: 0 0 10px rgba(0,136,255,0.3);
+        }
+        .btn-glass {
+            background: linear-gradient(135deg, #0078ff, #005ecb);
+            border: none;
+            border-radius: 40px;
+            color: white;
+            padding: 14px 28px;
+            transition: 0.2s;
+            font-weight: 600;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .btn-glass:active {
+            transform: scale(0.98);
+        }
+        .btn-glass:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(0,120,255,0.5);
+        }
+        .btn-attach {
+            background: rgba(100,100,120,0.5);
+            border: none;
+            border-radius: 40px;
+            color: white;
+            padding: 14px 18px;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .btn-attach:active {
+            transform: scale(0.98);
+        }
+        .btn-attach:hover {
+            background: rgba(0,120,255,0.5);
+            transform: scale(1.02);
+        }
+        .theme-toggle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .theme-toggle:active {
+            transform: scale(0.95);
+        }
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            background: rgba(255,255,255,0.3);
+        }
+        body.light-theme .theme-toggle {
+            background: rgba(0,0,0,0.1);
+            color: #333;
+        }
+        .community-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #0cf; border-radius: 10px; }
+        .badge-ia {
+            background: #5e2a84;
+            color: white;
+            font-size: 11px;
+            padding: 5px 12px;
+            border-radius: 40px;
+            letter-spacing: 1px;
+        }
+        .hotel-card {
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.15);
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .hotel-card:active {
+            transform: translateY(-2px);
+        }
+        .hotel-card:hover {
+            background: rgba(0,140,255,0.25);
+            transform: translateY(-3px);
+        }
+        body.light-theme .hotel-card {
+            background: rgba(255,255,240,0.7);
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        body.light-theme .hotel-card:hover { background: rgba(0,140,255,0.15); }
+        body.light-theme .hotel-card .text-white { color: #1a1a2e !important; }
+        
+        /* Estilos para mídia */
+        .media-preview {
+            max-width: 300px;
+            max-height: 300px;
+            border-radius: 12px;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+        .media-preview video {
+            max-width: 100%;
+            max-height: 250px;
+            border-radius: 12px;
+        }
+        .media-preview img {
+            max-width: 100%;
+            max-height: 250px;
+            border-radius: 12px;
+            object-fit: cover;
+        }
+        .message-text {
+            word-break: break-word;
+        }
+        
+        /* Botão para mostrar/esconder sidebar em mobile - POSICIONADO ACIMA/FLUTUANTE */
+        .sidebar-toggle-btn {
+            display: none;
+            position: fixed;
+            bottom: 90px;
+            left: 20px;
+            z-index: 1000;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0078ff, #005ecb);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+        .sidebar-toggle-btn:active {
+            transform: scale(0.95);
+        }
+        
+        /* Sidebar overlay para mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 998;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        @media (max-width: 768px) {
+            .app-container { padding: 8px; }
+            .message-bubble { max-width: 90%; }
+            .input-glass { padding: 10px 16px; font-size: 14px; }
+            .btn-glass { padding: 10px 20px; }
+            .btn-attach { padding: 10px 14px; }
+            
+            /* Sidebar se torna flutuante em mobile */
+            .chat-sidebar {
+                position: fixed;
+                top: 0;
+                left: -280px;
+                width: 280px;
+                height: 100%;
+                z-index: 999;
+                border-radius: 0 24px 24px 0;
+                transition: left 0.3s ease;
+                overflow-y: auto;
+            }
+            .chat-sidebar.open {
+                left: 0;
+            }
+            .chat-area {
+                border-radius: 24px;
+                width: 100%;
+            }
+            .sidebar-toggle-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .sidebar-overlay.show {
+                display: block;
+                opacity: 1;
+            }
+            .group-tab {
+                font-size: 12px;
+                white-space: nowrap;
+            }
+            .input-group-custom {
+                padding: 8px 12px;
+            }
+            .chat-messages {
+                padding: 12px;
+            }
+            .msg-actions {
+                top: -28px;
+                padding: 3px 8px;
+            }
+            .msg-actions button {
+                font-size: 10px;
+                padding: 2px 8px;
+            }
+            .floating-ai {
+                bottom: 80px;
+                right: 15px;
+            }
+            .ai-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 22px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .message-bubble {
+                max-width: 95%;
+                padding: 8px 12px;
+            }
+            .btn-glass {
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+            .input-glass {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+            .btn-attach {
+                padding: 8px 12px;
+            }
+            .group-tab {
+                font-size: 10px;
+                padding: 4px 8px;
+            }
+            .sidebar-toggle-btn {
+                bottom: 75px;
+                width: 45px;
+                height: 45px;
+                font-size: 20px;
+            }
+        }
+        
+        .floating-ai {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 99;
+        }
+        .ai-btn {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(145deg, #6c3ec7, #3a1f6e);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(100,0,255,0.7);
+            transition: 0.2s;
+        }
+        .ai-btn:active {
+            transform: scale(0.95);
+        }
+        .modal-ai-content, .modal-map-content, .modal-generic-content {
+            background: rgba(20,22,40,0.92);
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+        }
+        body.light-theme .modal-ai-content, body.light-theme .modal-map-content, body.light-theme .modal-generic-content {
+            background: rgba(250,250,255,0.92);
+            color: #1a1a2e;
+        }
+        .social-icon-link {
+            transition: 0.2s;
+        }
+        .social-icon-link:active {
+            transform: translateY(-2px);
+        }
+        .social-icon-link:hover {
+            transform: translateY(-2px);
+            opacity: 1 !important;
+        }
+        .btn-map {
+            background: rgba(0,150,100,0.7);
+            border: none;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .btn-map:active {
+            transform: scale(0.95);
+        }
+        .btn-map:hover {
+            background: #00a86b;
+            transform: scale(1.05);
+        }
+        .message-time {
+            font-size: 9px;
+            opacity: 0.6;
+            margin-top: 2px;
+            display: block;
+        }
+        .user-message .message-time { text-align: right; }
+        .toast-container { z-index: 1100; }
+        
+        /* Modal de visualização de mídia */
+        .media-modal-img, .media-modal-video {
+            max-width: 90vw;
+            max-height: 80vh;
+            margin: auto;
+            display: block;
+        }
+        .media-modal-video {
+            width: 80%;
+        }
+        
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body class="dark-theme">
+
+<div class="bg-wrapper">
+    <img class="bg-img" src="https://images.pexels.com/photos/258117/pexels-photo-258117.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Malanje landscape">
+    <div id="particles-js"></div>
+</div>
+
+<!-- Botão toggle para sidebar em mobile - ACIMA DA CAIXA DE TEXTO -->
+<button class="sidebar-toggle-btn" id="sidebarToggleBtn">
+    <i class="fas fa-bars"></i>
+</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="app-container">
+    <div class="row g-0 glass-panel h-100">
+        <div class="col-12 col-md-4 col-lg-3 chat-sidebar p-3" id="chatSidebar">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="community-logo"><i class="fas fa-hotel"></i></div>
+                    <h5 class="text-white m-0">Comunidade Hoteleira</h5>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="theme-toggle" id="themeToggleBtn"><i class="fas fa-moon"></i></button>
+                    <span class="badge-ia"><i class="fas fa-shield-alt"></i> IA</span>
+                </div>
+            </div>
+            <div class="mb-3">
+                <button class="btn btn-sm btn-outline-light w-100 rounded-pill" id="editAvatarBtn"><i class="fas fa-user-astronaut"></i> Criar/Editar Avatar</button>
+                <button class="btn btn-sm btn-outline-info w-100 rounded-pill mt-2" id="editSocialBtn"><i class="fas fa-share-alt"></i> Minhas Redes Sociais</button>
+            </div>
+            <div class="list-conversations" id="conversationList"></div>
+            <hr class="text-white-50">
+            <div class="mt-2">
+                <p class="text-white-50 small"><i class="fas fa-globe"></i> Hotéis Parceiros</p>
+                <div id="hotelCardsList" class="d-flex flex-column gap-2"></div>
+            </div>
+            <div class="mt-3 d-flex gap-3 justify-content-center" id="userSocialLinks">
+                <a href="#" class="social-icon-link text-white-50" id="socialFacebook" target="_blank"><i class="fab fa-facebook fa-lg"></i></a>
+                <a href="#" class="social-icon-link text-white-50" id="socialInstagram" target="_blank"><i class="fab fa-instagram fa-lg"></i></a>
+                <a href="#" class="social-icon-link text-white-50" id="socialWhatsapp" target="_blank"><i class="fab fa-whatsapp fa-lg"></i></a>
+                <a href="#" class="social-icon-link text-white-50" id="socialTiktok" target="_blank"><i class="fab fa-tiktok fa-lg"></i></a>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-8 col-lg-9 chat-area">
+            <div id="chat-particles"></div>
+            <div class="p-3 d-flex justify-content-between align-items-center border-bottom border-white-10" style="position: relative; z-index: 2;">
+                <div>
+                    <h5 class="text-white m-0" id="chatHeaderName">Turismo Malanje</h5>
+                    <span class="text-success small"><i class="fas fa-circle" style="font-size: 8px;"></i> online</span>
+                </div>
+                <div class="d-flex gap-2">
+                    <!-- NOVO BOTÃO DE SCREENSHOT -->
+                    <button class="btn btn-sm btn-outline-info" id="screenshotBtn" title="Tirar screenshot do chat">
+                        <i class="fas fa-camera"></i>
+                    </button>
+                    <button class="btn btn-sm btn-map" id="showMapBtn"><i class="fas fa-map-marker-alt"></i> Ver Mapa</button>
+                    <button class="btn btn-sm text-white" id="reportBtn" data-bs-toggle="modal" data-bs-target="#reportModal"><i class="fas fa-flag"></i></button>
+                    <button class="btn btn-sm text-white" id="profileBtn" data-bs-toggle="modal" data-bs-target="#infoModal"><i class="fas fa-info-circle"></i></button>
+                </div>
+            </div>
+            <div class="px-3 pt-2 d-flex gap-2 overflow-auto flex-nowrap" style="position: relative; z-index: 2;" id="groupTabs">
+                <button class="btn btn-sm btn-outline-info rounded-pill group-tab active-tab" data-group="Turismo Malanje"><i class="fas fa-globe-americas"></i> Turismo Malanje</button>
+                <button class="btn btn-sm btn-outline-info rounded-pill group-tab" data-group="Hotéis"><i class="fas fa-hotel"></i> Hotéis</button>
+                <button class="btn btn-sm btn-outline-info rounded-pill group-tab" data-group="Quedas Calandula"><i class="fas fa-water"></i> Quedas Calandula</button>
+                <button class="btn btn-sm btn-outline-info rounded-pill group-tab" data-group="Gastronomia"><i class="fas fa-utensils"></i> Gastronomia</button>
+            </div>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="px-3 d-flex justify-content-between align-items-center" style="position: relative; z-index: 2;">
+                <div class="d-flex gap-2">
+                    <select id="userLanguageSelect" class="form-select form-select-sm w-auto bg-dark text-white border-secondary">
+                        <option value="pt">Português</option>
+                        <option value="en">Inglês</option>
+                        <option value="fr">Francês</option>
+                        <option value="es">Espanhol</option>
+                    </select>
+                    <span class="badge bg-dark text-white-50"><i class="fas fa-language"></i> Meu idioma</span>
+                </div>
+            </div>
+            <div class="input-group-custom d-flex gap-2 align-items-center position-relative">
+                <input type="text" class="input-glass" id="messageInput" placeholder="Digite sua mensagem...">
+                <button class="btn-attach" id="attachBtn" title="Enviar imagem ou vídeo"><i class="fas fa-paperclip"></i></button>
+                <button class="btn-glass" id="sendMsgBtn"><i class="fas fa-paper-plane"></i> Enviar</button>
+            </div>
+            <input type="file" id="fileInput" accept="image/*,video/*" style="display: none;">
+        </div>
+    </div>
+</div>
+
+<div class="floating-ai">
+    <div class="ai-btn" id="aiFloatingBtn"><i class="fas fa-robot"></i></div>
+</div>
+
+<!-- Modal Visualização de Mídia -->
+<div class="modal fade" id="mediaViewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content modal-generic-content text-white">
+            <div class="modal-header border-secondary">
+                <h5><i class="fas fa-image"></i> Visualizar Mídia</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center" id="mediaViewBody">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal IA - MAIS INTELIGENTE -->
+<div class="modal fade" id="aiModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-ai-content text-white">
+            <div class="modal-header border-secondary">
+                <h5><i class="fas fa-microchip"></i> Assistente IA - Malanje</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="max-height: 350px; overflow-y: auto;" id="aiChatBody">
+                <div class="msg-bot message-bubble"><i class="fas fa-robot"></i> Olá! Sou o assistente turístico de Malanje. Pergunte sobre hotéis, preços, restaurantes, atrações como as Quedas de Calandula, ou dicas de viagem!</div>
+            </div>
+            <div class="modal-footer">
+                <input type="text" id="aiQueryInput" class="form-control bg-dark text-white" placeholder="Ex: Melhor época para visitar Calandula?">
+                <button id="askAiBtn" class="btn btn-primary"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Mapa -->
+<div class="modal fade" id="mapModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content modal-map-content text-white">
+            <div class="modal-header border-secondary">
+                <h5><i class="fas fa-map-marked-alt"></i> Mapa Turístico - Malanje</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <iframe width="100%" height="400" style="border-radius: 20px;" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d252255.56329567073!2d16.2675829!3d-9.533203!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1a5b2c3d4e5f6g7h%3A0x123456789abc!2sMalanje%2C%20Angola!5e0!3m2!1spt!2s!4v1640000000000!5m2!1spt!2s" allowfullscreen></iframe>
+                <div class="p-3">
+                    <p><i class="fas fa-hotel text-info"></i> <strong>Hotéis Recomendados:</strong> Hotel Kalandula, Hotel Malanje, Eco Hotel Calandula</p>
+                    <p><i class="fas fa-water text-primary"></i> <strong>Atrações:</strong> Quedas de Calandula, Lagoa da Nhaulu, Pedras Negras</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Informação -->
+<div class="modal fade" id="infoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-generic-content text-white">
+            <div class="modal-header border-secondary">
+                <h5><i class="fas fa-info-circle"></i> Sobre a Comunidade</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p><i class="fas fa-hotel"></i> <strong>Comunidade Hoteleira Malanje</strong> - Um espaço para turistas e hóspedes compartilharem experiências sobre hotéis e atrações da província de Malanje, Angola.</p>
+                <p><i class="fas fa-shield-alt"></i> <strong>Moderação:</strong> Utilizamos IA para bloquear palavras ofensivas e sugerir correções ortográficas, garantindo um ambiente respeitoso.</p>
+                <p><i class="fas fa-language"></i> <strong>Tradução Inteligente:</strong> As mensagens são automaticamente traduzidas para o idioma de cada usuário, facilitando a comunicação entre visitantes de diferentes países.</p>
+                <p><i class="fas fa-image"></i> <strong>Compartilhamento de Mídia:</strong> Você pode enviar imagens e vídeos para enriquecer as conversas!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Denúncia -->
+<div class="modal fade" id="reportModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-generic-content text-white">
+            <div class="modal-header border-secondary">
+                <h5><i class="fas fa-flag"></i> Denunciar Conteúdo</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Sua denúncia foi registrada. Nossa equipe irá analisar e tomar as medidas cabíveis para manter a comunidade segura.</p>
+                <p><i class="fas fa-check-circle text-success"></i> Obrigado por ajudar a manter o respeito!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Mensagem -->
+<div class="modal fade" id="editMessageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-generic-content text-white">
+            <div class="modal-header border-secondary">
+                <h5><i class="fas fa-edit"></i> Editar Mensagem</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <textarea class="form-control bg-dark text-white" id="editMessageText" rows="3" style="background: rgba(0,0,0,0.6); border-radius: 16px;"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-outline-success" id="confirmEditBtn"><i class="fas fa-save"></i> Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Excluir Mensagem -->
+<div class="modal fade" id="deleteMessageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-generic-content text-white">
+            <div class="modal-header border-secondary">
+                <h5><i class="fas fa-trash-alt"></i> Excluir Mensagem</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir esta mensagem? Esta ação não pode ser desfeita.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-outline-danger" id="confirmDeleteBtn"><i class="fas fa-trash"></i> Excluir</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100;"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // ================== SISTEMAS INTELIGENTES ==================
+    const offensiveWords = [
+        "bobo", "feio", "idiota", "pateta", "estupido", "parvo",
+        "burro", "otario", "inutil", "lixo", "chato", "nojento", 
+        "desgraça", "merda", "caralho", "puta", "paneleiro", "viado"
+    ];
+    function containsOffensive(text) { 
+        return offensiveWords.some(word => text.toLowerCase().includes(word)); 
+    }
+    
+    const commonMistakes = { 
+        "hotel": "hotel", "hoteis": "hotéis", "restaurante": "restaurante", 
+        "comdia": "comida", "malange": "Malanje", "calandula": "Calandula" 
+    };
+    function autoCorrectText(text) {
+        let corrected = text;
+        for (let [wrong, right] of Object.entries(commonMistakes)) {
+            const regex = new RegExp(`\\b${wrong}\\b`, 'gi');
+            if (regex.test(corrected)) corrected = corrected.replace(regex, right);
+        }
+        return corrected;
+    }
+    
+    function showWarningToast(message) {
+        const toastContainer = document.querySelector('.toast-container');
+        const toastEl = document.createElement('div');
+        toastEl.className = 'toast align-items-center text-bg-warning border-0 mb-2';
+        toastEl.setAttribute('role', 'alert');
+        toastEl.innerHTML = `<div class="d-flex"><div class="toast-body"><i class="fas fa-exclamation-triangle me-2"></i> ${message}</div><button type="button" class="btn-close btn-close-dark me-2 m-auto" data-bs-dismiss="toast"></button></div>`;
+        toastContainer.appendChild(toastEl);
+        const bsToast = new bootstrap.Toast(toastEl, { delay: 4000, autohide: true });
+        bsToast.show();
+        toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
+    }
+    
+    function sanitizeAndCorrectMessage(rawText) {
+        if (containsOffensive(rawText)) return { valid: false, message: "Mensagem bloqueada: linguagem ofensiva detectada. <i class='fas fa-shield-alt'></i> Mantenha o respeito." };
+        let corrected = autoCorrectText(rawText);
+        return { valid: true, correctedText: corrected, correctionApplied: (corrected !== rawText) };
+    }
+    
+    function universalTranslate(text, targetLang) {
+        if (targetLang === 'pt') return text;
+        const dict = { en: `[EN] ${text}`, fr: `[FR] ${text}`, es: `[ES] ${text}` };
+        return dict[targetLang] || text;
+    }
+    
+    // ========== DADOS DO CHAT ==========
+    const groupsData = {
+        "Turismo Malanje": { name: "Turismo Malanje", messages: [
+            { id: Date.now() + 1, text: "Bem-vindos ao coração de Malanje! Conheça nossas belezas naturais.", sender: "bot", time: "10:00", userId: null, originalText: "Bem-vindos ao coração de Malanje! Conheça nossas belezas naturais.", media: null }, 
+            { id: Date.now() + 2, text: "Alguém já visitou as Quedas de Calandula? Compartilhe sua experiência!", sender: "bot", time: "10:05", userId: null, originalText: "Alguém já visitou as Quedas de Calandula? Compartilhe sua experiência!", media: null }
+        ] },
+        "Hotéis": { name: "Hotéis", messages: [
+            { id: Date.now() + 3, text: "Hotel Kalandula tem desconto até sexta-feira!", sender: "bot", time: "09:30", userId: null, originalText: "Hotel Kalandula tem desconto até sexta-feira!", media: null }, 
+            { id: Date.now() + 4, text: "Alguma indicação de hotel em Malanje cidade?", sender: "bot", time: "09:45", userId: null, originalText: "Alguma indicação de hotel em Malanje cidade?", media: null }
+        ] },
+        "Quedas Calandula": { name: "Quedas Calandula", messages: [
+            { id: Date.now() + 5, text: "As quedas estão espetaculares nessa época! Melhor vista pela manhã.", sender: "bot", time: "08:20", userId: null, originalText: "As quedas estão espetaculares nessa época! Melhor vista pela manhã.", media: null }
+        ] },
+        "Gastronomia": { name: "Gastronomia", messages: [
+            { id: Date.now() + 6, text: "Restaurante Angoleira recomenda: Calulu e Funge com peixe fresco!", sender: "bot", time: "12:00", userId: null, originalText: "Restaurante Angoleira recomenda: Calulu e Funge com peixe fresco!", media: null }
+        ] }
+    };
+    
+    let currentGroup = "Turismo Malanje";
+    let conversationHistory = {};
+    let currentUserName = "Turista";
+    let currentUserId = "user_" + Date.now();
+    let userSocial = { facebook: "", instagram: "", whatsapp: "", tiktok: "" };
+    let currentUserLang = "pt";
+    let pendingEditMsgId = null;
+    let pendingDeleteMsgId = null;
+    
+    for (let g in groupsData) conversationHistory[g] = JSON.parse(JSON.stringify(groupsData[g].messages));
+    
+    const conversations = [
+        { id: "Turismo Malanje", name: "Turismo Malanje", lastMsg: "Explore as maravilhas", time: "12:30", online: true, avatar:"🌍" },
+        { id: "Hotéis", name: "Hotéis Kalandula", lastMsg: "Ofertas especiais!", time: "11:20", online: true, avatar:"🏨" },
+        { id: "Quedas Calandula", name: "Quedas Calandula", lastMsg: "Natureza exuberante", time: "10:15", online: true, avatar:"💧" },
+        { id: "Gastronomia", name: "Gastronomia", lastMsg: "Pratos típicos", time: "09:00", online: true, avatar:"🍽️" }
+    ];
+    
+    // CHATBOT MAIS INTELIGENTE
+    function getSmartBotResponse(userMessage) {
+        const msg = userMessage.toLowerCase();
+        
+        // Informações sobre hotéis
+        if (msg.includes("hotel") || msg.includes("hospedagem") || msg.includes("acomodação")) {
+            if (msg.includes("preço") || msg.includes("quanto") || msg.includes("custa") || msg.includes("diária")) {
+                return "🏨 Preços médios em Malanje: \n• Hotel Econômico: 15.000 - 25.000 Kz/diária\n• Hotel Standard: 30.000 - 45.000 Kz/diária\n• Resort/Luxo: 50.000 - 80.000 Kz/diária\nRecomendo consultar o Hotel Kalandula e o Malanje Plaza para ofertas atuais!";
+            }
+            if (msg.includes("melhor") || msg.includes("recomenda")) {
+                return "🏨 Hotéis mais recomendados em Malanje:\n• Hotel Kalandula - melhor custo-benefício\n• Hotel Malanje Plaza - área central\n• Eco Hotel Calandula - próximo às quedas\n• Hotel Vitória - vista panorâmica da cidade";
+            }
+            return "🏨 Em Malanje temos ótimas opções de hospedagem: Hotel Kalandula, Malanje Plaza, Eco Hotel Calandula e Hotel Vitória. Deseja saber sobre preços ou localização específica?";
+        }
+        
+        // Informações sobre Quedas de Calandula
+        if (msg.includes("calandula") || msg.includes("queda") || (msg.includes("cachoeira") && msg.includes("malanje"))) {
+            if (msg.includes("época") || msg.includes("melhor") || msg.includes("quando")) {
+                return "💧 Melhor época para visitar as Quedas de Calandula: \n• Maio a Agosto (estação seca) - quedas cheias e clima agradável\n• Evitar Novembro a Março (chuvas intensas) - acesso pode ser difícil\n• A manhã é o melhor horário para fotos (luz natural)";
+            }
+            if (msg.includes("distância") || msg.includes("como chegar") || msg.includes("longe")) {
+                return "🗺️ As Quedas de Calandula ficam a aproximadamente 85 km do centro de Malanje. O trajeto leva cerca de 1h30 de carro. Recomendo contratar um guia local ou usar transporte turístico.";
+            }
+            return "💧 As Quedas de Calandula são o principal cartão-postal de Malanje! Com 105 metros de altura, impressionam pela força e beleza. Quer saber sobre melhor época para visitar ou como chegar?";
+        }
+        
+        // Informações sobre gastronomia
+        if (msg.includes("comida") || msg.includes("gastronomia") || msg.includes("restaurante") || msg.includes("prato")) {
+            if (msg.includes("típico") || msg.includes("tradicional")) {
+                return "🍽️ Pratos típicos de Malanje:\n• Calulu - ensopado de peixe seco com legumes\n• Mufete - peixe grelhado com feijão e mandioca\n• Funge com peixe fresco - acompanhamento tradicional\n• Frango à Zambeziana - especialidade regional";
+            }
+            if (msg.includes("melhor restaurante") || msg.includes("onde comer")) {
+                return "🍴 Restaurantes recomendados em Malanje:\n• Restaurante Angoleira - culinária regional\n• Churrascaria Malanje - carnes nobres\n• Restaurante Calandula Vista - vista privilegiada\n• Petit Bistro - cozinha internacional";
+            }
+            return "🍴 A gastronomia de Malanje é rica e diversa! Destaque para Calulu, Mufete e Funge com peixe. Quer recomendações de restaurantes ou pratos típicos específicos?";
+        }
+        
+        // Informações turísticas gerais
+        if (msg.includes("atração") || msg.includes("passeio") || msg.includes("visitar") || msg.includes("turismo")) {
+            return "🏞️ Principais atrações em Malanje:\n• Quedas de Calandula (imperdível!)\n• Lagoa da Nhaulu\n• Pedras Negras do Pungo Andongo\n• Museu Regional de Malanje\n• Cachoeira do Congo\nGostaria de mais detalhes sobre alguma delas?";
+        }
+        
+        // Clima e melhor época
+        if (msg.includes("clima") || msg.includes("tempo") || msg.includes("época") && !msg.includes("calandula")) {
+            return "☀️ Clima em Malanje: tropical de altitude, temperaturas médias entre 18°C e 28°C. Melhor época para visita: Maio a Setembro (estação seca, menos chuvas e temperaturas agradáveis).";
+        }
+        
+        // Transporte
+        if (msg.includes("transporte") || msg.includes("como chegar") || msg.includes("ônibus") || msg.includes("carro")) {
+            return "🚗 Para conhecer Malanje, você pode:\n• Alugar um carro (recomendado para liberdade)\n• Contratar tours guiados\n• Utilizar táxis ou transporte local\n• Para Quedas Calandula: preferencialmente com guia ou veículo próprio";
+        }
+        
+        // Preços e custos
+        if (msg.includes("preço") || msg.includes("custo") || msg.includes("gasto") || msg.includes("quanto custa")) {
+            return "💰 Média de custos em Malanje:\n• Hospedagem: 15.000 - 80.000 Kz/diária\n• Refeições: 3.000 - 10.000 Kz\n• Entradas atrações: 1.000 - 5.000 Kz\n• Transporte local: 1.000 - 5.000 Kz por trecho\n• Tours guiados: 15.000 - 30.000 Kz (dia completo)";
+        }
+        
+        // Segurança
+        if (msg.includes("seguro") || msg.includes("segurança") || msg.includes("perigo")) {
+            return "🛡️ Malanje é uma província relativamente segura para turistas. Recomendações:\n• Evitar andar sozinho à noite em áreas desertas\n• Guardar documentos e dinheiro em local seguro\n• Utilizar transporte oficial ou de confiança\n• Respeitar orientações de guias locais\n• Tomar cuidados básicos como em qualquer destino turístico";
+        }
+        
+        // Saudação
+        if (msg.includes("olá") || msg.includes("oi") || msg.includes("bom dia") || msg.includes("boa tarde") || msg.includes("boa noite")) {
+            return "👋 Olá! Bem-vindo ao assistente turístico de Malanje! Como posso ajudar você hoje? Posso falar sobre hotéis, gastronomia, atrações, preços, clima e muito mais!";
+        }
+        
+        return "🤖 Desculpe, não entendi completamente. Posso ajudar com informações sobre: hotéis, preços, gastronomia, Quedas de Calandula, atrações turísticas, clima, transporte ou segurança em Malanje. Sobre o que gostaria de saber?";
+    }
+    
+    // Funções de controle do sidebar mobile
+    function initMobileSidebar() {
+        const sidebar = document.getElementById('chatSidebar');
+        const toggleBtn = document.getElementById('sidebarToggleBtn');
+        const overlay = document.getElementById('sidebarOverlay');
+        
+        function closeSidebar() {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('show');
+                toggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
+            }
+        }
+        
+        function openSidebar() {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.add('open');
+                overlay.classList.add('show');
+                toggleBtn.innerHTML = '<i class="fas fa-times"></i>';
+            }
+        }
+        
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (sidebar.classList.contains('open')) {
+                    closeSidebar();
+                } else {
+                    openSidebar();
+                }
+            });
+        }
+        
+        if (overlay) {
+            overlay.addEventListener('click', closeSidebar);
+        }
+        
+        // Fechar sidebar ao clicar em uma conversa em mobile
+        document.querySelectorAll('.conv-item').forEach(item => {
+            item.addEventListener('click', closeSidebar);
+        });
+        
+        // Fechar sidebar ao redimensionar para desktop
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                closeSidebar();
+                if (sidebar) sidebar.classList.remove('open');
+                if (overlay) overlay.classList.remove('show');
+            }
+        });
+    }
+    
+    function loadConversations() {
+        const container = document.getElementById("conversationList");
+        container.innerHTML = "";
+        conversations.forEach(conv => {
+            const activeClass = (conv.id === currentGroup) ? "conv-active" : "";
+            const div = document.createElement("div");
+            div.className = `conv-item d-flex align-items-center p-2 ${activeClass}`;
+            div.setAttribute("data-group-id", conv.id);
+            div.innerHTML = `<div class="avatar-small me-3">${conv.avatar}</div><div class="flex-grow-1"><div class="text-white fw-semibold">${conv.name}</div><small class="text-white-50">${conv.lastMsg}</small></div><div class="text-end"><small class="text-white-50">${conv.time}</small><br><i class="fas fa-circle text-success ${!conv.online ? 'invisible' : ''}" style="font-size:10px"></i></div>`;
+            div.addEventListener("click", (e) => {
+                e.stopPropagation();
+                switchConversation(conv.id);
+            });
+            container.appendChild(div);
+        });
+    }
+    
+    function switchConversation(groupId) {
+        if (groupsData[groupId]) {
+            currentGroup = groupId;
+            document.getElementById("chatHeaderName").innerText = groupsData[groupId].name;
+            renderMessages();
+            highlightActiveConversation();
+            // Atualizar abas
+            document.querySelectorAll(".group-tab").forEach(btn => {
+                if(btn.getAttribute("data-group") === groupId) {
+                    btn.classList.add("active-tab");
+                } else {
+                    btn.classList.remove("active-tab");
+                }
+            });
+        }
+    }
+    
+    function highlightActiveConversation() {
+        document.querySelectorAll(".conv-item").forEach(el => {
+            const id = el.getAttribute("data-group-id");
+            if(id === currentGroup) el.classList.add("conv-active");
+            else el.classList.remove("conv-active");
+        });
+    }
+    
+    function getCurrentTime() { 
+        return `${new Date().getHours().toString().padStart(2,'0')}:${new Date().getMinutes().toString().padStart(2,'0')}`; 
+    }
+    
+    function escapeHtml(text) { 
+        const div = document.createElement('div'); 
+        div.textContent = text; 
+        return div.innerHTML; 
+    }
+    
+    function translateMessageForUser(msgText, originalText) {
+        if (currentUserLang === 'pt') return msgText;
+        return universalTranslate(originalText || msgText, currentUserLang);
+    }
+    
+    function openMediaView(mediaUrl, mediaType) {
+        const mediaViewBody = document.getElementById("mediaViewBody");
+        if (mediaType === 'image') {
+            mediaViewBody.innerHTML = `<img src="${mediaUrl}" class="media-modal-img" alt="Imagem">`;
+        } else if (mediaType === 'video') {
+            mediaViewBody.innerHTML = `<video controls class="media-modal-video"><source src="${mediaUrl}" type="video/mp4">Seu navegador não suporta vídeo.</video>`;
+        }
+        new bootstrap.Modal(document.getElementById('mediaViewModal')).show();
+    }
+    
+    function renderMessages() {
+        const container = document.getElementById("chatMessages");
+        if (!container) return;
+        container.innerHTML = "";
+        const msgs = conversationHistory[currentGroup] || [];
+        msgs.forEach((msg) => {
+            const isUser = (msg.sender === "user");
+            const bubbleClass = isUser ? "msg-user" : "msg-bot";
+            const wrapperClass = isUser ? "user-message" : "bot-message";
+            let displayText = msg.text;
+            if (!isUser && currentUserLang !== 'pt') displayText = translateMessageForUser(msg.text, msg.originalText || msg.text);
+            
+            const wrapper = document.createElement("div");
+            wrapper.className = `message-wrapper ${wrapperClass} mb-2`;
+            wrapper.setAttribute("data-msg-id", msg.id);
+            
+            const bubble = document.createElement("div");
+            bubble.className = `message-bubble ${bubbleClass}`;
+            
+            const contentDiv = document.createElement("div");
+            contentDiv.className = "message-text";
+            contentDiv.innerHTML = `<i class="${isUser ? 'fas fa-user' : 'fas fa-robot'} me-2"></i><strong>${isUser ? currentUserName : 'Assistente'}:</strong> ${escapeHtml(displayText)}`;
+            bubble.appendChild(contentDiv);
+            
+            if (msg.media) {
+                const mediaDiv = document.createElement("div");
+                mediaDiv.className = "media-preview";
+                if (msg.media.type === 'image') {
+                    const img = document.createElement("img");
+                    img.src = msg.media.url;
+                    img.alt = "Imagem compartilhada";
+                    img.addEventListener("click", () => openMediaView(msg.media.url, 'image'));
+                    mediaDiv.appendChild(img);
+                } else if (msg.media.type === 'video') {
+                    const video = document.createElement("video");
+                    video.controls = true;
+                    const source = document.createElement("source");
+                    source.src = msg.media.url;
+                    source.type = "video/mp4";
+                    video.appendChild(source);
+                    video.addEventListener("click", () => openMediaView(msg.media.url, 'video'));
+                    mediaDiv.appendChild(video);
+                }
+                bubble.appendChild(mediaDiv);
+            }
+            
+            const timeSpan = document.createElement("small");
+            timeSpan.className = "message-time";
+            timeSpan.textContent = msg.time || getCurrentTime();
+            bubble.appendChild(timeSpan);
+            wrapper.appendChild(bubble);
+            
+            if (isUser && msg.userId === currentUserId) {
+                const actions = document.createElement("div");
+                actions.className = "msg-actions";
+                actions.innerHTML = `<button class="edit-msg-btn" data-id="${msg.id}"><i class="fas fa-edit"></i> Editar</button><button class="delete-msg-btn" data-id="${msg.id}"><i class="fas fa-trash-alt"></i> Excluir</button>`;
+                wrapper.appendChild(actions);
+            }
+            container.appendChild(wrapper);
+        });
+        document.querySelectorAll('.edit-msg-btn').forEach(btn => btn.addEventListener('click', openEditModal));
+        document.querySelectorAll('.delete-msg-btn').forEach(btn => btn.addEventListener('click', openDeleteModal));
+        container.scrollTop = container.scrollHeight;
+    }
+    
+    function openEditModal(e) {
+        e.stopPropagation();
+        const msgId = parseFloat(e.currentTarget.getAttribute('data-id'));
+        const msgs = conversationHistory[currentGroup];
+        const msgIndex = msgs.findIndex(m => m.id === msgId);
+        if (msgIndex !== -1 && msgs[msgIndex].sender === "user" && msgs[msgIndex].userId === currentUserId) {
+            pendingEditMsgId = msgId;
+            document.getElementById("editMessageText").value = msgs[msgIndex].text;
+            new bootstrap.Modal(document.getElementById('editMessageModal')).show();
+        } else showWarningToast("Você só pode editar suas próprias mensagens.");
+    }
+    
+    function openDeleteModal(e) {
+        e.stopPropagation();
+        const msgId = parseFloat(e.currentTarget.getAttribute('data-id'));
+        const msgs = conversationHistory[currentGroup];
+        const msgIndex = msgs.findIndex(m => m.id === msgId);
+        if (msgIndex !== -1 && msgs[msgIndex].sender === "user" && msgs[msgIndex].userId === currentUserId) {
+            pendingDeleteMsgId = msgId;
+            new bootstrap.Modal(document.getElementById('deleteMessageModal')).show();
+        } else showWarningToast("Você só pode excluir suas próprias mensagens.");
+    }
+    
+    function confirmEdit() {
+        if (pendingEditMsgId) {
+            const newText = document.getElementById("editMessageText").value.trim();
+            if (newText === "") { showWarningToast("A mensagem não pode estar vazia."); return; }
+            const sanitized = sanitizeAndCorrectMessage(newText);
+            if (!sanitized.valid) { showWarningToast(sanitized.message); return; }
+            const msgs = conversationHistory[currentGroup];
+            const msgIndex = msgs.findIndex(m => m.id === pendingEditMsgId);
+            if (msgIndex !== -1) {
+                msgs[msgIndex].text = sanitized.correctedText;
+                msgs[msgIndex].originalText = sanitized.correctedText;
+                renderMessages();
+                if (sanitized.correctionApplied) showWarningToast(`Correção aplicada: "${sanitized.correctedText}"`);
+                else showWarningToast("Mensagem editada com sucesso!");
+            }
+            bootstrap.Modal.getInstance(document.getElementById('editMessageModal')).hide();
+            pendingEditMsgId = null;
+        }
+    }
+    
+    function confirmDelete() {
+        if (pendingDeleteMsgId) {
+            const msgs = conversationHistory[currentGroup];
+            const msgIndex = msgs.findIndex(m => m.id === pendingDeleteMsgId);
+            if (msgIndex !== -1) {
+                msgs.splice(msgIndex, 1);
+                renderMessages();
+                showWarningToast("Mensagem excluída com sucesso!");
+            }
+            bootstrap.Modal.getInstance(document.getElementById('deleteMessageModal')).hide();
+            pendingDeleteMsgId = null;
+        }
+    }
+    
+    function addMessage(group, text, sender, userId = null, originalText = null, media = null) {
+        if(!conversationHistory[group]) conversationHistory[group] = [];
+        const newMsg = { 
+            id: Date.now() + Math.random() * 10000, 
+            text: text, 
+            sender: sender, 
+            time: getCurrentTime(), 
+            userId: userId, 
+            originalText: originalText || text,
+            media: media
+        };
+        conversationHistory[group].push(newMsg);
+        if(group === currentGroup) renderMessages();
+        return newMsg;
+    }
+    
+    function processMediaFile(file) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const mediaUrl = e.target.result;
+                const mediaType = file.type.startsWith('image/') ? 'image' : 'video';
+                resolve({ url: mediaUrl, type: mediaType });
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    async function sendMediaMessage(file) {
+        if (!file) return;
+        
+        if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
+            showWarningToast("Por favor, selecione apenas imagens ou vídeos.");
+            return;
+        }
+        
+        const maxSize = file.type.startsWith('video/') ? 10 * 1024 * 1024 : 5 * 1024 * 1024;
+        if (file.size > maxSize) {
+            showWarningToast(`Arquivo muito grande! Máximo: ${maxSize / (1024*1024)}MB`);
+            return;
+        }
+        
+        showWarningToast("Enviando mídia...");
+        
+        try {
+            const mediaData = await processMediaFile(file);
+            const mediaText = file.type.startsWith('image/') ? "📷 Imagem compartilhada" : "🎥 Vídeo compartilhado";
+            
+            addMessage(currentGroup, mediaText, "user", currentUserId, mediaText, mediaData);
+            showWarningToast("Mídia enviada com sucesso!");
+            
+            setTimeout(() => {
+                const autoReply = "Obrigado por compartilhar! Que legal ver isso sobre Malanje! O que mais você gostaria de saber sobre nossa província?";
+                addMessage(currentGroup, autoReply, "bot", null, autoReply);
+            }, 1000);
+        } catch (error) {
+            showWarningToast("Erro ao enviar mídia. Tente novamente.");
+        }
+    }
+    
+    function sendUserMessage() {
+        const input = document.getElementById("messageInput");
+        let rawText = input.value.trim();
+        if(rawText === "") return;
+        const result = sanitizeAndCorrectMessage(rawText);
+        if (!result.valid) { showWarningToast(result.message); input.value = ""; return; }
+        let finalText = result.correctedText;
+        if(result.correctionApplied) showWarningToast(`Correção ortográfica: "${rawText}" → "${finalText}"`);
+        addMessage(currentGroup, finalText, "user", currentUserId, finalText);
+        input.value = "";
+        
+        // Resposta do bot mais inteligente baseada no contexto
+        setTimeout(() => {
+            const botResponse = getSmartBotResponse(finalText);
+            addMessage(currentGroup, botResponse, "bot", null, botResponse);
+        }, 800);
+    }
+    
+    // Função para fazer screenshot da área de chat
+    async function takeScreenshot() {
+        const chatMessages = document.getElementById("chatMessages");
+        if (!chatMessages) {
+            showWarningToast("Não foi possível capturar a tela do chat.");
+            return;
+        }
+        
+        showWarningToast("Gerando screenshot, aguarde...");
+        
+        try {
+            // Salvar o scroll atual
+            const scrollTop = chatMessages.scrollTop;
+            
+            // Armazenar estilos temporários para garantir que o scroll não atrapalhe
+            const originalOverflow = chatMessages.style.overflow;
+            chatMessages.style.overflow = 'visible';
+            const originalHeight = chatMessages.style.height;
+            chatMessages.style.height = 'auto';
+            
+            // Capturar a área do chat
+            const canvas = await html2canvas(chatMessages, {
+                scale: 2, // Melhor qualidade
+                backgroundColor: null,
+                logging: false,
+                useCORS: true,
+                allowTaint: false
+            });
+            
+            // Restaurar estilos originais
+            chatMessages.style.overflow = originalOverflow;
+            chatMessages.style.height = originalHeight;
+            chatMessages.scrollTop = scrollTop;
+            
+            // Criar link para download
+            const link = document.createElement('a');
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+            link.download = `screenshot-chat-${currentGroup}-${timestamp}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            
+            showWarningToast("Screenshot salvo com sucesso! 📸");
+        } catch (error) {
+            console.error('Erro ao gerar screenshot:', error);
+            showWarningToast("Erro ao gerar screenshot. Tente novamente.");
+        }
+    }
+    
+    function loadHotelCards() {
+        const hotels = [
+            { name: "Hotel Kalandula", icon: "🏨", groupChat: "Hotéis" },
+            { name: "Hotel Malanje Plaza", icon: "🏨", groupChat: "Hotéis" },
+            { name: "Eco Hotel Calandula", icon: "🏨", groupChat: "Quedas Calandula" }
+        ];
+        const container = document.getElementById("hotelCardsList");
+        if (!container) return;
+        container.innerHTML = "";
+        hotels.forEach(h => {
+            const card = document.createElement("div");
+            card.className = "hotel-card d-flex align-items-center p-2 gap-2";
+            card.innerHTML = `<div class="fs-3">${h.icon}</div><div class="flex-grow-1 small text-white">${h.name}</div><button class="btn btn-sm btn-primary talkHotelBtn" data-group="${h.groupChat}"><i class="fas fa-comment"></i></button>`;
+            container.appendChild(card);
+        });
+        document.querySelectorAll(".talkHotelBtn").forEach(btn => btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            switchConversation(btn.getAttribute("data-group"));
+        }));
+    }
+    
+    function updateSocialLinks() {
+        const fb = document.getElementById("socialFacebook"), ig = document.getElementById("socialInstagram"), wa = document.getElementById("socialWhatsapp"), tt = document.getElementById("socialTiktok");
+        fb.href = userSocial.facebook || "#"; ig.href = userSocial.instagram || "#"; wa.href = userSocial.whatsapp || "#"; tt.href = userSocial.tiktok || "#";
+        [fb, ig, wa, tt].forEach(link => link.style.opacity = (link.href === "#" || link.href === "") ? "0.4" : "1");
+    }
+    
+    function initChatParticles() { 
+        if (typeof particlesJS !== 'undefined') 
+            particlesJS("chat-particles", { 
+                particles: { 
+                    number: { value: 40 }, 
+                    color: { value: "#88aaff" }, 
+                    opacity: { value: 0.2 }, 
+                    size: { value: 2 }, 
+                    move: { speed: 0.6 } 
+                }, 
+                interactivity: { 
+                    events: { 
+                        onhover: { enable: true, mode: "repulse" } 
+                    } 
+                } 
+            }); 
+    }
+    
+    if (typeof particlesJS !== 'undefined') 
+        particlesJS("particles-js", { 
+            particles: { 
+                number: { value: 60, density: { enable: true, value_area: 800 } }, 
+                color: { value: "#ffcc88" }, 
+                shape: { type: "circle" }, 
+                opacity: { value: 0.4, random: true }, 
+                size: { value: 2, random: true }, 
+                move: { enable: true, speed: 0.8, direction: "none", random: true, out_mode: "out" } 
+            }, 
+            interactivity: { 
+                detect_on: "canvas", 
+                events: { 
+                    onhover: { enable: true, mode: "repulse" } 
+                } 
+            } 
+        });
+    
+    function toggleTheme() {
+        const body = document.body, themeBtn = document.getElementById("themeToggleBtn");
+        if (body.classList.contains("dark-theme")) { 
+            body.classList.remove("dark-theme"); 
+            body.classList.add("light-theme"); 
+            themeBtn.innerHTML = '<i class="fas fa-sun"></i>'; 
+            localStorage.setItem("theme", "light"); 
+        } else { 
+            body.classList.remove("light-theme"); 
+            body.classList.add("dark-theme"); 
+            themeBtn.innerHTML = '<i class="fas fa-moon"></i>'; 
+            localStorage.setItem("theme", "dark"); 
+        }
+    }
+    
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "light") { 
+        document.body.classList.add("light-theme"); 
+        document.getElementById("themeToggleBtn").innerHTML = '<i class="fas fa-sun"></i>'; 
+    }
+    
+    const attachBtn = document.getElementById("attachBtn");
+    const fileInput = document.getElementById("fileInput");
+    
+    attachBtn.addEventListener("click", () => {
+        fileInput.click();
+    });
+    
+    fileInput.addEventListener("change", (e) => {
+        if (e.target.files && e.target.files[0]) {
+            sendMediaMessage(e.target.files[0]);
+            fileInput.value = '';
+        }
+    });
+    
+    document.getElementById("themeToggleBtn").addEventListener("click", toggleTheme);
+    document.getElementById("sendMsgBtn").addEventListener("click", sendUserMessage);
+    document.getElementById("messageInput").addEventListener("keypress", (e) => { if(e.key === "Enter") sendUserMessage(); });
+    document.getElementById("editAvatarBtn").addEventListener("click", () => { let newName = prompt("Digite seu nome:", currentUserName); if(newName && newName.trim()) { currentUserName = newName.trim(); showWarningToast(`Nome atualizado para ${currentUserName}`); renderMessages(); } });
+    document.getElementById("editSocialBtn").addEventListener("click", () => { userSocial.facebook = prompt("Facebook (link):", userSocial.facebook) || ""; userSocial.instagram = prompt("Instagram (link):", userSocial.instagram) || ""; userSocial.whatsapp = prompt("WhatsApp (link):", userSocial.whatsapp) || ""; userSocial.tiktok = prompt("TikTok (link):", userSocial.tiktok) || ""; updateSocialLinks(); showWarningToast("Redes sociais atualizadas!"); });
+    document.getElementById("showMapBtn").addEventListener("click", () => new bootstrap.Modal(document.getElementById('mapModal')).show());
+    document.getElementById("userLanguageSelect").addEventListener("change", (e) => { currentUserLang = e.target.value; renderMessages(); showWarningToast(`Idioma alterado para ${e.target.options[e.target.selectedIndex].text}. As mensagens serão traduzidas automaticamente.`); });
+    document.getElementById("confirmEditBtn").addEventListener("click", confirmEdit);
+    document.getElementById("confirmDeleteBtn").addEventListener("click", confirmDelete);
+    
+    // Evento do botão de screenshot
+    const screenshotBtn = document.getElementById("screenshotBtn");
+    if (screenshotBtn) {
+        screenshotBtn.addEventListener("click", takeScreenshot);
+    }
+    
+    const aiModal = new bootstrap.Modal(document.getElementById('aiModal'));
+    document.getElementById("aiFloatingBtn").addEventListener("click", () => aiModal.show());
+    document.getElementById("askAiBtn").addEventListener("click", () => {
+        const query = document.getElementById("aiQueryInput").value.trim();
+        if (query === "") {
+            showWarningToast("Digite uma pergunta para o assistente.");
+            return;
+        }
+        const answer = getSmartBotResponse(query);
+        const chatBody = document.getElementById("aiChatBody");
+        chatBody.innerHTML += `<div class="msg-bot message-bubble mt-2"><i class="fas fa-robot"></i> ${escapeHtml(answer)}</div>`;
+        document.getElementById("aiQueryInput").value = "";
+        chatBody.scrollTop = chatBody.scrollHeight;
+    });
+    
+    function initGroupsTabs() {
+        document.querySelectorAll(".group-tab").forEach(btn => btn.addEventListener("click", () => {
+            const groupName = btn.getAttribute("data-group");
+            if(groupName && groupsData[groupName]) { 
+                currentGroup = groupName; 
+                document.getElementById("chatHeaderName").innerHTML = groupsData[groupName].name; 
+                renderMessages(); 
+                highlightActiveConversation(); 
+                document.querySelectorAll(".group-tab").forEach(t => t.classList.remove("active-tab")); 
+                btn.classList.add("active-tab"); 
+            }
+        }));
+    }
+    
+    loadConversations(); 
+    renderMessages(); 
+    initGroupsTabs(); 
+    loadHotelCards(); 
+    updateSocialLinks(); 
+    initChatParticles();
+    initMobileSidebar();
+    
+    const bannerHtml = `<div class="glass-panel m-2 p-2 text-center" style="position: relative; z-index: 2;">
+    <span class="text-white"><i class="fas fa-users"></i> Bem-vindo à Comunidade Turística de Malanje <i class="fas fa-hotel"></i></span></div>`;
+    const chatArea = document.querySelector(".chat-area");
+    if(chatArea) chatArea.insertAdjacentHTML("afterbegin", bannerHtml);
+</script>
+</body>
+</html>

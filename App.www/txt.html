@@ -1,0 +1,2043 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Reserve Já | Painel do Hoteleiro — Angola</title>
+    <!-- Bootstrap 5 + Ícones + Fonts -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- html2canvas para captura de ecrã -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            color: #EFFAF5;
+            transition: background 0.3s ease, color 0.2s;
+            background: #0A1210;
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        .carousel-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+        .carousel-bg .carousel-inner, .carousel-bg .carousel-item {
+            height: 100%;
+        }
+        .carousel-bg .carousel-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.65);
+            z-index: -1;
+            pointer-events: none;
+            transition: background 0.3s;
+        }
+        body.light::before {
+            background: rgba(230, 245, 235, 0.88);
+        }
+        body.light {
+            color: #143523;
+        }
+        body.light .glass-bg {
+            background: rgba(240, 250, 245, 0.92);
+            border-color: rgba(60, 110, 80, 0.25);
+            color: #143523;
+        }
+        body.light .sidebar {
+            background: rgba(230, 245, 235, 0.95);
+            border-right-color: rgba(60, 110, 80, 0.3);
+        }
+        body.light .sidebar .nav-link { color: #1C4F3A; }
+        body.light .sidebar .nav-link.active { background: rgba(30, 100, 70, 0.2); color: #0A3B28; }
+        body.light .stat-value { background: linear-gradient(135deg, #1B6B48, #0C4F34); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        body.light .card-flat { background: rgba(235, 248, 240, 0.85); border-color: rgba(60, 110, 80, 0.2); }
+        body.light .product-item { background: rgba(0,0,0,0.03); border: 1px solid rgba(60,110,80,0.2); }
+        body.light .dropdown-menu { background: #f0f8f2; color: #143523; border: 1px solid #6FDE9C; }
+        body.light .chat-widget { background: rgba(240, 248, 242, 0.98); color: #143523; }
+        body.light .chat-bubble-user { background-color: #2a4b2a; color: #f0f0f0; }
+        body.light .chat-bubble-bot { background-color: #3a3a3a; color: #f0f0f0; }
+        .glass-bg {
+            background: rgba(18, 32, 28, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(90, 180, 120, 0.35);
+            border-radius: 20px;
+        }
+        .app-container {
+            display: flex;
+            height: 100%;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        .sidebar {
+            width: 260px;
+            flex-shrink: 0;
+            background: rgba(12, 24, 20, 0.85);
+            backdrop-filter: blur(12px);
+            border-right: 1px solid rgba(90, 180, 120, 0.3);
+            transition: width 0.3s, left 0.3s;
+            overflow-y: auto;
+            z-index: 1000;
+            height: 100%;
+            position: relative;
+        }
+        .sidebar.collapsed { width: 80px; }
+        .sidebar.collapsed .sidebar-brand span,
+        .sidebar.collapsed .nav-link span:not(.menu-icon) { display: none; }
+        .sidebar-brand { padding: 24px 20px; font-size: 1.6rem; font-weight: 800; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(90, 180, 120, 0.3); }
+        .nav-link { color: #E2F0E8; padding: 12px 20px; margin: 4px 8px; display: flex; align-items: center; gap: 14px; font-weight: 500; border-radius: 12px; }
+        .nav-link.active { background: rgba(111, 222, 156, 0.2); border-left: 3px solid #6FDE9C; }
+        .menu-icon { width: 28px; font-size: 1.2rem; text-align: center; }
+        .sidebar-footer { margin-top: auto; padding: 20px; font-size: 0.7rem; text-align: center; border-top: 1px solid rgba(90, 180, 120, 0.2); }
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: rgba(10, 18, 16, 0.4);
+            position: relative;
+            z-index: 1;
+            height: 100%;
+            overflow: hidden;
+        }
+        .main-content .content-scroll {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-bottom: 30px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .topbar {
+            padding: 12px 24px;
+            background: rgba(12, 24, 20, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(90, 180, 120, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 1010;
+            flex-shrink: 0;
+        }
+        .datetime-extenso {
+            margin: 12px 20px 0 20px;
+            border-radius: 28px;
+            padding: 12px 20px;
+            font-weight: 500;
+            backdrop-filter: blur(12px);
+            background: rgba(18, 32, 28, 0.65);
+            border: 1px solid rgba(90, 180, 120, 0.3);
+            font-size: clamp(0.75rem, 3vw, 0.95rem);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .card-flat {
+            background: rgba(18, 32, 28, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(90, 180, 120, 0.25);
+            border-radius: 20px;
+            padding: 1.2rem;
+            transition: 0.2s;
+            height: 100%;
+        }
+        .stat-value {
+            font-size: clamp(1.8rem, 6vw, 2.4rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, #E3FFED, #A5E0BB);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.2;
+        }
+        .farm-map-real {
+            height: 250px;
+            width: 100%;
+            border-radius: 16px;
+            border: none;
+        }
+        .product-item {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            transition: 0.2s;
+            gap: 10px;
+        }
+        .product-item > div:first-child {
+            flex: 1;
+            min-width: 150px;
+        }
+        .product-actions i, .share-buttons i {
+            margin: 0 6px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: 0.2s;
+            font-size: 1.2rem;
+        }
+        .product-actions i:hover, .share-buttons i:hover { opacity: 1; color: #6FDE9C; }
+        .btn-outline-glass {
+            background: transparent;
+            border: 1px solid rgba(111, 222, 156, 0.6);
+            color: inherit;
+            padding: 6px 16px;
+            transition: 0.2s;
+            border-radius: 40px;
+            white-space: nowrap;
+        }
+        .btn-outline-glass:hover { background: rgba(111, 222, 156, 0.2); }
+        .theme-switch-wrapper { display: flex; align-items: center; }
+        .theme-switch { position: relative; display: inline-block; width: 60px; height: 30px; }
+        .theme-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #2c3e2f; transition: 0.3s; border-radius: 34px; display: flex; align-items: center; justify-content: space-between; padding: 0 6px; }
+        .slider:before { position: absolute; content: ""; height: 24px; width: 24px; left: 3px; bottom: 3px; background-color: white; transition: 0.3s; border-radius: 50%; z-index: 2; }
+        input:checked + .slider { background-color: #6FDE9C; }
+        input:checked + .slider:before { transform: translateX(30px); }
+        .avatar-img { width: 42px; height: 42px; object-fit: cover; border-radius: 50%; border: 1px solid #6FDE9C; cursor: pointer; }
+        .real-clock { font-family: monospace; font-size: 0.8rem; background: rgba(0,0,0,0.3); padding: 4px 12px; border-radius: 40px; }
+        .dropdown-menu { background: rgba(20, 35, 30, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(111, 222, 156, 0.5); border-radius: 20px; box-shadow: 0 12px 28px rgba(0,0,0,0.3); padding: 8px; }
+        .dropdown-item { border-radius: 12px; color: #EFFAF5; transition: 0.2s; }
+        .dropdown-item:hover { background: rgba(111, 222, 156, 0.2); color: #6FDE9C; }
+
+        .btn-preview {
+            background: linear-gradient(135deg, #6FDE9C, #4CAF50);
+            border: none;
+            color: #0A1210;
+            font-weight: bold;
+            margin-top: 10px;
+            width: 100%;
+        }
+        .btn-preview:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(111, 222, 156, 0.4);
+        }
+
+        .image-upload-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+        .image-preview-item {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #6FDE9C;
+        }
+        .image-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .remove-image-btn {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+            border: none;
+        }
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            gap: 5px;
+        }
+        .star-rating input {
+            display: none;
+        }
+        .star-rating label {
+            font-size: 24px;
+            color: #ddd;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .star-rating label:hover,
+        .star-rating label:hover ~ label,
+        .star-rating input:checked ~ label {
+            color: #ffc107;
+        }
+        .promotion-badge {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        .validation-modal .modal-content {
+            background: linear-gradient(135deg, #1a2e26, #0f201a);
+            border: 2px solid #6FDE9C;
+        }
+        .validation-success {
+            background: rgba(111, 222, 156, 0.2);
+            border: 1px solid #6FDE9C;
+            border-radius: 12px;
+            padding: 15px;
+        }
+        .preview-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .share-buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .share-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s;
+            border: none;
+        }
+        .share-btn:hover {
+            transform: scale(1.1);
+        }
+        .share-facebook { background: #1877f2; }
+        .share-whatsapp { background: #25d366; }
+        .share-twitter { background: #1da1f2; }
+        .share-instagram { background: linear-gradient(45deg, #f09433, #d62976); }
+        .share-download { background: #6c757d; }
+
+        .card-add-hotel {
+            background: rgba(111, 222, 156, 0.1);
+            border: 2px dashed rgba(111, 222, 156, 0.5);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .card-add-hotel:hover {
+            background: rgba(111, 222, 156, 0.2);
+            border-color: #6FDE9C;
+            transform: translateY(-3px);
+        }
+        .card-add-hotel .plus-icon {
+            font-size: 48px;
+            color: #6FDE9C;
+            background: rgba(111, 222, 156, 0.2);
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .card-add-hotel:hover .plus-icon {
+            background: #6FDE9C;
+            color: #0A1210;
+            transform: scale(1.05);
+        }
+        .card-add-hotel h6 {
+            margin: 0;
+            color: #6FDE9C;
+            font-weight: 600;
+        }
+        .card-add-hotel small {
+            opacity: 0.7;
+            font-size: 0.75rem;
+        }
+        body.light .card-add-hotel {
+            background: rgba(27, 107, 72, 0.1);
+            border-color: rgba(27, 107, 72, 0.4);
+        }
+        body.light .card-add-hotel h6 {
+            color: #1B6B48;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                top: 0;
+                height: 100%;
+                width: 260px;
+                transition: left 0.3s ease;
+                z-index: 1050;
+            }
+            .sidebar.mobile-open { left: 0; }
+            .menu-toggle { display: block !important; }
+            .topbar { padding: 12px 16px; }
+            .datetime-extenso { flex-direction: column; text-align: center; margin: 8px 12px 0 12px; }
+            .product-item { flex-direction: column; align-items: flex-start; }
+            .product-item > div:last-child { align-self: flex-end; width: 100%; display: flex; justify-content: space-between; margin-top: 8px; }
+            .share-buttons, .product-actions { display: flex; gap: 12px; }
+            .chat-widget { width: calc(100% - 24px); right: 12px; left: 12px; bottom: 80px; max-width: 400px; margin: 0 auto; }
+            .floating-social { bottom: 16px; right: 16px; gap: 8px; }
+            .social-icon { width: 42px; height: 42px; font-size: 1.3rem; }
+            .stat-value { font-size: 1.8rem; }
+            .card-flat h5 { font-size: 1.1rem; }
+            .sidebar-brand { padding: 16px; font-size: 1.3rem; }
+            .btn-outline-glass { padding: 4px 12px; font-size: 0.85rem; white-space: normal; }
+        }
+        @media (max-width: 480px) {
+            .topbar { flex-direction: column; align-items: stretch; text-align: center; }
+            .topbar .d-flex:last-child { justify-content: center; flex-wrap: wrap; }
+            .theme-switch-wrapper, .dropdown, .real-clock { margin: 4px 0; }
+            .farm-map-real { height: 200px; }
+        }
+        .menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; background: none; border: none; color: #6FDE9C; }
+        .modal-content { background: #1A2E26; color: #EFFAF5; border-radius: 24px; }
+        body.light .modal-content { background: #F0F8F2; color: #143523; }
+        .hidden { display: none !important; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #1A2E26; }
+        ::-webkit-scrollbar-thumb { background: #6FDE9C; }
+        .floating-social {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 1100;
+        }
+        .social-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            color: white;
+            transition: 0.2s;
+            text-decoration: none;
+            border: 1px solid rgba(111, 222, 156, 0.5);
+            cursor: pointer;
+        }
+        .social-icon:hover { transform: scale(1.1); background: #6FDE9C; color: #0A1210; }
+        .chatbot-btn { background: #1B6B48; color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .chat-widget {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 320px;
+            background: rgba(20, 35, 30, 0.95);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            border: 1px solid #6FDE9C;
+            z-index: 1150;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+        .chat-header {
+            background: #0F2A20;
+            padding: 12px 15px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #6FDE9C;
+        }
+        .chat-messages {
+            height: 260px;
+            overflow-y: auto;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .chat-msg-wrapper { display: flex; width: 100%; margin-bottom: 6px; }
+        .chat-msg-user { justify-content: flex-end; }
+        .chat-msg-bot { justify-content: flex-start; }
+        .chat-bubble-user {
+            background-color: #dcf8c5;
+            border-radius: 15px 15px 5px 15px;
+            padding: 8px 12px;
+            max-width: 85%;
+            text-align: right;
+            color: #000000;
+        }
+        .chat-bubble-bot {
+            background-color: #f1f0f0;
+            border-radius: 15px 15px 15px 5px;
+            padding: 8px 12px;
+            max-width: 85%;
+            text-align: left;
+            color: #000000;
+        }
+        .chat-input-area {
+            display: flex;
+            border-top: 1px solid rgba(111,222,156,0.4);
+            padding: 8px;
+            gap: 6px;
+        }
+        .chat-input-area input {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            outline: none;
+            color: inherit;
+            padding: 8px 12px;
+            border-radius: 50px;
+            min-width: 0;
+        }
+        .product-images-gallery {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+            flex-wrap: wrap;
+        }
+        .product-images-gallery img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .share-buttons i { font-size: 1.2rem; margin: 0 4px; cursor: pointer; color: #6FDE9C; }
+        .btn-outline-adaptive {
+            background: transparent;
+            border: 1px solid #6FDE9C;
+            border-radius: 40px;
+            padding: 4px 12px;
+            color: inherit;
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+        .logo-maker {
+            border-radius: 50px;
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+        }
+        .logo-panel {
+            border-radius: 50px;
+            width: 30px;
+            height: 30px;
+            vertical-align: middle;
+        }
+        .logo-point {
+            max-width: 100px;
+            height: auto;
+        }
+        img, svg {
+            max-width: 100%;
+            height: auto;
+        }
+        .container-especialista {
+            text-align: center;
+            padding: 6px;
+            border-top: 1px solid rgba(111,222,156,0.3);
+        }
+        #salesChartCanvas {
+            max-height: 200px;
+            width: 100% !important;
+        }
+        .form-control, .form-select {
+            background-color: rgba(0,0,0,0.2);
+            border: 1px solid rgba(111,222,156,0.5);
+            color: inherit;
+        }
+        body.light .form-control, body.light .form-select {
+            background-color: rgba(0,0,0,0.05);
+        }
+        .modal-body .form-control {
+            margin-bottom: 12px;
+        }
+        
+        .gm-style .gm-style-iw-c {
+            background: #1A2E26 !important;
+            color: #EFFAF5 !important;
+            border-radius: 16px !important;
+        }
+        body.light .gm-style .gm-style-iw-c {
+            background: #F0F8F2 !important;
+            color: #143523 !important;
+        }
+        
+        /* Estilo para área de captura de screenshot */
+        #screenshotCaptureArea {
+            background: inherit;
+            padding: 20px;
+            border-radius: 20px;
+        }
+        
+        /* =======================================CSS ADD================================= */
+          /* --- Ícone flutuante tipo raio (triggers) --- */
+        .lightshot-trigger {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(145deg, #3f5b8a, #0f172a);
+            border-radius: 28px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 1000;
+            backdrop-filter: blur(2px);
+        }
+        .lightshot-trigger i {
+            font-size: 28px;
+            color: #ffb347;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+            transition: 0.2s;
+        }
+        .lightshot-trigger:hover {
+            transform: scale(1.08);
+            background: linear-gradient(145deg, #2d3a4e, #0f172a);
+            box-shadow: 0 15px 25px rgba(0,0,0,0.3);
+        }
+        .lightshot-trigger:hover i {
+            color: #ffcc66;
+        }
+
+        /* --- Mini barra de ferramentas (overlay flutuante, estilo LightShot) --- */
+        .toolbar-panel {
+            position: fixed;
+            bottom: 100px;
+            right: 28px;
+            background: rgba(20, 25, 35, 0.92);
+            backdrop-filter: blur(18px);
+            border-radius: 60px;
+            padding: 10px 18px;
+            box-shadow: 0 20px 35px -8px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.15);
+            z-index: 1001;
+            display: flex;
+            gap: 20px;
+            transition: 0.2s;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .toolbar-panel.hidden {
+            display: none;
+        }
+        .tool-btn {
+            background: transparent;
+            border: none;
+            color: #e2e8f0;
+            font-size: 22px;
+            cursor: pointer;
+            transition: 0.15s;
+            width: 44px;
+            height: 44px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .tool-btn:hover {
+            background: rgba(255, 180, 70, 0.25);
+            color: #ffb347;
+            transform: scale(1.05);
+        }
+        .tool-btn.active {
+            background: #ffb347;
+            color: #1e1f2c;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .color-picker-tool {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid white;
+            cursor: pointer;
+            background: #ffb347;
+            margin-top: 4px;
+        }
+        .divider {
+            width: 1px;
+            background: rgba(255,255,255,0.25);
+            margin: 8px 0;
+        }
+        /* Área de pré-visualização / editor (subtile, só aparece após captura) */
+        .editor-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.96);
+            background: #0f1219dd;
+            backdrop-filter: blur(20px);
+            border-radius: 32px;
+            padding: 20px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.4);
+            z-index: 1050;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: 0.2s;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            max-width: 90vw;
+            max-height: 85vh;
+        }
+        .editor-container.show {
+            display: flex;
+        }
+        .canvas-wrapper {
+            background: #1e1f2c;
+            border-radius: 24px;
+            padding: 8px;
+            box-shadow: inset 0 0 6px #00000055, 0 8px 20px rgba(0,0,0,0.3);
+        }
+        canvas {
+            display: block;
+            border-radius: 18px;
+            max-width: 100%;
+            height: auto;
+            cursor: crosshair;
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .editor-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .editor-actions button {
+            background: rgba(30,35,48,0.9);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: 0.2s;
+            backdrop-filter: blur(4px);
+        }
+        .editor-actions button i {
+            margin-right: 8px;
+        }
+        .editor-actions button:hover {
+            background: #ffb347;
+            color: #121212;
+            transform: translateY(-2px);
+        }
+        .close-editor {
+            position: absolute;
+            top: 18px;
+            right: 22px;
+            background: rgba(0,0,0,0.5);
+            border: none;
+            color: white;
+            font-size: 20px;
+            border-radius: 30px;
+            width: 36px;
+            height: 36px;
+        }
+        /* máscara de seleção (estilo lightshot puro) */
+        .selection-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.65);
+            z-index: 10000;
+            cursor: crosshair;
+        }
+        .selection-box {
+            position: absolute;
+            border: 2.5px solid #ffb347;
+            background: rgba(255, 180, 71, 0.08);
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.55);
+            display: none;
+        }
+        .toast-custom {
+            background: #1a1e2a;
+            color: #f0f0f0;
+            border-left: 6px solid #ffb347;
+        }
+        @media (max-width: 640px) {
+            .toolbar-panel { gap: 12px; padding: 8px 16px; bottom: 90px; right: 16px; }
+            .tool-btn { width: 38px; height: 38px; font-size: 18px; }
+            .editor-actions button { padding: 5px 12px; font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="bgCarousel" class="carousel-bg carousel slide" data-bs-ride="carousel" data-bs-interval="8000">
+        <div class="carousel-inner">
+            <div class="carousel-item active"><img src="https://via.placeholder.com/1920x1080/1a4d3a/ffffff?text=Resort+Luxo" alt="Hotel1"></div>
+            <div class="carousel-item"><img src="https://via.placeholder.com/1920x1080/2a5d4a/ffffff?text=Hotel+Premium" alt="Hotel2"></div>
+            <div class="carousel-item"><img src="https://via.placeholder.com/1920x1080/3a6d5a/ffffff?text=Suite+Deluxe" alt="Hotel3"></div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#bgCarousel" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
+        <button class="carousel-control-next" type="button" data-bs-target="#bgCarousel" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
+    </div>
+
+    <div class="app-container">
+        <aside class="sidebar" id="mainSidebar">
+            <div class="sidebar-brand"><span>Reserve Já</span></div>
+            <div class="d-flex justify-content-end p-2">
+                <i class="fas fa-chevron-left" id="compactSidebarBtn" style="cursor:pointer; color:#6FDE9C;"></i>
+            </div>
+            <nav class="nav flex-column">
+                <a href="dashboard-hotel.html" class="nav-link "><i class="fas fa-tachometer-alt menu-icon"></i> <span>Dashboard</span></a>
+                <a href="#" class="nav-link active"><i class="fas fa-hotel menu-icon"></i> <span>Meus Hotéis</span></a>
+                <a href="splash.html" class="nav-link"><i class="fas fa-chart-line menu-icon"></i> <span>Reservas</span></a>
+                <a href="market.html" class="nav-link"><i class="fas fa-store menu-icon"></i> <span>Mercado Hoteleiro</span></a>
+                <a href="403.html" class="nav-link"><i class="fas fa-users menu-icon"></i> <span>Hóspedes</span></a>
+            </nav>
+            <div class="sidebar-footer"><i class="fas fa-umbrella-beach"></i> Temporada 2026</div>
+        </aside>
+
+        <div class="main-content">
+            <div class="topbar">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="menu-toggle" id="mobileMenuToggle">
+                        <i class="fas fa-bars fa-lg"></i>
+                    </div>
+                    <h5 class="mb-0">
+                        <a href="login.html">
+                            <img src="images/palanca-real-rbg.png" class="logo-point" alt="Reserve Já">
+                        </a>
+                    </h5>
+                </div>
+                <div class="d-flex gap-3 align-items-center flex-wrap">
+                    <div id="weatherWidget"><i class="fas fa-cloud-sun"></i> <span id="weatherTemp">--°C</span> <span id="weatherDesc">carregando...</span></div>
+                    <div class="timer-ring" id="timerWidget" style="position:relative; width:48px; height:48px; cursor:pointer;">
+                        <svg width="48" height="48"><circle cx="24" cy="24" r="21" fill="none" stroke="rgba(200,240,210,0.3)" stroke-width="3"></circle><circle cx="24" cy="24" r="21" fill="none" stroke="#6FDE9C" stroke-width="3" stroke-dasharray="131.95" stroke-dashoffset="0" id="timerProgressCircle"></circle></svg>
+                        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:0.65rem; font-weight:700;" id="timerText">15:00</div>
+                    </div>
+                    <div class="theme-switch-wrapper">
+                        <label class="theme-switch">
+                            <input type="checkbox" id="themeToggleCheckbox">
+                            <div class="slider">
+                                <i class="fas fa-sun"></i>
+                                <i class="fas fa-moon"></i>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn-outline-glass dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-globe"></i> <span id="langLabel">PT</span></button>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item lang-opt" data-lang="pt">🇵🇹 Português</a></li>
+                            <li><a class="dropdown-item lang-opt" data-lang="en">🇺🇸 English</a></li>
+                            <li><a class="dropdown-item lang-opt" data-lang="fr">🇫🇷 Français</a></li>
+                        </ul>
+                    </div>
+                    <div class="dropdown">
+                        <img id="profileAvatar" class="avatar-img" src="https://randomuser.me/api/portraits/men/32.jpg" data-bs-toggle="dropdown" alt="Avatar">
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" id="profileOption"><i class="fas fa-id-card"></i> Meu Perfil</a></li>
+                            <li><a class="dropdown-item" id="changeAvatarOption"><i class="fas fa-camera"></i> Alterar foto</a></li>
+                            <li><a href="#" class="dropdown-item" id="changePasswordOption"><i class="fas fa-key"></i> Alterar senha</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a href="#" class="dropdown-item" id="logoutOption"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="content-scroll">
+                <div class="datetime-extenso d-flex justify-content-between flex-wrap">
+                    <span><i class="far fa-calendar-alt me-2"></i> <span id="fullDateExtenso">Carregando...</span></span>
+                    <span><i class="far fa-clock me-2"></i> <span id="fullTimeExtenso">--:--:--</span></span>
+                </div>
+                <div class="p-3">
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card-flat">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                    <div>
+                                        <h4><span id="welcomeMsg">Boas-vindas</span>, <span id="hotelOwnerName">Hoteleiro</span>!</h4>
+                                        <p id="welcomeSub">Bem-vindo ao seu painel de gestão. Cadastre hotéis, serviços e divulgue nas redes sociais.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Formulário de Cadastro de Quarto/Serviço -->
+                    <div class="card-flat mb-4" id="roomRegistrationForm">
+                        <h5 class="mb-3"><i class="fas fa-bed"></i> Cadastrar Quarto / Serviço</h5>
+                        <div class="row g-3">
+                            <div class="col-md-2">
+                                <!-- Card subtil com PLUS para adicionar novo hotel -->
+                                <div class="card-add-hotel" id="cardAddHotel">
+                                    <div class="plus-icon">
+                                        <i class="fas fa-plus"></i>
+                                    </div>
+                                    <h6>Novo Hotel</h6>
+                                    <small>Validar estabelecimento</small>
+                                </div>
+                            </div>
+                            
+                            
+                                
+                                <div class="row g-2">
+                                    
+                                    <div class="col-md-6">
+                                        <label class="form-label">Selecione o Hotel *</label>
+                                        <select id="hotelSelect" class="form-select">
+                                            <option value="">-- Selecione um hotel --</option>
+                                            <option value="Palanca Hotel">Palanca Hotel</option>
+                                            <option value="Hotel Palácio Regina">Hotel Palácio Regina</option>
+                                            <option value="Hotel Mbanza Marimba">Hotel Mbanza Marimba</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Tipo de Quarto *</label>
+                                        <input type="text" id="roomType" class="form-control" placeholder="Ex: Suíte Presidencial, Quarto Standard, Luxo...">
+                                    </div>
+                                    
+                                </div>
+                            
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Tipo de Serviços</label>
+                                <input type="text" id="serviceType" class="form-control" placeholder="Ex: Spa, Restaurante, Piscina, Estacionamento...">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Preço por noite (Kz) *</label>
+                                <input type="number" id="roomPrice" class="form-control" placeholder="Ex: 35000">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Avaliação (Estrelas)</label>
+                                <div class="star-rating">
+                                    <input type="radio" id="star5" name="rating" value="5"><label for="star5" title="5 estrelas">★</label>
+                                    <input type="radio" id="star4" name="rating" value="4"><label for="star4" title="4 estrelas">★</label>
+                                    <input type="radio" id="star3" name="rating" value="3"><label for="star3" title="3 estrelas">★</label>
+                                    <input type="radio" id="star2" name="rating" value="2"><label for="star2" title="2 estrelas">★</label>
+                                    <input type="radio" id="star1" name="rating" value="1"><label for="star1" title="1 estrela">★</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-12">
+                                <div class="form-check">
+                                    <input type="checkbox" id="promotionCheck" class="form-check-input">
+                                    <label class="form-check-label" for="promotionCheck">
+                                        <i class="fas fa-tag"></i> Marcar como promoção (desconto especial)
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Descrição do Quarto</label>
+                                <textarea id="roomDescription" class="form-control" rows="3" placeholder="Descreva os detalhes do quarto, comodidades, vista..."></textarea>
+                                <button type="button" id="generateDescBtn" class="btn-outline-glass btn-sm mt-2">
+                                    <i class="fas fa-magic"></i> Gerar descrição com IA
+                                </button>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Imagens do Quarto (máximo 5 imagens)</label>
+                                <input type="file" id="roomImages" class="form-control" accept="image/*" multiple>
+                                <div id="imagePreviewContainer" class="image-upload-container mt-2"></div>
+                                <small class="text-muted">Pode selecionar até 5 imagens do quarto</small>
+                            </div>
+                            <div class="col-12">
+                                <button id="registerRoomBtn" class="btn-outline-glass w-100">
+                                    <i class="fas fa-save"></i> Cadastrar e Partilhar
+                                </button>
+                                <button class="btn-outline-glass btn-preview" id="previewResultsBtn">
+                                    <i class="fas fa-eye"></i> Pré-visualizar Produto
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Área para captura de ecrã (resultados) -->
+                    <div id="screenshotCaptureArea">
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6"><div class="card-flat">
+                                <h5>
+                                    <i class="fas fa-map-marker-alt"></i> Localização do seu hotel - Malanje</h5>
+                                <!--
+                                <div id="realMap" 
+                                     class="farm-map-real" 
+                                     style="height: 200px; background: #1a2a1f; border-radius: 12px;">
+                                </div>
+                                -->
+                                <iframe 
+                                    style="width: 100%; height: 90%"
+                                src="https://maps.google.com/maps?q=Bairro%20Ritondo%2C%20Malanje%2C%20Angola&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+                                allowfullscreen="" 
+                                loading="lazy" 
+                                referrerpolicy="no-referrer-when-downgrade">
+                            </iframe>
+                                
+                                <div class="mt-2 small text-center">Malanje, Angola</div></div>
+                            </div>
+                            <div class="col-md-6"><div class="card-flat"><h5><i class="fas fa-chart-line"></i> Estatísticas Rápidas</h5><div class="row text-center"><div class="col-6"><div class="stat-value" id="totalRoomsCount">0</div><small>Quartos Cadastrados</small></div><div class="col-6"><div class="stat-value" id="totalHotelsCount">0</div><small>Hotéis Ativos</small></div></div></div></div>
+                        </div>
+                        <div class="row"><div class="col-12">
+                            <div class="card-flat"><h5><i class="fas fa-list-ul"></i> Meus Quartos / Serviços Cadastrados</h5><div id="productsListContainer"><p class="text-muted">Nenhum quarto cadastrado ainda. Utilize o formulário acima para cadastrar.</p></div></div></div>
+                        </div>
+                        <div class="row g-3 mt-2"><div class="col-md-12"><div class="card-flat"><h5><i class="fas fa-chart-bar"></i> Reservas Simuladas (últimos 7 dias)</h5><canvas id="salesChartCanvas" style="max-height:200px; width:100%"></canvas></div></div></div>
+                    </div>
+                    <div class="text-center small mt-3 pb-3"><a href="#">© 2026 Reserve Já - Angola</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE VALIDAÇÃO PARA HOTEL "OUTROS" -->
+    <div class="modal fade" id="hotelValidationModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content validation-modal">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-shield-alt"></i> 🔒 SISTEMA INTELIGENTE DE VALIDAÇÃO HOTELEIRA</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> <strong>Validação Anti-Fraude</strong><br>
+                        Apenas hotéis autênticos da província de Malanje são aceites. Preencha todos os campos obrigatórios.
+                    </div>
+                    <div id="validationForm">
+                        <label class="form-label mt-2"><i class="fas fa-hotel"></i> Nome Oficial do Hotel *</label>
+                        <input type="text" id="hotelNomeValidacao" class="form-control" placeholder="Ex: Hotel Kalandula Resort">
+                        
+                        <label class="form-label mt-2"><i class="fas fa-map-marker-alt"></i> Endereço Completo *</label>
+                        <input type="text" id="hotelEnderecoValidacao" class="form-control" placeholder="Município, Rua, Bairro...">
+                        
+                        <label class="form-label mt-2"><i class="fas fa-id-card"></i> NIF / Número de Registo *</label>
+                        <input type="text" id="hotelNifValidacao" class="form-control" placeholder="NIF ou Número de Licença">
+                        
+                        <label class="form-label mt-2"><i class="fas fa-phone"></i> Telefone de Contacto *</label>
+                        <input type="text" id="hotelTelefoneValidacao" class="form-control" placeholder="+244 XXX XXX XXX">
+                        
+                        <label class="form-label mt-2"><i class="fas fa-envelope"></i> Email do Hotel *</label>
+                        <input type="email" id="hotelEmailValidacao" class="form-control" placeholder="hotel@exemplo.com">
+                        
+                        <label class="form-label mt-2"><i class="fas fa-file-alt"></i> Documento Comprovativo *</label>
+                        <input type="file" id="hotelDocumentoValidacao" class="form-control" accept="image/*,.pdf">
+                        <small class="text-muted">Envie: Licença de funcionamento, Alvará ou Documento de identificação do responsável</small>
+                        
+                        <label class="form-label mt-2"><i class="fas fa-image"></i> Foto da Fachada *</label>
+                        <input type="file" id="hotelFachadaValidacao" class="form-control" accept="image/*">
+                    </div>
+                    <div id="validationMessage" class="mt-3"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-outline-glass" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn-outline-glass" id="submitValidationBtn" style="background:#6FDE9C; color:#0A1210;">
+                        <i class="fas fa-check-circle"></i> Enviar para Validação
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE PRÉ-VISUALIZAÇÃO DO PRODUTO -->
+    <div class="modal fade" id="previewProductModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-eye"></i> Pré-visualização do Produto</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="previewProductContent"></div>
+                <div class="modal-footer">
+                    <button class="btn-outline-glass" data-bs-dismiss="modal">Fechar</button>
+                    <button class="btn-outline-glass" id="capturePreviewBtn" style="background:#6FDE9C; color:#0A1210;">
+                        <i class="fas fa-camera"></i> Capturar Ecrã e Partilhar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE PARTILHA DE IMAGEM CAPTURADA -->
+    <div class="modal fade" id="shareImageModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-share-alt"></i> Partilhar Imagem Capturada</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div id="capturedImagePreview" style="max-height: 400px; overflow-y: auto; margin-bottom: 20px; border-radius: 12px; border: 1px solid rgba(111,222,156,0.3);"></div>
+                    <p><strong>Partilhe esta oferta nas redes sociais:</strong></p>
+                    <div class="share-buttons-container">
+                        <button class="share-btn share-facebook" id="shareImageFacebook"><i class="fab fa-facebook-f"></i></button>
+                        <button class="share-btn share-whatsapp" id="shareImageWhatsApp"><i class="fab fa-whatsapp"></i></button>
+                        <button class="share-btn share-twitter" id="shareImageTwitter"><i class="fab fa-twitter"></i></button>
+                        <button class="share-btn share-instagram" id="shareImageInstagram"><i class="fab fa-instagram"></i></button>
+                        <button class="share-btn share-download" id="downloadImageBtn"><i class="fas fa-download"></i></button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-outline-glass" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAIS DE PERFIL E OUTROS -->
+    <div class="modal fade" id="profileEditModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title"><i class="fas fa-user-edit"></i> Editar Perfil</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body"><input type="text" id="editNome" class="form-control mb-2" placeholder="Nome completo"><input type="tel" id="editTelefone" class="form-control mb-2" placeholder="Telefone"><input type="text" id="editFazenda" class="form-control mb-2" placeholder="Localização do hotel"><textarea id="editBio" class="form-control mb-2" rows="2" placeholder="Descrição / Serviços"></textarea><label class="form-label">Foto de perfil</label><input type="file" id="editAvatarInput" accept="image/*" class="form-control"></div><div class="modal-footer flex-wrap gap-2"><button type="button" class="btn-outline-glass" id="deleteProfileBtn" style="border-color:#dc3545;"><i class="fas fa-trash-alt"></i> Eliminar Conta</button><button type="button" class="btn-outline-glass" data-bs-dismiss="modal">Cancelar</button><button type="button" class="btn-outline-glass" id="saveProfileBtn">Guardar</button></div></div></div></div>
+    
+    <div class="modal fade" id="deleteProfileConfirmModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title text-danger"><i class="fas fa-exclamation-triangle"></i> Eliminar Conta</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><p>Tem certeza que deseja eliminar permanentemente a sua conta e todos os seus hotéis? Esta ação é irreversível.</p></div><div class="modal-footer"><button class="btn-outline-glass" data-bs-dismiss="modal">Cancelar</button><button class="btn-outline-glass" id="confirmDeleteAccountBtn" style="background:#dc3545; color:white;">Sim, Eliminar</button></div></div></div></div>
+
+    <div class="modal fade" id="editProductModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title"><i class="fas fa-edit"></i> Editar Quarto</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><input type="text" id="editProdNome" class="form-control mb-2" placeholder="Nome do hotel"><input type="text" id="editRoomType" class="form-control mb-2" placeholder="Tipo de quarto"><input type="number" id="editProdPreco" class="form-control mb-2" placeholder="Preço por noite (Kz)"><textarea id="editProdDescricao" class="form-control mb-2" rows="2" placeholder="Descrição"></textarea><label class="form-label">Avaliação</label><select id="editProdRating" class="form-control mb-2"><option value="1">⭐</option><option value="2">⭐⭐</option><option value="3">⭐⭐⭐</option><option value="4">⭐⭐⭐⭐</option><option value="5">⭐⭐⭐⭐⭐</option></select><div class="form-check mb-2"><input type="checkbox" id="editPromotionCheck" class="form-check-input"><label class="form-check-label">Em promoção</label></div><label>Imagens atuais</label><div id="editProdImgPreview"></div><input type="file" id="editProdImagem" accept="image/*" multiple class="form-control"></div><div class="modal-footer"><button class="btn-outline-glass" data-bs-dismiss="modal">Cancelar</button><button class="btn-outline-glass" id="saveProductEditBtn">Guardar</button></div></div></div></div>
+    
+    <div class="modal fade" id="deleteProductModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title text-danger"><i class="fas fa-trash-alt"></i> Eliminar Quarto</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><p>Deseja realmente eliminar este quarto?</p></div><div class="modal-footer"><button class="btn-outline-glass" data-bs-dismiss="modal">Cancelar</button><button class="btn-outline-glass" id="confirmDeleteProductBtn">Eliminar</button></div></div></div></div>
+
+    <div class="modal fade" id="shareModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Partilhar Serviço</h5></div><div class="modal-body text-center"><p>Quarto/ Serviço cadastrado com sucesso!</p><div class="d-flex justify-content-around flex-wrap gap-2"><button id="shareFacebookBtn" class="btn-outline-glass"><i class="fab fa-facebook"></i> Facebook</button><button id="shareWhatsAppBtn" class="btn-outline-glass"><i class="fab fa-whatsapp"></i> WhatsApp</button><button id="shareInstagramBtn" class="btn-outline-glass"><i class="fab fa-instagram"></i> Instagram</button></div></div><div class="modal-footer"><button class="btn-outline-glass" data-bs-dismiss="modal">Fechar</button></div></div></div></div>
+
+    <div class="modal fade" id="renewSessionModal" data-bs-backdrop="static" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title"><i class="fas fa-hourglass-half"></i> Sessão a expirar</h5></div><div class="modal-body"><p>Tem a certeza que pretende terminar a sessão?</p><p class="small text-muted">Faltam 2 minutos para o término automático.</p></div><div class="modal-footer">
+        <button id="renewNoBtn" class="btn-outline-glass" style="border-color:#dc3545;"><i class="fas fa-sign-out-alt"></i> Sim, Terminar</button>
+        <button id="renewYesBtn" class="btn-outline-glass"><i class="fas fa-sync-alt"></i> Renovar Sessão</button></div></div></div></div>
+
+    <div class="floating-social">
+        <a id="lightningTrigger" href="#" role="button" aria-label="Lightning trigger" class="social-icon"><i class="fas fa-bolt"></i></a>
+        
+        <a href="https://facebook.com/reserveja.ao" target="_blank" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+        <a href="https://instagram.com/reserveja.ao" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>
+        <a href="https://wa.me/244923456789" target="_blank" class="social-icon"><i class="fab fa-whatsapp"></i></a>
+        <div class="social-icon chatbot-btn" id="chatWidgetBtn">
+            <img class="logo-maker" src="images/Muami.png" alt="Bot">
+        </div>
+    </div>
+
+    <div id="chatWidget" class="chat-widget">
+        <div class="chat-header">
+            <span><img class="logo-panel" src="images/Muami.png" onerror="this.src='https://via.placeholder.com/24'" alt="Bot"> M.W.A.M.I</span>
+            <i class="fas fa-times" id="closeChatBtn" style="cursor:pointer;"></i>
+        </div>
+        <div id="chatMessages" class="chat-messages"></div>
+        <div class="container-especialista text-center">
+            <a href="#" class="btn-outline-adaptive" id="falarEspecialista">Falar com Consultor Hoteleiro</a>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="Pergunte...">
+            <button id="chatSend" class="btn btn-sm" style="background:#6FDE9C; border-radius: 50px; color:#0A1210;">➤</button>
+        </div>
+    </div>
+
+    <input type="file" id="avatarUpload" accept="image/*" style="display:none;">
+    
+    
+    
+    <!-- ==================================================HTML5 ADD===================================================================== -->
+<!-- Barra de ferramentas flutuante minimal (aparece após captura) -->
+    <!-- Barra de ferramentas flutuante minimal (aparece após captura) -->
+    <div id="floatingTools" class="toolbar-panel hidden">
+        <button class="tool-btn" id="toolRectFs" title="Retângulo"><i class="fas fa-square"></i></button>
+        <button class="tool-btn" id="toolArrowFs" title="Seta"><i class="fas fa-arrow-right"></i></button>
+        <button class="tool-btn" id="toolTextFs" title="Texto"><i class="fas fa-font"></i></button>
+        <button class="tool-btn" id="toolPenFs" title="Pincel"><i class="fas fa-pencil-alt"></i></button>
+        <button class="tool-btn" id="undoFs" title="Desfazer"><i class="fas fa-undo-alt"></i></button>
+        <input type="color" id="colorPickerFs" value="#ffb347" class="color-picker-tool" title="Cor">
+        <div class="divider"></div>
+        <button class="tool-btn" id="saveImgFs" title="Guardar PNG"><i class="fas fa-save"></i></button>
+        <button class="tool-btn" id="copyImgFs" title="Copiar imagem"><i class="fas fa-copy"></i></button>
+        <button class="tool-btn" id="shareFs" title="Partilhar link"><i class="fas fa-share-alt"></i></button>
+    </div>
+
+    <!-- Editor principal (canvas) que aparece após captura -->
+    <div id="editorModal" class="editor-container">
+        <button id="closeEditorBtn" class="close-editor"><i class="fas fa-times"></i></button>
+        <div class="canvas-wrapper">
+            <canvas id="editorCanvas" width="700" height="400" style="width:100%; height:auto; max-width:700px;"></canvas>
+        </div>
+        <div class="editor-actions">
+            <button id="downloadCanvasBtn"><i class="fas fa-download"></i></button>
+            <button id="copyCanvasBtn"><i class="fas fa-clipboard"></i></button>
+            <button id="shareLinkBtn"><i class="fas fa-link"></i> </button>
+            <button id="clearAnnotationsBtn"><i class="fas fa-trash-alt"></i> </button>
+        </div>
+        <small style="margin-top: 12px; color: #ccc;"><i class="fas fa-vector-square"></i> Use as ferramentas flutuantes (⚡ raio) para editar</small>
+    </div>
+
+    <!-- Overlay de seleção de área (captura) -->
+    <div id="selectionOverlay" class="selection-overlay">
+        <div id="selectionBox" class="selection-box"></div>
+    </div>
+    
+    
+    
+    
+    
+    
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDrUYq-PK7D6hRCrh4YQK05w9sp8X9oU5A&callback=initGoogleMap"></script>
+    <script>
+        // DADOS PERFIL E QUARTOS (simulação persistente)
+        let userProfile = JSON.parse(localStorage.getItem("reserveja_userProfile")) || { nome: "João Lourenço", telefone: "+244 938 089 671", fazenda: "Malanje, Angola", bio: "Gestor hoteleiro focado em hospitalidade de excelência.", avatar: null };
+        let quartos = JSON.parse(localStorage.getItem("quartos_vendedor")) || [];
+        let hoteisPersonalizados = JSON.parse(localStorage.getItem("hoteis_personalizados")) || [];
+        let vendasSimuladas = [12500, 14800, 13200, 18900, 21000, 24500, 22800];
+        let currentLang = 'pt';
+        let timeLeftSeconds = 900, timerInterval = null, renewalModalShown = false, renewModalInstance = null, salesChart = null;
+        let editProductIndex = null, deleteProductIndex = null;
+        let currentImages = [];
+        let validationModal = null;
+        let capturedScreenshot = null;
+
+        function gerarDescricaoIA(tipoQuarto, hotelNome) {
+            const descricoes = {
+                "Suíte Presidencial": [
+                    `🏰 EXPERIÊNCIA REAL 🏰\n\nA ${tipoQuarto} do ${hotelNome} oferece o ápice do luxo e conforto. Com mais de 80m², esta suíte dispõe de sala de estar separada, jacuzzi privativa com vista panorâmica, decoração em estilo real africano e serviço de mordomo 24 horas.`,
+                    `👑 ELEGÂNCIA SUPREMA 👑\n\nDesfrute da exclusiva ${tipoQuarto} no ${hotelNome}. Acomodações com mobiliário de design exclusivo, cama king size com lençóis egípcios, banheira de hidromassagem e varanda privativa.`
+                ],
+                "Quarto Standard": [
+                    `🏨 CONFORTO E PRATICIDADE 🏨\n\nO ${tipoQuarto} do ${hotelNome} foi projetado para oferecer todo o conforto que você precisa. Com cama queen size, ar condicionado, TV LCD, frigobar e Wi-Fi de alta velocidade.`,
+                    `💼 SUA BASE EM MALANJE 💼\n\n${tipoQuarto} no ${hotelNome}: Espaço aconchegante e funcional. Inclui mesa de trabalho, banheiro privativo e vista para o jardim interno.`
+                ],
+                "Quarto Luxo": [
+                    `✨ SOFISTICAÇÃO E CONFORTO ✨\n\n${tipoQuarto} do ${hotelNome} combina elegância e funcionalidade. Quarto amplo com decoração refinada, cama king size, banheiro com banheira e varanda privativa.`,
+                    `💎 HOSPEDAGEM PREMIUM 💎\n\nExperimente o ${tipoQuarto} no ${hotelNome}. Com acabamentos de alto padrão, vista panorâmica, acesso à piscina e spa.`
+                ]
+            };
+            let categoria = "Quarto Standard";
+            if(tipoQuarto.includes("Suíte") || tipoQuarto.includes("Presidencial")) categoria = "Suíte Presidencial";
+            else if(tipoQuarto.includes("Luxo")) categoria = "Quarto Luxo";
+            const lista = descricoes[categoria] || descricoes["Quarto Standard"];
+            return lista[Math.floor(Math.random() * lista.length)];
+        }
+
+        function generateRoomDescription() {
+            const hotelSelect = document.getElementById('hotelSelect');
+            const roomType = document.getElementById('roomType').value.trim();
+            const hotelNome = hotelSelect.value;
+            if(!hotelNome || !roomType) {
+                alert('Por favor, selecione o hotel e informe o tipo de quarto primeiro!');
+                return;
+            }
+            const descricao = gerarDescricaoIA(roomType, hotelNome);
+            document.getElementById('roomDescription').value = descricao;
+        }
+
+        function atualizarSelectHoteis() {
+            const select = document.getElementById('hotelSelect');
+            const valorAtual = select.value;
+            while(select.options.length > 3) {
+                select.remove(3);
+            }
+            hoteisPersonalizados.forEach(hotel => {
+                if(hotel.aprovado) {
+                    const option = document.createElement('option');
+                    option.value = hotel.nome;
+                    option.textContent = hotel.nome;
+                    select.appendChild(option);
+                }
+            });
+            let encontrado = false;
+            for(let i = 0; i < select.options.length; i++) {
+                if(select.options[i].value === valorAtual) {
+                    select.selectedIndex = i;
+                    encontrado = true;
+                    break;
+                }
+            }
+            if(!encontrado && valorAtual) select.value = '';
+        }
+
+        function validarHotel(dadosHotel) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    if(dadosHotel.nome && dadosHotel.endereco && dadosHotel.nif && dadosHotel.telefone && dadosHotel.email) {
+                        const aprovado = Math.random() < 0.8;
+                        resolve({ aprovado, mensagem: aprovado ? "✅ Hotel validado com sucesso!" : "❌ Pedido não aprovado. Verifique os documentos." });
+                    } else {
+                        resolve({ aprovado: false, mensagem: "❌ Preencha todos os campos obrigatórios." });
+                    }
+                }, 2000);
+            });
+        }
+
+        function abrirModalValidacao() {
+            const modalElement = document.getElementById('hotelValidationModal');
+            validationModal = new bootstrap.Modal(modalElement);
+            document.getElementById('hotelNomeValidacao').value = '';
+            document.getElementById('hotelEnderecoValidacao').value = '';
+            document.getElementById('hotelNifValidacao').value = '';
+            document.getElementById('hotelTelefoneValidacao').value = '';
+            document.getElementById('hotelEmailValidacao').value = '';
+            document.getElementById('hotelDocumentoValidacao').value = '';
+            document.getElementById('hotelFachadaValidacao').value = '';
+            document.getElementById('validationMessage').innerHTML = '';
+            validationModal.show();
+        }
+
+        async function submitValidacao() {
+            const dadosHotel = {
+                nome: document.getElementById('hotelNomeValidacao').value.trim(),
+                endereco: document.getElementById('hotelEnderecoValidacao').value.trim(),
+                nif: document.getElementById('hotelNifValidacao').value.trim(),
+                telefone: document.getElementById('hotelTelefoneValidacao').value.trim(),
+                email: document.getElementById('hotelEmailValidacao').value.trim()
+            };
+            const documento = document.getElementById('hotelDocumentoValidacao').files[0];
+            const fachada = document.getElementById('hotelFachadaValidacao').files[0];
+            const messageDiv = document.getElementById('validationMessage');
+            if(!dadosHotel.nome || !dadosHotel.endereco || !dadosHotel.nif || !dadosHotel.telefone || !dadosHotel.email) {
+                messageDiv.innerHTML = '<div class="alert alert-danger">Preencha todos os campos obrigatórios!</div>';
+                return;
+            }
+            if(!documento) { messageDiv.innerHTML = '<div class="alert alert-danger">Envie um documento comprovativo!</div>'; return; }
+            if(!fachada) { messageDiv.innerHTML = '<div class="alert alert-danger">Envie uma foto da fachada!</div>'; return; }
+            messageDiv.innerHTML = '<div class="text-info"><i class="fas fa-spinner fa-spin"></i> A validar dados do hotel com IA...</div>';
+            const resultado = await validarHotel(dadosHotel);
+            if(resultado.aprovado) {
+                messageDiv.innerHTML = `<div class="validation-success"><i class="fas fa-check-circle"></i> ${resultado.mensagem}</div>`;
+                const novoHotel = { nome: dadosHotel.nome, aprovado: true, dataAprovacao: new Date().toISOString() };
+                hoteisPersonalizados.push(novoHotel);
+                localStorage.setItem("hoteis_personalizados", JSON.stringify(hoteisPersonalizados));
+                atualizarSelectHoteis();
+                const select = document.getElementById('hotelSelect');
+                select.value = dadosHotel.nome;
+                setTimeout(() => {
+                    validationModal.hide();
+                    alert(`✅ Hotel "${dadosHotel.nome}" validado com sucesso!`);
+                }, 2000);
+            } else {
+                messageDiv.innerHTML = `<div class="alert alert-danger">${resultado.mensagem}</div>`;
+            }
+        }
+
+        function escapeHtml(str) { return String(str).replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; return '&gt;';}); }
+        
+        function atualizarPerfilUI() { 
+            document.getElementById('hotelOwnerName').innerText = userProfile.nome || "Hoteleiro"; 
+            if(userProfile.avatar) document.getElementById('profileAvatar').src = userProfile.avatar; 
+        }
+        
+        function salvarPerfilLocal() { localStorage.setItem("reserveja_userProfile", JSON.stringify(userProfile)); atualizarPerfilUI(); }
+
+        function atualizarEstatisticas() { 
+            document.getElementById('totalRoomsCount').innerText = quartos.length;
+            const hoteisUnicos = new Set(quartos.map(q => q.hotelNome)).size;
+            document.getElementById('totalHotelsCount').innerText = hoteisUnicos + hoteisPersonalizados.filter(h => h.aprovado).length;
+        }
+        
+        function atualizarGraficoVendas() { 
+            const ctx = document.getElementById('salesChartCanvas').getContext('2d'); 
+            const fator = Math.min(3, quartos.length+1)*0.5+0.5; 
+            const dados = vendasSimuladas.map(v=>Math.floor(v*fator)); 
+            if(salesChart) salesChart.destroy(); 
+            salesChart = new Chart(ctx, { 
+                type:'bar', 
+                data:{ labels:['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'], 
+                datasets:[{ label: 'Reservas (Kz)', data:dados, backgroundColor:'#6FDE9C', borderRadius:8 }] }, 
+                options:{ responsive:true, maintainAspectRatio:true } 
+            }); 
+        }
+        
+        window.shareProduct = (idx, platform) => { 
+            const quarto = quartos[idx];
+            const text = `🏨 ${quarto.hotelNome} - ${quarto.tipoQuarto}\n💰 ${quarto.preco} Kz/noite\nReserve já!`; 
+            const url = location.href; 
+            if(platform==='facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`); 
+            else if(platform==='whatsapp') window.open(`https://wa.me/?text=${encodeURIComponent(text+' '+url)}`); 
+            else if(platform==='instagram') alert(`Copie: ${text}\n${url}`);
+        };
+        
+        function renderizarQuartos() {
+            const container = document.getElementById('productsListContainer');
+            if(quartos.length === 0) { container.innerHTML = '<p class="text-muted">Nenhum quarto cadastrado ainda.</p>'; atualizarEstatisticas(); return; }
+            let html = '';
+            quartos.forEach((quarto, idx) => {
+                const ratingStars = '★'.repeat(quarto.rating) + '☆'.repeat(5-quarto.rating);
+                const promotionBadge = quarto.promotion ? '<span class="promotion-badge ms-2">PROMOÇÃO</span>' : '';
+                let imagesHtml = '';
+                if(quarto.imagens && quarto.imagens.length > 0) {
+                    imagesHtml = '<div class="product-images-gallery">';
+                    quarto.imagens.forEach(img => { imagesHtml += `<img src="${img}" alt="Quarto">`; });
+                    imagesHtml += '</div>';
+                }
+                html += `<div class="product-item"><div><strong>🏨 ${escapeHtml(quarto.hotelNome)}</strong>${promotionBadge}<br><strong>🛏️ ${escapeHtml(quarto.tipoQuarto)}</strong><br><small>⭐ ${ratingStars} • 💰 ${quarto.preco} Kz/noite</small><br><small>📝 ${quarto.descricao.substring(0, 80)}...</small>${imagesHtml}</div><div><div class="share-buttons"><i class="fab fa-facebook-f" onclick="shareProduct(${idx},'facebook')"></i><i class="fab fa-whatsapp" onclick="shareProduct(${idx},'whatsapp')"></i><i class="fab fa-instagram" onclick="shareProduct(${idx},'instagram')"></i></div><div class="product-actions mt-1"><i class="fas fa-edit" onclick="editarProdutoModal(${idx})"></i><i class="fas fa-trash-alt" onclick="removerProdutoModal(${idx})"></i></div></div></div>`;
+            });
+            container.innerHTML = html;
+            atualizarEstatisticas(); 
+            atualizarGraficoVendas();
+        }
+        
+        function adicionarQuarto(hotelNome, tipoQuarto, preco, descricao, rating, promotion, imagens, servicos) { 
+            quartos.push({ hotelNome, tipoQuarto, preco: parseFloat(preco), descricao, rating: parseInt(rating)||3, promotion, imagens: imagens||[], servicos: servicos||'', data: new Date().toISOString() }); 
+            localStorage.setItem("quartos_vendedor", JSON.stringify(quartos)); 
+            renderizarQuartos(); 
+        }
+        
+        window.editarProdutoModal = (idx) => { editProductIndex = idx; const q = quartos[idx]; document.getElementById('editProdNome').value = q.hotelNome; document.getElementById('editRoomType').value = q.tipoQuarto; document.getElementById('editProdPreco').value = q.preco; document.getElementById('editProdDescricao').value = q.descricao; document.getElementById('editProdRating').value = q.rating; document.getElementById('editPromotionCheck').checked = q.promotion; new bootstrap.Modal(document.getElementById('editProductModal')).show(); };
+        window.removerProdutoModal = (idx) => { deleteProductIndex = idx; new bootstrap.Modal(document.getElementById('deleteProductModal')).show(); };
+        
+        function redirectToLogin() { window.location.href = 'login.html'; }
+        
+        const timerProgress = document.getElementById('timerProgressCircle'); const timerTextSpan = document.getElementById('timerText'); const circumference = 2*Math.PI*21; if(timerProgress) timerProgress.style.strokeDasharray=circumference;
+        function updateTimerUI(){ let mins=Math.floor(timeLeftSeconds/60), secs=timeLeftSeconds%60; timerTextSpan.innerText=`${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`; let percent=timeLeftSeconds/900; let offset=circumference*(1-percent); if(timerProgress) timerProgress.style.strokeDashoffset=offset; if(timeLeftSeconds<=0){ clearInterval(timerInterval); redirectToLogin(); } }
+        function renewSession(){ timeLeftSeconds=900; renewalModalShown=false; updateTimerUI(); if(renewModalInstance) renewModalInstance.hide(); if(timerInterval) clearInterval(timerInterval); startTimer(); }
+        function checkAndShowRenewalModal(){ if(timeLeftSeconds===120 && !renewalModalShown){ renewalModalShown=true; renewModalInstance=new bootstrap.Modal(document.getElementById('renewSessionModal'),{backdrop:'static'}); renewModalInstance.show(); } }
+        function startTimer(){ if(timerInterval) clearInterval(timerInterval); timerInterval=setInterval(()=>{ if(timeLeftSeconds>0){ timeLeftSeconds--; updateTimerUI(); checkAndShowRenewalModal(); } else { clearInterval(timerInterval); } },1000); }
+        
+        function showProductPreview() {
+            const hotelSelect = document.getElementById('hotelSelect');
+            const roomType = document.getElementById('roomType').value.trim();
+            const serviceType = document.getElementById('serviceType').value.trim();
+            const price = document.getElementById('roomPrice').value;
+            const description = document.getElementById('roomDescription').value.trim();
+            const ratingInput = document.querySelector('input[name="rating"]:checked');
+            const rating = ratingInput ? ratingInput.value : 3;
+            const promotion = document.getElementById('promotionCheck').checked;
+            if(!hotelSelect.value || !roomType || !price) { alert('Preencha os campos obrigatórios!'); return; }
+            const ratingStars = '★'.repeat(parseInt(rating)) + '☆'.repeat(5-parseInt(rating));
+            const promotionBadge = promotion ? '<span class="promotion-badge">PROMOÇÃO ESPECIAL!</span>' : '';
+            let imagesHtml = '';
+            if(currentImages.length > 0) {
+                imagesHtml = '<div style="margin-top: 15px;">';
+                currentImages.forEach(img => { imagesHtml += `<img src="${img}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; margin: 5px;">`; });
+                imagesHtml += '</div>';
+            }
+            const previewHTML = `<div class="preview-card" id="previewCaptureArea"><div style="text-align:center;"><img src="https://via.placeholder.com/150x60/6FDE9C/0A1210?text=Reserve+Já" style="max-width:150px;"><hr></div><div style="text-align:center;"><h3 style="color:#6FDE9C;">🏨 ${escapeHtml(hotelSelect.value)}</h3>${promotionBadge}<h4>🛏️ ${escapeHtml(roomType)}</h4>${serviceType ? `<p><strong>Serviços:</strong> ${escapeHtml(serviceType)}</p>` : ''}<div style="font-size:2rem;color:#ffc107;">${ratingStars}</div><h2 style="color:#6FDE9C;">💰 ${parseFloat(price).toLocaleString()} Kz/noite</h2><div style="background:rgba(255,255,255,0.1);padding:15px;border-radius:12px;"><p>${escapeHtml(description) || 'Descrição não fornecida'}</p></div>${imagesHtml}<hr><p><i class="fas fa-map-marker-alt"></i> Malanje, Angola</p><div style="background:linear-gradient(135deg,#6FDE9C,#4CAF50);padding:10px;border-radius:40px;color:#0A1210;font-weight:bold;">📞 RESERVE JÁ</div></div></div>`;
+            document.getElementById('previewProductContent').innerHTML = previewHTML;
+            new bootstrap.Modal(document.getElementById('previewProductModal')).show();
+        }
+        
+        async function capturePreviewAndShare() {
+            const element = document.getElementById('previewCaptureArea');
+            if (!element) { 
+                alert('Erro: Elemento não encontrado para capturar!'); 
+                return; 
+            }
+            try {
+                const canvas = await html2canvas(element, { 
+                    scale: 2, 
+                    backgroundColor: document.body.classList.contains('light') ? '#F0F8F2' : '#0A1210', 
+                    useCORS: true,
+                    logging: false,
+                    allowTaint: false
+                });
+                capturedScreenshot = canvas.toDataURL('image/png');
+                document.getElementById('capturedImagePreview').innerHTML = `<img src="${capturedScreenshot}" style="width:100%; border-radius:12px;">`;
+                const previewModal = bootstrap.Modal.getInstance(document.getElementById('previewProductModal'));
+                if(previewModal) previewModal.hide();
+                new bootstrap.Modal(document.getElementById('shareImageModal')).show();
+            } catch (error) { 
+                console.error('Erro na captura:', error);
+                alert('Erro ao capturar o ecrã. Tente novamente.'); 
+            }
+        }
+        
+        function shareCapturedImage(platform) {
+            if (!capturedScreenshot) { alert('Nenhuma imagem capturada!'); return; }
+            const text = "🏨 Oferta exclusiva no Reserve Já! Hotel em Malanje, Angola.";
+            const url = location.href;
+            if(platform==='facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`);
+            else if(platform==='whatsapp') window.open(`https://wa.me/?text=${encodeURIComponent(text+' '+url)}`);
+            else if(platform==='twitter') window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`);
+            else if(platform==='instagram') { if(navigator.share) navigator.share({ title:'Reserve Já', text: text, url: url }); else alert('Faça o download da imagem e publique manualmente.'); }
+        }
+        
+        function downloadCapturedImage() {
+            if (!capturedScreenshot) { alert('Nenhuma imagem!'); return; }
+            const link = document.createElement('a');
+            link.download = `reserveja_oferta_${new Date().toISOString().slice(0,19)}.png`;
+            link.href = capturedScreenshot;
+            link.click();
+        }
+        
+        function previewImages(files) {
+            const container = document.getElementById('imagePreviewContainer');
+            container.innerHTML = '';
+            currentImages = [];
+            Array.from(files).slice(0,5).forEach((file, index) => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const previewDiv = document.createElement('div');
+                        previewDiv.className = 'image-preview-item';
+                        previewDiv.innerHTML = `<img src="${e.target.result}"><button class="remove-image-btn" data-index="${index}">×</button>`;
+                        container.appendChild(previewDiv);
+                        currentImages.push(e.target.result);
+                        previewDiv.querySelector('.remove-image-btn').addEventListener('click', function() {
+                            previewDiv.remove();
+                            const imgIndex = currentImages.indexOf(e.target.result);
+                            if(imgIndex > -1) currentImages.splice(imgIndex, 1);
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+        
+        async function fetchWeather(){ 
+            try{ 
+                const res=await fetch('https://api.open-meteo.com/v1/forecast?latitude=-9.5445&longitude=16.3457&current_weather=true'); 
+                const data=await res.json(); 
+                document.getElementById('weatherTemp').innerHTML=`${Math.round(data.current_weather.temperature)}°C`; 
+                document.getElementById('weatherDesc').innerHTML=data.current_weather.weathercode===0?'Céu limpo':'Nublado'; 
+            } catch(e){ document.getElementById('weatherDesc').innerHTML='ensolarado'; document.getElementById('weatherTemp').innerHTML='26°C'; } 
+        }
+        
+        function updateDateTimeExtenso(){ 
+            const now=new Date(); 
+            document.getElementById('fullDateExtenso').innerHTML=now.toLocaleDateString('pt-PT',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).replace(/^\w/,c=>c.toUpperCase()); 
+            document.getElementById('fullTimeExtenso').innerHTML=now.toLocaleTimeString('pt-PT'); 
+        }
+        
+        function initGoogleMap() { 
+            const container = document.getElementById('realMap'); 
+            if(!container || typeof google === 'undefined') return;
+            const malanjeCoords = { lat: -9.5445, lng: 16.3457 };
+            const map = new google.maps.Map(container, { center: malanjeCoords, zoom: 13 });
+            new google.maps.Marker({ position: malanjeCoords, map: map, title: "Malanje - Sua Localização" });
+        }
+        
+        const themeCheckbox=document.getElementById('themeToggleCheckbox'); 
+        function applyTheme(isLight){ 
+            if(isLight) document.body.classList.add('light'); else document.body.classList.remove('light'); 
+            themeCheckbox.checked=isLight; localStorage.setItem('theme',isLight?'light':'dark'); 
+        }
+        
+        // Event Listeners
+        document.getElementById('saveProfileBtn').addEventListener('click', () => {
+            userProfile.nome = document.getElementById('editNome').value.trim() || "Hoteleiro";
+            userProfile.telefone = document.getElementById('editTelefone').value;
+            userProfile.fazenda = document.getElementById('editFazenda').value;
+            userProfile.bio = document.getElementById('editBio').value;
+            const avatarFile = document.getElementById('editAvatarInput').files[0];
+            if(avatarFile) { const reader = new FileReader(); reader.onload = e => { userProfile.avatar = e.target.result; salvarPerfilLocal(); }; reader.readAsDataURL(avatarFile); }
+            else salvarPerfilLocal();
+            bootstrap.Modal.getInstance(document.getElementById('profileEditModal')).hide();
+        });
+        
+        document.getElementById('deleteProfileBtn').addEventListener('click', () => { bootstrap.Modal.getInstance(document.getElementById('profileEditModal')).hide(); new bootstrap.Modal(document.getElementById('deleteProfileConfirmModal')).show(); });
+        document.getElementById('confirmDeleteAccountBtn').addEventListener('click', () => { localStorage.clear(); alert("Conta eliminada."); location.reload(); });
+        document.getElementById('changeAvatarOption').addEventListener('click', () => document.getElementById('avatarUpload').click());
+        document.getElementById('avatarUpload').addEventListener('change', (e) => { if(e.target.files[0]){ const reader = new FileReader(); reader.onload = ev => { userProfile.avatar = ev.target.result; salvarPerfilLocal(); }; reader.readAsDataURL(e.target.files[0]); } });
+        
+        document.getElementById('saveProductEditBtn').addEventListener('click', () => { 
+            if(editProductIndex !== null) { 
+                const q = quartos[editProductIndex]; 
+                q.hotelNome = document.getElementById('editProdNome').value; 
+                q.tipoQuarto = document.getElementById('editRoomType').value;
+                q.preco = parseFloat(document.getElementById('editProdPreco').value); 
+                q.descricao = document.getElementById('editProdDescricao').value;
+                q.rating = parseInt(document.getElementById('editProdRating').value);
+                q.promotion = document.getElementById('editPromotionCheck').checked;
+                localStorage.setItem("quartos_vendedor", JSON.stringify(quartos)); 
+                renderizarQuartos(); 
+                bootstrap.Modal.getInstance(document.getElementById('editProductModal')).hide();
+            } 
+        });
+        
+        document.getElementById('confirmDeleteProductBtn').addEventListener('click', () => { if(deleteProductIndex !== null) { quartos.splice(deleteProductIndex,1); localStorage.setItem("quartos_vendedor", JSON.stringify(quartos)); renderizarQuartos(); bootstrap.Modal.getInstance(document.getElementById('deleteProductModal')).hide(); } });
+        
+        document.getElementById('generateDescBtn').addEventListener('click', generateRoomDescription);
+        document.getElementById('registerRoomBtn').addEventListener('click', () => {
+            const hotelSelect = document.getElementById('hotelSelect');
+            const roomType = document.getElementById('roomType').value.trim();
+            const price = document.getElementById('roomPrice').value;
+            const description = document.getElementById('roomDescription').value.trim();
+            const ratingInput = document.querySelector('input[name="rating"]:checked');
+            const rating = ratingInput ? ratingInput.value : 3;
+            const promotion = document.getElementById('promotionCheck').checked;
+            const serviceType = document.getElementById('serviceType').value.trim();
+            if(!hotelSelect.value || !roomType || !price) { alert('Preencha todos os campos obrigatórios!'); return; }
+            let descricaoFinal = description;
+            if(!descricaoFinal) descricaoFinal = gerarDescricaoIA(roomType, hotelSelect.value);
+            adicionarQuarto(hotelSelect.value, roomType, price, descricaoFinal, rating, promotion, currentImages, serviceType);
+            document.getElementById('roomType').value = ''; document.getElementById('serviceType').value = ''; document.getElementById('roomPrice').value = ''; document.getElementById('roomDescription').value = ''; document.getElementById('promotionCheck').checked = false; document.getElementById('imagePreviewContainer').innerHTML = ''; currentImages = []; document.getElementById('roomImages').value = '';
+            document.querySelectorAll('input[name="rating"]').forEach(star => star.checked = false);
+            new bootstrap.Modal(document.getElementById('shareModal')).show();
+        });
+        document.getElementById('roomImages').addEventListener('change', function(e) { previewImages(e.target.files); });
+        document.getElementById('previewResultsBtn').addEventListener('click', showProductPreview);
+        document.getElementById('submitValidationBtn').addEventListener('click', submitValidacao);
+        document.getElementById('capturePreviewBtn').addEventListener('click', capturePreviewAndShare);
+        document.getElementById('cardAddHotel').addEventListener('click', abrirModalValidacao);
+        document.getElementById('shareImageFacebook').addEventListener('click', () => shareCapturedImage('facebook'));
+        document.getElementById('shareImageWhatsApp').addEventListener('click', () => shareCapturedImage('whatsapp'));
+        document.getElementById('shareImageTwitter').addEventListener('click', () => shareCapturedImage('twitter'));
+        document.getElementById('shareImageInstagram').addEventListener('click', () => shareCapturedImage('instagram'));
+        document.getElementById('downloadImageBtn').addEventListener('click', downloadCapturedImage);
+        document.getElementById('shareFacebookBtn').onclick = () => { if(quartos.length) shareProduct(quartos.length-1,'facebook'); }; 
+        document.getElementById('shareWhatsAppBtn').onclick = () => { if(quartos.length) shareProduct(quartos.length-1,'whatsapp'); }; 
+        document.getElementById('shareInstagramBtn').onclick = () => { if(quartos.length) shareProduct(quartos.length-1,'instagram'); };
+        document.getElementById('renewYesBtn').addEventListener('click', renewSession); 
+        document.getElementById('renewNoBtn').addEventListener('click', () => { clearInterval(timerInterval); redirectToLogin(); }); 
+        document.getElementById('timerWidget').addEventListener('click', renewSession);
+        themeCheckbox.addEventListener('change',function(){ applyTheme(!document.body.classList.contains('light')); });
+        document.getElementById('profileOption').addEventListener('click', () => { document.getElementById('editNome').value = userProfile.nome || ''; document.getElementById('editTelefone').value = userProfile.telefone || ''; document.getElementById('editFazenda').value = userProfile.fazenda || ''; document.getElementById('editBio').value = userProfile.bio || ''; new bootstrap.Modal(document.getElementById('profileEditModal')).show(); });
+        
+        const chatWidgetDiv = document.getElementById("chatWidget");
+        const chatWidgetBtn = document.getElementById("chatWidgetBtn");
+        const closeChatBtn = document.getElementById("closeChatBtn");
+        const chatMessagesDiv = document.getElementById("chatMessages");
+        const chatInputField = document.getElementById("chatInput");
+        const chatSendBtn = document.getElementById("chatSend");
+        function addMessage(text, isUser) { 
+            const wrapper = document.createElement("div"); wrapper.className = `chat-msg-wrapper ${isUser ? "chat-msg-user" : "chat-msg-bot"}`; 
+            const bubble = document.createElement("div"); bubble.className = isUser ? "chat-bubble-user" : "chat-bubble-bot"; 
+            bubble.innerHTML = isUser ? `<strong>Você:</strong> ${text}` : `<strong>M.W.A.M.I</strong><br>${text}`; 
+            wrapper.appendChild(bubble); chatMessagesDiv.appendChild(wrapper); chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight; 
+        }
+        function botReply(msg) { addMessage("🏨 Olá! Sou seu assistente hoteleiro. Como posso ajudar?", false); }
+        chatWidgetBtn.addEventListener("click", () => { chatWidgetDiv.style.display = chatWidgetDiv.style.display === "flex" ? "none" : "flex"; if(chatMessagesDiv.children.length === 0) addMessage("🏨 Olá! Sou seu assistente hoteleiro para Angola.", false); });
+        closeChatBtn.addEventListener("click", () => { chatWidgetDiv.style.display = "none"; });
+        chatSendBtn.addEventListener("click", () => { const msg = chatInputField.value.trim(); if(!msg) return; addMessage(msg, true); chatInputField.value = ""; botReply(msg); });
+        chatInputField.addEventListener("keypress", (e) => { if(e.key === "Enter") chatSendBtn.click(); });
+        
+        const sidebar = document.getElementById('mainSidebar');
+        const compactBtn = document.getElementById('compactSidebarBtn');
+        const mobileToggle = document.getElementById('mobileMenuToggle');
+        if(compactBtn) compactBtn.addEventListener('click', () => sidebar.classList.toggle('collapsed'));
+        if(mobileToggle) mobileToggle.addEventListener('click', () => sidebar.classList.toggle('mobile-open'));
+        document.addEventListener('click', (event) => { if(window.innerWidth <= 768 && !sidebar.contains(event.target) && !mobileToggle?.contains(event.target) && sidebar.classList.contains('mobile-open')) sidebar.classList.remove('mobile-open'); });
+        
+        atualizarPerfilUI();
+        atualizarSelectHoteis();
+        renderizarQuartos();
+        startTimer();
+        fetchWeather();
+        setInterval(fetchWeather,1800000);
+        updateDateTimeExtenso(); 
+        setInterval(updateDateTimeExtenso,1000);
+        if(localStorage.getItem('theme')==='light') applyTheme(true); else applyTheme(false);
+        if(typeof google !== 'undefined' && google.maps) initGoogleMap(); else window.initGoogleMap = initGoogleMap;
+    
+    //==================================================JS ADD===========================================================//
+      // ------------------ Variáveis globais ------------------
+        let originalImage = null;       // imagem base capturada
+        let canvas = document.getElementById('editorCanvas');
+        let ctx = canvas.getContext('2d');
+        let historyStack = [];          // para desfazer
+        let currentTool = 'rect';       
+        let currentColor = '#ffb347';
+        let isDrawing = false;
+        let tempPenPoints = [];
+        let tempRectStart = null;
+        let tempArrowStart = null;
+        
+        // elementos DOM
+        const floatingToolsDiv = document.getElementById('floatingTools');
+        const editorModal = document.getElementById('editorModal');
+        const lightningBtn = document.getElementById('lightningTrigger');
+        const overlayDiv = document.getElementById('selectionOverlay');
+        const selectionBoxDiv = document.getElementById('selectionBox');
+        
+        // ferramentas flutuantes
+        const toolRect = document.getElementById('toolRectFs');
+        const toolArrow = document.getElementById('toolArrowFs');
+        const toolText = document.getElementById('toolTextFs');
+        const toolPen = document.getElementById('toolPenFs');
+        const undoBtn = document.getElementById('undoFs');
+        const colorPicker = document.getElementById('colorPickerFs');
+        const saveImgBtn = document.getElementById('saveImgFs');
+        const copyImgBtn = document.getElementById('copyImgFs');
+        const shareFsBtn = document.getElementById('shareFs');
+        
+        // ações do editor modal
+        const downloadCanvas = document.getElementById('downloadCanvasBtn');
+        const copyCanvas = document.getElementById('copyCanvasBtn');
+        const shareLink = document.getElementById('shareLinkBtn');
+        const clearAnnot = document.getElementById('clearAnnotationsBtn');
+        const closeModal = document.getElementById('closeEditorBtn');
+        
+        // ----- auxiliares / toast
+        function showToast(msg, type = "info") {
+            const toastContainer = document.createElement('div');
+            toastContainer.className = 'position-fixed bottom-0 end-0 p-3';
+            toastContainer.style.zIndex = '11000';
+            const toastEl = document.createElement('div');
+            toastEl.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : type === 'danger' ? 'danger' : 'dark'} border-0 show toast-custom`;
+            toastEl.setAttribute('role', 'alert');
+            toastEl.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body"><i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'} me-2"></i>${msg}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            toastContainer.appendChild(toastEl);
+            document.body.appendChild(toastContainer);
+            const bsToast = new bootstrap.Toast(toastEl, { delay: 2000 });
+            bsToast.show();
+            toastEl.addEventListener('hidden.bs.toast', () => toastContainer.remove());
+        }
+        
+        // Guardar estado do canvas no histórico
+        function saveStateToHistory() {
+            if (!originalImage) return;
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            historyStack.push(imageData);
+            if (historyStack.length > 30) historyStack.shift();
+        }
+        
+        function applyAndSave() {
+            saveStateToHistory();
+        }
+        
+        function undo() {
+            if (!originalImage) return;
+            if (historyStack.length <= 1) { showToast("Nada para desfazer", "info"); return; }
+            historyStack.pop();
+            const prev = historyStack[historyStack.length - 1];
+            ctx.putImageData(prev, 0, 0);
+            showToast("Desfeito ✓", "success");
+        }
+        
+        // desenhar primitivas
+        function drawRect(x1, y1, x2, y2) {
+            ctx.beginPath();
+            ctx.strokeStyle = currentColor;
+            ctx.lineWidth = 3;
+            ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+        }
+        function drawArrow(fromX, fromY, toX, toY) {
+            ctx.beginPath();
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.strokeStyle = currentColor;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            let angle = Math.atan2(toY - fromY, toX - fromX);
+            let arrowSize = 14;
+            let ax = toX, ay = toY;
+            ctx.beginPath();
+            ctx.moveTo(ax, ay);
+            ctx.lineTo(ax - arrowSize * Math.cos(angle - Math.PI/6), ay - arrowSize * Math.sin(angle - Math.PI/6));
+            ctx.lineTo(ax - arrowSize * Math.cos(angle + Math.PI/6), ay - arrowSize * Math.sin(angle + Math.PI/6));
+            ctx.fillStyle = currentColor;
+            ctx.fill();
+        }
+        function drawPenStroke(points) {
+            if (points.length < 2) return;
+            ctx.beginPath();
+            ctx.strokeStyle = currentColor;
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+            ctx.moveTo(points[0].x, points[0].y);
+            for (let i=1; i<points.length; i++) ctx.lineTo(points[i].x, points[i].y);
+            ctx.stroke();
+        }
+        function addTextAt(x,y) {
+            const txt = prompt("✏️ Escreva o texto:", "");
+            if (txt && txt.trim() !== "") {
+                ctx.font = "bold 26px 'Inter', sans-serif";
+                ctx.fillStyle = currentColor;
+                ctx.fillText(txt, x, y);
+                applyAndSave();
+            }
+        }
+        
+        // eventos de desenho no canvas
+        function getCanvasCoords(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            let clientX, clientY;
+            if (e.touches) { clientX = e.touches[0].clientX; clientY = e.touches[0].clientY; }
+            else { clientX = e.clientX; clientY = e.clientY; }
+            let cx = (clientX - rect.left) * scaleX;
+            let cy = (clientY - rect.top) * scaleY;
+            cx = Math.min(Math.max(0, cx), canvas.width);
+            cy = Math.min(Math.max(0, cy), canvas.height);
+            return { x: cx, y: cy };
+        }
+        
+        let drawingActive = false;
+        let penPointsArr = [];
+        let rectStartPt = null;
+        let arrowStartPt = null;
+        
+        function startDrawCanvas(e) {
+            e.preventDefault();
+            if (!originalImage) { showToast("Capture uma imagem primeiro", "warning"); return; }
+            const { x, y } = getCanvasCoords(e);
+            drawingActive = true;
+            if (currentTool === 'pen') {
+                penPointsArr = [{ x, y }];
+            } else if (currentTool === 'rect') {
+                rectStartPt = { x, y };
+            } else if (currentTool === 'arrow') {
+                arrowStartPt = { x, y };
+            } else if (currentTool === 'text') {
+                addTextAt(x, y);
+                drawingActive = false;
+            }
+        }
+        
+        function drawMoveCanvas(e) {
+            if (!drawingActive) return;
+            e.preventDefault();
+            const { x, y } = getCanvasCoords(e);
+            // restaura último estado do histórico
+            if (historyStack.length) {
+                ctx.putImageData(historyStack[historyStack.length-1], 0, 0);
+            } else if (originalImage) ctx.drawImage(originalImage,0,0);
+            
+            if (currentTool === 'pen' && penPointsArr) {
+                penPointsArr.push({ x, y });
+                drawPenStroke(penPointsArr);
+            } else if (currentTool === 'rect' && rectStartPt) {
+                drawRect(rectStartPt.x, rectStartPt.y, x, y);
+            } else if (currentTool === 'arrow' && arrowStartPt) {
+                drawArrow(arrowStartPt.x, arrowStartPt.y, x, y);
+            }
+        }
+        
+        function endDrawCanvas(e) {
+            if (!drawingActive) return;
+            e.preventDefault();
+            const { x, y } = getCanvasCoords(e);
+            if (currentTool === 'pen' && penPointsArr && penPointsArr.length > 1) {
+                if (historyStack.length) ctx.putImageData(historyStack[historyStack.length-1], 0, 0);
+                drawPenStroke(penPointsArr);
+                applyAndSave();
+            } 
+            else if (currentTool === 'rect' && rectStartPt) {
+                if (historyStack.length) ctx.putImageData(historyStack[historyStack.length-1], 0, 0);
+                drawRect(rectStartPt.x, rectStartPt.y, x, y);
+                applyAndSave();
+            }
+            else if (currentTool === 'arrow' && arrowStartPt) {
+                if (historyStack.length) ctx.putImageData(historyStack[historyStack.length-1], 0, 0);
+                drawArrow(arrowStartPt.x, arrowStartPt.y, x, y);
+                applyAndSave();
+            }
+            drawingActive = false;
+            penPointsArr = [];
+            rectStartPt = null;
+            arrowStartPt = null;
+        }
+        
+        canvas.addEventListener('mousedown', startDrawCanvas);
+        window.addEventListener('mousemove', drawMoveCanvas);
+        window.addEventListener('mouseup', endDrawCanvas);
+        canvas.addEventListener('touchstart', startDrawCanvas);
+        window.addEventListener('touchmove', drawMoveCanvas);
+        window.addEventListener('touchend', endDrawCanvas);
+        
+        // trocar ferramentas
+        function setTool(tool) {
+            currentTool = tool;
+            [toolRect, toolArrow, toolText, toolPen].forEach(btn => btn.classList.remove('active'));
+            if (tool === 'rect') toolRect.classList.add('active');
+            if (tool === 'arrow') toolArrow.classList.add('active');
+            if (tool === 'text') toolText.classList.add('active');
+            if (tool === 'pen') toolPen.classList.add('active');
+        }
+        toolRect.onclick = () => setTool('rect');
+        toolArrow.onclick = () => setTool('arrow');
+        toolText.onclick = () => setTool('text');
+        toolPen.onclick = () => setTool('pen');
+        undoBtn.onclick = () => undo();
+        colorPicker.onchange = (e) => { currentColor = e.target.value; };
+        
+        // Limpar anotações
+        function clearDrawings() {
+            if (!originalImage) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(originalImage, 0, 0);
+            saveStateToHistory();
+            showToast("Anotações removidas", "success");
+        }
+        clearAnnot.onclick = clearDrawings;
+        
+        // ------ Captura de ecrã com seleção (lightshot style) ------
+        let selecting = false;
+        let startX = 0, startY = 0;
+        function showSelectionOverlay() {
+            overlayDiv.style.display = 'block';
+            selectionBoxDiv.style.display = 'none';
+            selecting = false;
+        }
+        overlayDiv.addEventListener('mousedown', (e) => {
+            if (e.target === overlayDiv || e.target === selectionBoxDiv) {
+                selecting = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                selectionBoxDiv.style.left = startX + 'px';
+                selectionBoxDiv.style.top = startY + 'px';
+                selectionBoxDiv.style.width = '0px';
+                selectionBoxDiv.style.height = '0px';
+                selectionBoxDiv.style.display = 'block';
+            }
+        });
+        window.addEventListener('mousemove', (e) => {
+            if (!selecting) return;
+            let curX = e.clientX, curY = e.clientY;
+            let w = Math.abs(curX - startX), h = Math.abs(curY - startY);
+            let left = Math.min(startX, curX), top = Math.min(startY, curY);
+            selectionBoxDiv.style.left = left + 'px';
+            selectionBoxDiv.style.top = top + 'px';
+            selectionBoxDiv.style.width = w + 'px';
+            selectionBoxDiv.style.height = h + 'px';
+        });
+        window.addEventListener('mouseup', async (e) => {
+            if (!selecting) return;
+            selecting = false;
+            let left = parseFloat(selectionBoxDiv.style.left);
+            let top = parseFloat(selectionBoxDiv.style.top);
+            let w = parseFloat(selectionBoxDiv.style.width);
+            let h = parseFloat(selectionBoxDiv.style.height);
+            overlayDiv.style.display = 'none';
+            selectionBoxDiv.style.display = 'none';
+            if (w > 8 && h > 8) {
+                try {
+                    const fullCanvas = await html2canvas(document.body, { scale: 2, useCORS: true, logging: false, windowWidth: window.innerWidth, windowHeight: window.innerHeight });
+                    const regionCanvas = document.createElement('canvas');
+                    regionCanvas.width = w;
+                    regionCanvas.height = h;
+                    const rctx = regionCanvas.getContext('2d');
+                    rctx.drawImage(fullCanvas, left, top, w, h, 0, 0, w, h);
+                    const imgData = regionCanvas.toDataURL();
+                    const img = new Image();
+                    img.onload = () => {
+                        originalImage = img;
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        ctx.drawImage(img, 0, 0);
+                        historyStack = [];
+                        saveStateToHistory();
+                        // mostrar editor e barra de ferramentas
+                        editorModal.classList.add('show');
+                        floatingToolsDiv.classList.remove('hidden');
+                        showToast("Captura realizada! Use as ferramentas.", "success");
+                    };
+                    img.src = imgData;
+                } catch(err) { showToast("Erro na captura", "danger"); }
+            } else { showToast("Seleção muito pequena", "warning"); }
+        });
+        
+        // acionar captura pelo raio
+        lightningBtn.onclick = () => {
+            // esconder editor caso aberto (opcional)
+            editorModal.classList.remove('show');
+            floatingToolsDiv.classList.add('hidden');
+            showSelectionOverlay();
+        };
+        
+        // Guardar PNG (via botão da barra flutuante)
+        saveImgFs.onclick = () => {
+            if (!originalImage) { showToast("Nada para guardar", "warning"); return; }
+            const link = document.createElement('a');
+            link.download = 'lightshot_print.png';
+            link.href = canvas.toDataURL();
+            link.click();
+            showToast("Imagem guardada!", "success");
+            generateFakeLink();
+        };
+        copyImgFs.onclick = async () => {
+            if (!originalImage) { showToast("Nada copiar", "warning"); return; }
+            try {
+                canvas.toBlob(async (blob) => {
+                    await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+                    showToast("Imagem copiada ✓", "success");
+                });
+            } catch(e) { showToast("Permissão negada", "danger"); }
+            generateFakeLink();
+        };
+        shareFsBtn.onclick = () => { generateFakeLink(); showToast("Link simulado copiado!", "success"); };
+        
+        // açoes do modal
+        downloadCanvas.onclick = () => {
+            if (!originalImage) return;
+            const a = document.createElement('a');
+            a.download = 'lightshot_edit.png';
+            a.href = canvas.toDataURL();
+            a.click();
+            generateFakeLink();
+        };
+        copyCanvas.onclick = async () => {
+            if (!originalImage) return;
+            canvas.toBlob(async (blob) => {
+                await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+                showToast("Imagem copiada", "success");
+            });
+            generateFakeLink();
+        };
+        shareLink.onclick = () => { generateFakeLink(); };
+        
+        function generateFakeLink() {
+            const fakeId = Math.random().toString(36).substring(2, 10);
+            const fakeUrl = `https://prnt.sc/${fakeId}`;
+            navigator.clipboard.writeText(fakeUrl);
+            showToast(`Link partilha: ${fakeUrl} (copiado)`, "success");
+        }
+        
+        closeModal.onclick = () => {
+            editorModal.classList.remove('show');
+            floatingToolsDiv.classList.add('hidden');
+        };
+        
+        // inicial placeholder (sem imagem)
+        function setPlaceholder() {
+            canvas.width = 700;
+            canvas.height = 400;
+            ctx.fillStyle = "#232635";
+            ctx.fillRect(0,0,canvas.width,canvas.height);
+            ctx.fillStyle = "#aaa";
+            ctx.font = "18px Inter";
+            ctx.textAlign = "center";
+            ctx.fillText("⚡ Clique no raio → selecione uma área", canvas.width/2, canvas.height/2);
+            originalImage = null;
+        }
+        setPlaceholder();
+        
+        // ao abrir editor com imagem, garantir que ferramentas flutuantes estejam com estilo
+        window.addEventListener('load', () => {
+            setTool('rect');
+        });
+    </script>
+</body>
+</html>

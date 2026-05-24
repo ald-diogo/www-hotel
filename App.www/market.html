@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Reserve Já | Mapa de Oportunidades - Formação para Hotéis em Malanje</title>
+    <!-- Bootstrap 5 + Icons + Leaflet + Charts + QR -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <style>
+        * {
+            transition: background 0.2s ease, color 0.2s;
+            margin: 0;
+            box-sizing: border-box;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+        body {
+            background: #f4f7fb;
+            font-family: 'Segoe UI', Roboto, system-ui;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        body.dark-mode {
+            background: #121212;
+            color: #e0e0e0;
+        }
+        body.dark-mode .card, body.dark-mode .bg-white, body.dark-mode .list-group-item, body.dark-mode .modal-content, body.dark-mode .dropdown-menu {
+            background-color: #1e2a2e !important;
+            color: #f0f0f0 !important;
+            border-color: #3a4b3a;
+        }
+        body.dark-mode .btn-outline-secondary {
+            color: #ccc;
+            border-color: #5a6e5a;
+        }
+        body.dark-mode .text-muted {
+            color: #bbbbbb !important;
+        }
+        .map-container {
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .card-modern {
+            border-radius: 24px;
+            border: none;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card-modern:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 30px rgba(0,0,0,0.1);
+        }
+        .badge-demand-high { background-color: #e67e22; color: white; }
+        .badge-demand-medium { background-color: #f1c40f; color: #2c3e2f; }
+        .badge-demand-low { background-color: #2ecc71; color: #1e3c2c; }
+        .btn-icon-circle {
+            border-radius: 60px;
+            padding: 8px 16px;
+        }
+        .clickable-card {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .clickable-card:active { transform: scale(0.98); }
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            cursor: pointer;
+        }
+        .stats-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        .footer-note {
+            font-size: 0.8rem;
+            background: #fff3e0;
+            border-radius: 20px;
+            padding: 8px 16px;
+        }
+        body.dark-mode .footer-note {
+            background: #2b2b1a;
+            color: #fdd;
+        }
+        .container {
+            min-height: 100vh;
+            padding-bottom: 5rem;
+        }
+        .map-container {
+            height: 420px;
+            width: 100%;
+        }
+        @media (max-width: 768px) {
+            .stats-number { font-size: 1.2rem; }
+            .map-container { height: 350px !important; }
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+        }
+        @media (max-width: 576px) {
+            .map-container { height: 280px !important; }
+            .container {
+                padding-bottom: 6rem;
+            }
+        }
+        canvas { 
+            max-width: 100%; 
+            height: auto !important; 
+            max-height: 200px;
+        }
+        .page-content {
+            max-width: 1300px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .hero {
+            background: linear-gradient(105deg, #1e3a2f 0%, #2b5e4c 100%);
+            border-radius: 48px;
+            padding: 2rem 2rem;
+            color: white;
+            box-shadow: 0 25px 40px -12px rgba(0,0,0,0.25);
+            margin-bottom: 2.5rem;
+        }
+        .hero h1 {
+            font-size: 2.6rem;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+        .hero h1 i {
+            margin-right: 12px;
+            color: #f5b042;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            margin-top: 0.8rem;
+            opacity: 0.92;
+            max-width: 750px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .aviso-transparencia {
+            background: rgba(255,255,245,0.15);
+            display: inline-block;
+            padding: 0.45rem 1.2rem;
+            border-radius: 80px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-top: 1rem;
+            backdrop-filter: blur(2px);
+        }
+        .aviso-transparencia i {
+            margin-right: 6px;
+        }
+        .grade-servicos {
+            margin-top: 2rem;
+        }
+        .grade-servicos h2 {
+            font-size: 1.9rem;
+            color: #1e3a2f;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+        .cards-negocios {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.8rem;
+        }
+        .card-negocio {
+            background: white;
+            border-radius: 32px;
+            padding: 1.6rem 1.2rem;
+            width: 260px;
+            text-align: center;
+            transition: all 0.25s ease;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.05);
+            cursor: pointer;
+            border: 1px solid #dce5e0;
+        }
+        .card-negocio i {
+            font-size: 2.6rem;
+            color: #c27e2e;
+            margin-bottom: 0.8rem;
+        }
+        .card-negocio h3 {
+            font-size: 1.3rem;
+            color: #1c473a;
+            margin-bottom: 0.5rem;
+        }
+        .card-negocio p {
+            font-size: 0.85rem;
+            color: #4f5a55;
+        }
+        .card-negocio:hover {
+            transform: translateY(-7px);
+            background: #fffcf0;
+            box-shadow: 0 22px 30px rgba(0,0,0,0.1);
+            border-color: #edd18e;
+        }
+        .cta-principal {
+            margin: 2.5rem auto 1rem;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #c27e2e;
+            padding: 0.9rem 2rem;
+            border-radius: 60px;
+            font-weight: bold;
+            color: #c27e2e;
+            font-size: 1rem;
+            transition: 0.2s;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .btn-outline:hover {
+            background: #c27e2e;
+            color: white;
+            border-color: #c27e2e;
+            transform: scale(1.02);
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(6px);
+            display: none;
+            justify-content: center;
+            align-items: flex-start;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            z-index: 2000;
+            padding: 1.5rem;
+        }
+        .modal-card {
+            max-width: 920px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 32px 55px rgba(0, 0, 0, 0.4);
+            animation: modalFadeUp 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            margin: 2rem auto;
+        }
+        @keyframes modalFadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(28px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        .modal-flex {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .modal-imagem {
+            flex: 0.9;
+            background: #1f3d31;
+            position: relative;
+            overflow: hidden;
+            min-height: 200px;
+            display: flex;
+            align-items: stretch;
+        }
+        .img-wrapper {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .img-agricola {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            flex: 1;
+        }
+        .overlay-social {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(0,0,0,0.2) 0%, rgba(37, 162, 111, 0.2) 100%);
+            pointer-events: none;
+        }
+        .modal-conteudo {
+            flex: 1.2;
+            padding: 2rem 2rem;
+            background: #fffef9;
+            position: relative;
+        }
+        .btn-fechar {
+            position: absolute;
+            top: 18px;
+            right: 20px;
+            background: #f0ede5;
+            width: 34px;
+            height: 34px;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #2d3e2c;
+            font-size: 1.2rem;
+            z-index: 10;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+        .btn-fechar:hover {
+            background: #e6e0d0;
+            transform: scale(1.02);
+            color: #b34e2e;
+        }
+        .titulo-software {
+            font-size: 1.9rem;
+            font-weight: 800;
+            color: #2c5a42;
+            margin-bottom: 0.5rem;
+            line-height: 1.25;
+            border-left: 5px solid #f5b042;
+            padding-left: 18px;
+        }
+        .titulo-software i {
+            color: #f5b042;
+            margin-right: 8px;
+            font-size: 1.7rem;
+        }
+        .descricao-principal {
+            font-size: 0.95rem;
+            color: #2a3b2e;
+            margin: 0.5rem 0 1rem 0;
+            line-height: 1.45;
+        }
+        .lista-vantagens-agrolux {
+            list-style: none;
+            margin: 1rem 0 1.2rem 0;
+        }
+        .lista-vantagens-agrolux li {
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #1f3b1a;
+        }
+        .lista-vantagens-agrolux i {
+            color: #f5b042;
+            font-size: 1.2rem;
+            width: 26px;
+        }
+        .nota-importante {
+            background: #fef4e8;
+            border-radius: 20px;
+            padding: 0.8rem 1rem;
+            margin: 0.8rem 0 1.2rem 0;
+            font-size: 0.8rem;
+            border-left: 3px solid #e4a022;
+        }
+        .nota-importante i {
+            color: #d48f2b;
+            margin-right: 8px;
+        }
+        .btn-acao {
+            display: block;
+            background: linear-gradient(95deg, #ca9622, #b47c10);
+            border: none;
+            width: 100%;
+            border-radius: 60px;
+            text-align: center;
+            transition: all 0.2s;
+            box-shadow: 0 8px 18px rgba(180, 124, 16, 0.3);
+            cursor: pointer;
+            text-decoration: none;
+            padding: 13px 12px;
+            font-weight: bold;
+            font-size: 1rem;
+            color: white;
+            letter-spacing: 0.5px;
+        }
+        .btn-acao a {
+            color: white;
+            text-decoration: none;
+            display: block;
+        }
+        .btn-acao i {
+            margin-right: 10px;
+        }
+        .btn-acao:hover {
+            transform: scale(1.01);
+            background: linear-gradient(95deg, #e0a82e, #cc8c1a);
+            box-shadow: 0 10px 22px rgba(180, 124, 16, 0.45);
+        }
+        .texto-info {
+            font-size: 0.7rem;
+            text-align: center;
+            color: #a16207;
+            background: #fff1cf;
+            display: inline-block;
+            width: 100%;
+            padding: 6px 10px;
+            border-radius: 40px;
+            margin-top: 14px;
+        }
+        .floating-agrolux {
+            position: fixed;
+            bottom: 26px;
+            right: 26px;
+            background: linear-gradient(135deg, #1b4e3f, #0c352a);
+            width: 62px;
+            height: 62px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 15px 28px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(245,176,66,0.7);
+            z-index: 1500;
+            transition: all 0.2s ease;
+            animation: softPulse 2.2s infinite;
+        }
+        .floating-agrolux i {
+            font-size: 2rem;
+            color: #FFDF8c;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+        .floating-agrolux:hover {
+            transform: scale(1.08);
+            background: linear-gradient(135deg, #2a6b56, #15523f);
+            box-shadow: 0 18px 32px rgba(0, 0, 0, 0.35), 0 0 0 4px #ffda77;
+        }
+        @keyframes softPulse {
+            0% { box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25), 0 0 0 3px rgba(245,176,66,0.6); }
+            50% { box-shadow: 0 16px 28px rgba(0, 0, 0, 0.35), 0 0 0 5px rgba(255, 200, 70, 0.9); }
+            100% { box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25), 0 0 0 3px rgba(245,176,66,0.6); }
+        }
+        .floating-agrolux::after {
+            content: "Reserve Já · Visibilidade Hotéis";
+            position: absolute;
+            bottom: 72px;
+            right: 0;
+            background: #1a2f28;
+            color: #ffecb3;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 5px 12px;
+            border-radius: 40px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.2s;
+            font-family: 'Segoe UI', system-ui;
+        }
+        .floating-agrolux:hover::after {
+            opacity: 1;
+            bottom: 70px;
+        }
+        @media (max-width: 780px) {
+            body {
+                padding: 0.5rem;
+            }
+            .modal-flex {
+                flex-direction: column;
+            }
+            .modal-imagem {
+                min-height: 180px;
+                flex: auto;
+            }
+            .modal-conteudo {
+                padding: 1.5rem;
+            }
+            .titulo-software {
+                font-size: 1.5rem;
+            }
+            .hero h1 {
+                font-size: 1.9rem;
+            }
+            .cards-negocios {
+                gap: 1rem;
+            }
+            .card-negocio {
+                width: 220px;
+            }
+            .floating-agrolux {
+                width: 50px;
+                height: 50px;
+                bottom: 16px;
+                right: 16px;
+            }
+            .floating-agrolux i {
+                font-size: 1.6rem;
+            }
+        }
+        @media (max-width: 560px) {
+            .card-negocio {
+                width: 100%;
+                max-width: 280px;
+            }
+            .hero {
+                padding: 1.5rem;
+            }
+            .btn-outline {
+                font-size: 0.9rem;
+                padding: 0.7rem 1.4rem;
+            }
+        }
+        .modal-body {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        #alertsContainer {
+            max-height: 180px;
+            overflow-y: auto;
+        }
+        .list-group-item {
+            word-break: break-word;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container py-3 py-md-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="display-6 fw-bold" style="background: linear-gradient(135deg, #2D6A4F, #52B788); -webkit-background-clip: text; background-clip: text; color: transparent;">
+                <i class="fas fa-map-marked-alt me-2"></i> Reserve Já - Mapa de Oportunidades Hoteleiras
+            </h1>
+            <p class="text-muted small mt-1" id="disclaimerMsg">
+                <i class="fas fa-chalkboard-teacher"></i> Reserve Já não garante hóspedes diretos — é uma plataforma de <strong>formação digital e marketing hoteleiro</strong>. Promoção do turismo e das maravilhas de Malanje.
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary rounded-pill" id="themeToggleBtn"><i class="fas fa-moon"></i> <span id="themeText">Tema escuro</span></button>
+            <div class="dropdown">
+                <button class="btn btn-outline-success rounded-pill dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-language"></i> <span id="langActive">Português</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="#" data-lang="pt">🇵🇹 Português</a></li>
+                    <li><a class="dropdown-item" href="#" data-lang="en">🇬🇧 English</a></li>
+                    <li><a class="dropdown-item" href="#" data-lang="fr">🇫🇷 Français</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <label class="form-label fw-semibold"><i class="fas fa-search"></i> <span data-i18n="searchProduct">Serviço / Atração</span></label>
+            <input type="text" id="searchProduct" class="form-control rounded-pill" placeholder="Ex: piscina, vista, restaurante, Kalandula" value="vista">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label fw-semibold"><span data-i18n="province">Província</span></label>
+            <select id="provinceFilter" class="form-select rounded-pill">
+                <option value="all">Todas</option>
+                <option value="Malanje">Malanje</option>
+                <option value="Outros">...</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label fw-semibold"><span data-i18n="municipality">Município</span></label>
+            <select id="municipalityFilter" class="form-select rounded-pill">
+                <option value="all">Todos</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label fw-semibold"><span data-i18n="commune">Comuna</span></label>
+            <select id="communeFilter" class="form-select rounded-pill">
+                <option value="all">Todas</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-7">
+            <div class="map-container" style="height: 420px;">
+                <div id="leafletMap" style="height: 100%; width: 100%;"></div>
+            </div>
+            <div class="mt-2 d-flex justify-content-between">
+                <small class="text-muted" id="clickDistanceInfo"><i class="fas fa-arrows-alt-h"></i> <span data-i18n="clickMarkerDistance">Clique num hotel para ver a distância</span></small>
+                <button class="btn btn-sm btn-success rounded-pill" id="whatsappBtn"><i class="fab fa-whatsapp"></i> WhatsApp Rápido</button>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="card card-modern bg-white h-100">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-chart-line"></i> <span data-i18n="regionDemand">Demanda por região / Atração turística</span></h5>
+                    <div id="selectedRegionInfo">
+                        <p class="text-muted"><span data-i18n="selectMarkerHint">Selecione um hotel no mapa</span></p>
+                    </div>
+                    <hr>
+                    <div><strong><i class="fas fa-users"></i> <span data-i18n="potentialBuyersZone">Hóspedes potenciais (zona)</span>:</strong> <span id="buyersList">—</span></div>
+                    <div class="mt-2"><strong><i class="fas fa-star"></i> <span data-i18n="mostDemandedProduct">Atração / Serviço mais procurado</span>:</strong> <span id="topProductZone">—</span></div>
+                    <div class="mt-2"><strong><i class="fas fa-route"></i> <span data-i18n="distanceToFarmer">Distância do centro de Malanje</span>:</strong> <span id="distanceDisplay">—</span></div>
+                    <div class="mt-2"><strong><i class="fas fa-fire"></i> <span data-i18n="demandLevel">Nível de popularidade</span>:</strong> <span id="demandBadge">—</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card card-modern">
+                <div class="card-body">
+                    <h5><i class="fas fa-chart-area"></i> <span data-i18n="areaCharts">Tendência de reservas (mensal)</span></h5>
+                    <canvas id="areaChart" height="160" style="max-height: 200px; width:100%"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card card-modern">
+                <div class="card-body">
+                    <h5><i class="fas fa-chart-pie"></i> <span data-i18n="statisticsArea">Popularidade por região turística</span></h5>
+                    <canvas id="statsBarChart" height="160" style="max-height: 200px; width:100%"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card card-modern h-100">
+                <div class="card-body">
+                    <h5><i class="fas fa-history"></i> <span data-i18n="historyInterest">Histórico de hotéis mais consultados</span></h5>
+                    <ul id="historyList" class="list-group list-group-flush bg-transparent">
+                        <li class="list-group-item bg-transparent">Hotel Kalandula (Alta demanda - Vista cascata)</li>
+                        <li class="list-group-item bg-transparent">Pousada de Cangandala (Média - Ecoturismo)</li>
+                        <li class="list-group-item bg-transparent">Residencial Malanje (Alta - Conforto)</li>
+                    </ul>
+                    <button class="btn btn-sm btn-link mt-2" id="clearHistoryBtn"><i class="fas fa-trash-alt"></i> Limpar</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-modern h-100">
+                <div class="card-body">
+                    <h5><i class="fas fa-bell"></i> <span data-i18n="alerts">Alertas de novas oportunidades</span></h5>
+                    <div id="alertsContainer" class="small">
+                        <div class="alert alert-success py-1"><i class="fas fa-chart-up"></i> Nova demanda elevada para hotéis em Kalandula!</div>
+                        <div class="alert alert-warning py-1"><i class="fas fa-truck"></i> Pico da Mebria: interesse crescente para ecoturismo.</div>
+                    </div>
+                    <button class="btn btn-outline-primary btn-sm mt-1" id="simulateAlertBtn">+ Simular novo alerta</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-modern h-100">
+                <div class="card-body">
+                    <h5><i class="fas fa-lightbulb"></i> <span data-i18n="recommendations">Recomendações inteligentes</span></h5>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-chart-line text-success"></i> Melhore sua visibilidade no Instagram para as cachoeiras</li>
+                        <li><i class="fas fa-store"></i> Crie campanhas no Facebook para os circuitos em Malanje</li>
+                        <li><i class="fas fa-users"></i> Utilize nosso centro de formação digital hoteleira</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-6"><div class="card clickable-card text-center p-3" id="facebookCard"><i class="fab fa-facebook fa-2x text-primary"></i> <strong>Partilhar no Facebook</strong></div></div>
+        <div class="col-md-3 col-6"><div class="card clickable-card text-center p-3" id="instagramCard"><i class="fab fa-instagram fa-2x text-danger"></i> <strong>Publicar Instagram</strong></div></div>
+        <div class="col-md-3 col-6"><div class="card clickable-card text-center p-3" id="contactBuyerCard"><i class="fas fa-phone-alt fa-2x text-success"></i> <strong>Contactar visitantes</strong></div></div>
+        <div class="col-md-3 col-6"><div class="card clickable-card text-center p-3" id="qrCodeCard"><i class="fas fa-qrcode fa-2x text-dark"></i> <strong>QR Atração</strong></div></div>
+    </div>
+</div>
+
+<div class="modal fade" id="qrModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header"><h5>Código QR da Atração</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body text-center"><div id="qrcodeContainer"></div><p class="mt-2">Partilhe com os visitantes potenciais!</p></div>
+        </div>
+    </div>
+</div>
+
+<div id="modalAgroLux" class="modal-overlay">
+    <div class="modal-card">
+        <div class="modal-flex">
+            <div class="modal-imagem">
+                <div class="img-wrapper">
+                    <img class="img-agricola" 
+                         src="images/chat.png" 
+                         alt="Reserve Já integração" 
+                         onerror="this.src='https://placehold.co/700x480/2b5a4c/f5e5b0?text=🏨+Reserve+Já+Rede+sociais&font=roboto'">
+                    <div class="overlay-social"></div>
+                </div>
+            </div>
+            <div class="modal-conteudo">
+                <div class="btn-fechar" id="fecharModalAgroLux"><i class="fas fa-times"></i></div>
+                <div class="titulo-software"><i class="fas fa-hand-holding-usd"></i> Reserve Já – Visibilidade Hoteleira<br><span style="font-size: 0.9rem; color: #e4a022;">Reservas via redes sociais + Turismo Malanje</span></div>
+                <p class="descricao-principal">Uma plataforma que transforma o seu hotel numa vitrine digital. Você gere a sua visibilidade e expõe os seus serviços automaticamente no WhatsApp, Facebook e Instagram – sem necessidade de site complexo.</p>
+                <ul class="lista-vantagens-agrolux">
+                    <li><i class="fab fa-whatsapp"></i> <strong>Catálogo direto no WhatsApp Business</strong> – os clientes veem quartos, preços e disponibilidades</li>
+                    <li><i class="fab fa-instagram"></i> <strong>Integração Instagram Shopping</strong> – marque os seus serviços nos stories e feed</li>
+                    <li><i class="fab fa-facebook"></i> <strong>Marketplace Facebook</strong> – alcance os turistas que visitam Malanje</li>
+                    <li><i class="fas fa-chart-pie"></i> <strong>Gestão de reputação e reservas</strong> – tudo sincronizado com a sua vitrine social</li>
+                    <li><i class="fas fa-users"></i> <strong>Destaque das maravilhas de Malanje</strong> (Kalandula, Pico da Mebria, Cangandala)</li>
+                </ul>
+                <div class="nota-importante"><i class="fas fa-exclamation-triangle"></i> <strong>Informação importante:</strong> Reserve Já <u>não garante hóspedes diretos</u> e <u>não gere pagamentos</u>. O nosso papel é fornecer formação digital para melhorar a sua visibilidade. As reservas e transações são feitas através das suas redes sociais (WhatsApp, Instagram, Facebook) sob sua própria responsabilidade.</div>
+                <button class="btn-acao">
+                    <a href="splash.html">
+                        <i class="fab fa-whatsapp"></i> Experimentar a Vitrine Digital Gratuita
+                    </a>
+                </button>
+                <div class="texto-info"><i class="fas fa-clock"></i> Ativação imediata · Configuração em 5 minutos · Plano grátis 30 dias</div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="floating-agrolux" id="floatingAgroLuxBtn"><i class="fas fa-hotel"></i></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Dados dos hotéis de Malanje e atrações turísticas
+    const markersData = [
+        { id: 1, name: "Hotel Kalandula", lat: -9.076, lng: 16.003, province: "Malanje", municipality: "Kalandula", commune: "Kalandula Centro", topProduct: "Vista cascata", demandLevel: "Alta", potentialBuyers: 45, distance: 85, productDemandMap: { "vista cascata": "Alta", "piscina": "Média", "restaurante": "Média" }, buyersList: "Agências de viagem, Turistas internacionais" },
+        { id: 2, name: "Residencial Cangandala", lat: -9.689, lng: 16.852, province: "Malanje", municipality: "Cangandala", commune: "Cangandala", topProduct: "Ecoturismo", demandLevel: "Média", potentialBuyers: 22, distance: 62, productDemandMap: { "ecoturismo": "Média", "caminhada": "Alta" }, buyersList: "Investigadores, Amantes da natureza" },
+        { id: 3, name: "Pousada da Mebria", lat: -9.845, lng: 16.954, province: "Malanje", municipality: "Mucari", commune: "Mucari", topProduct: "Caminhada", demandLevel: "Alta", potentialBuyers: 30, distance: 110, productDemandMap: { "caminhada": "Alta", "vista": "Alta" }, buyersList: "Aventureiros, Fotógrafos" },
+        { id: 4, name: "Hotel Malanje Central", lat: -9.539, lng: 16.344, province: "Malanje", municipality: "Malanje", commune: "Malanje Sede", topProduct: "Conforto moderno", demandLevel: "Muito Alta", potentialBuyers: 78, distance: 5, productDemandMap: { "conforto moderno": "Muito Alta", "piscina": "Alta" }, buyersList: "Homens de negócios, Famílias" },
+        { id: 5, name: "Quedas Kalandula Lodge", lat: -9.077, lng: 15.998, province: "Malanje", municipality: "Kalandula", commune: "Kalandula", topProduct: "Vista panorâmica", demandLevel: "Alta", potentialBuyers: 52, distance: 88, productDemandMap: { "vista panorâmica": "Alta", "fotografia": "Alta" }, buyersList: "Influenciadores, Guias turísticos" }
+    ];
+    const farmerCoord = { lat: -9.539, lng: 16.344 };
+    function haversineDistance(lat1,lng1,lat2,lng2){ const R=6371; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lng2-lng1)*Math.PI/180; const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2; return (R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))).toFixed(1); }
+    const translations={ pt:{ searchProduct:"Serviço / Atração", province:"Província", municipality:"Município", commune:"Comuna", clickMarkerDistance:"Clique num hotel para ver a distância", regionDemand:"Demanda por região / Atração", potentialBuyersZone:"Hóspedes potenciais", mostDemandedProduct:"Serviço mais procurado", distanceToFarmer:"Distância do centro", demandLevel:"Nível de popularidade", areaCharts:"Tendência de reservas (mensal)", statisticsArea:"Popularidade por região", historyInterest:"Hotéis mais vistos", alerts:"Alertas de oportunidades", recommendations:"Recomendações", promisingMarkets:"Mercados promissores", selectMarkerHint:"Selecione um hotel no mapa" }, en:{ searchProduct:"Service / Attraction", province:"Province", municipality:"Municipality", commune:"Commune", clickMarkerDistance:"Click on hotel to see distance", regionDemand:"Demand by region / attraction", potentialBuyersZone:"Potential guests", mostDemandedProduct:"Most requested service", distanceToFarmer:"Distance from center", demandLevel:"Popularity level", areaCharts:"Booking trend (monthly)", statisticsArea:"Popularity by region", historyInterest:"Most viewed hotels", alerts:"Opportunity alerts", recommendations:"Recommendations", promisingMarkets:"Promising markets", selectMarkerHint:"Select a hotel on the map" }, fr:{ searchProduct:"Service / Attraction", province:"Province", municipality:"Municipalité", commune:"Commune", clickMarkerDistance:"Cliquez sur un hôtel pour voir la distance", regionDemand:"Demande par région / Attrait", potentialBuyersZone:"Clients potentiels", mostDemandedProduct:"Service le plus recherché", distanceToFarmer:"Distance du centre", demandLevel:"Niveau de popularité", areaCharts:"Tendance des réservations", statisticsArea:"Popularité par région", historyInterest:"Hôtels les plus consultés", alerts:"Alertes d'opportunités", recommendations:"Recommandations", promisingMarkets:"Marchés prometteurs", selectMarkerHint:"Sélectionnez un hôtel sur la carte" } };
+    let currentLang='pt';
+    function updateUIlanguage(){ document.querySelectorAll('[data-i18n]').forEach(el=>{ const key=el.getAttribute('data-i18n'); if(translations[currentLang][key]) el.innerText=translations[currentLang][key]; }); document.getElementById('langActive').innerText=currentLang==='pt'?'Português':(currentLang==='en'?'English':'Français'); document.getElementById('disclaimerMsg').innerHTML=currentLang==='pt'?'<i class="fas fa-chalkboard-teacher"></i> Reserve Já não garante hóspedes diretos — é uma plataforma de <strong>formação digital e marketing hoteleiro</strong>. Promoção do turismo e das maravilhas de Malanje.':(currentLang==='en'?'<i class="fas fa-chalkboard-teacher"></i> Reserve Já does not guarantee direct guests — it is a <strong>digital training & hotel marketing platform</strong>. Promoting tourism and wonders of Malanje.':'<i class="fas fa-chalkboard-teacher"></i> Reserve Já ne garantit pas de clients directs — c\'est une plateforme de <strong>formation digitale et marketing hôtelier</strong>. Promotion du tourisme et des merveilles de Malanje.'); }
+    let map, markersLayer, currentMarkers=[], areaChart=null, barChart=null;
+    let historyRegions=["Hotel Kalandula (Alta demanda - Vista cascata)","Residencial Cangandala (Média - Ecoturismo)","Hotel Malanje Central (Muito Alta - Conforto)"];
+    function initMap(){ map=L.map('leafletMap').setView([-9.5,16.5],8); L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{ attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> & carto' }).addTo(map); markersLayer=L.layerGroup().addTo(map); updateMarkersAndUI(); }
+    function updateMarkersAndUI(){ const product=document.getElementById('searchProduct').value.toLowerCase().trim(); const prov=document.getElementById('provinceFilter').value; markersLayer.clearLayers(); currentMarkers=[]; const filtered=markersData.filter(m=>{ let matchProduct=true; if(product&&m.productDemandMap){ let found=false; for(let key in m.productDemandMap){ if(key.includes(product)) found=true; } if(!found) matchProduct=false; } if(prov!=='all'&&m.province!==prov) matchProduct=false; return matchProduct; }); const bounds=L.latLngBounds(); filtered.forEach(m=>{ const dist=haversineDistance(farmerCoord.lat,farmerCoord.lng,m.lat,m.lng); const popupContent=`<b>${m.name}</b><br>Atração: ${m.topProduct}<br>Popularidade: ${m.demandLevel}<br>Distância: ${dist} km<br>Visitantes potenciais: ${m.potentialBuyers}`; const marker=L.marker([m.lat,m.lng]).bindPopup(popupContent); marker.on('click',()=>showRegionDetails(m,dist)); markersLayer.addLayer(marker); currentMarkers.push(marker); bounds.extend([m.lat,m.lng]); }); if(filtered.length>0&&bounds.isValid()) map.fitBounds(bounds,{padding:[30,30]}); else if(filtered.length===0) map.setView([-9.5,16.5],8); updateCharts(); updateStatsBar(filtered); if(filtered.length>0){ const first=filtered[0]; const distFirst=haversineDistance(farmerCoord.lat,farmerCoord.lng,first.lat,first.lng); showRegionDetails(first,distFirst); } else { document.getElementById('selectedRegionInfo').innerHTML='<p class="text-muted">Nenhum resultado para estes filtros.</p>'; document.getElementById('buyersList').innerHTML='—'; document.getElementById('topProductZone').innerHTML='—'; document.getElementById('distanceDisplay').innerHTML='—'; document.getElementById('demandBadge').innerHTML='—'; } }
+    function showRegionDetails(m,distanceVal){ document.getElementById('selectedRegionInfo').innerHTML=`<strong>${m.name}</strong> <span class="badge bg-secondary">${m.province}</span>`; document.getElementById('buyersList').innerHTML=m.buyersList; document.getElementById('topProductZone').innerHTML=`${m.topProduct.toUpperCase()} (popularidade ${m.demandLevel})`; document.getElementById('distanceDisplay').innerHTML=`${distanceVal} km do centro de Malanje`; let badgeClass=m.demandLevel==='Muito Alta'?'badge-demand-high':(m.demandLevel==='Alta'?'badge-demand-high':(m.demandLevel==='Média'?'badge-demand-medium':'badge-demand-low')); document.getElementById('demandBadge').innerHTML=`<span class="badge ${badgeClass}">${m.demandLevel}</span>`; let histEntry=`${m.name} (${m.demandLevel} - ${m.topProduct})`; if(!historyRegions.includes(histEntry)){ historyRegions.unshift(histEntry); if(historyRegions.length>5) historyRegions.pop(); renderHistory(); } }
+    function renderHistory(){ const ul=document.getElementById('historyList'); ul.innerHTML=historyRegions.map(h=>`<li class="list-group-item bg-transparent">${h}</li>`).join(''); }
+    function clearHistory(){ historyRegions=[]; renderHistory(); }
+    function updateCharts(){ const months=['Jan','Fev','Mar','Abr','Mai','Jun']; const demandTrend=[45,52,68,74,89,102]; const ctxArea=document.getElementById('areaChart').getContext('2d'); if(areaChart) areaChart.destroy(); areaChart=new Chart(ctxArea,{ type:'line', data:{ labels:months, datasets:[{ label:currentLang==='pt'?'Reservas (vista cascata)':(currentLang==='en'?'Bookings (waterfall view)':'Réservations (vue cascade)'), data:demandTrend, fill:true, backgroundColor:'rgba(46, 125, 50, 0.2)', borderColor:'#2E7D32', tension:0.3, pointBackgroundColor:'#2E7D32' }] }, options:{ responsive:true, maintainAspectRatio:true } }); }
+    function updateStatsBar(filtered){ const regionDemandMap={}; filtered.forEach(m=>{ regionDemandMap[m.name]=(regionDemandMap[m.name]||0)+m.potentialBuyers; }); let labels=Object.keys(regionDemandMap); let dataValues=labels.map(l=>regionDemandMap[l]); if(labels.length===0){ labels=['Sem dados']; dataValues=[0]; } const ctxBar=document.getElementById('statsBarChart').getContext('2d'); if(barChart) barChart.destroy(); barChart=new Chart(ctxBar,{ type:'bar', data:{ labels:labels.slice(0,5), datasets:[{ label:currentLang==='pt'?'Visitantes potenciais':(currentLang==='en'?'Potential guests':'Visiteurs potentiels'), data:dataValues.slice(0,5), backgroundColor:'#4CAF50', borderRadius:8 }] }, options:{ responsive:true, maintainAspectRatio:true, plugins:{ legend:{ position:'top' } } } }); }
+    document.getElementById('searchProduct').addEventListener('input',()=>updateMarkersAndUI()); document.getElementById('provinceFilter').addEventListener('change',()=>updateMarkersAndUI()); document.getElementById('clearHistoryBtn').addEventListener('click',clearHistory); document.getElementById('simulateAlertBtn').addEventListener('click',()=>{ const alertDiv=document.createElement('div'); alertDiv.className='alert alert-info py-1 mt-1'; alertDiv.innerHTML='<i class="fas fa-bullhorn"></i> Nova oportunidade: forte procura por hotéis em Kalandula!'; document.getElementById('alertsContainer').prepend(alertDiv); setTimeout(()=>alertDiv.remove(),5000); }); document.getElementById('whatsappBtn').addEventListener('click',()=>window.open('https://wa.me/244900000000?text=Olá! Estou a descobrir as oportunidades hoteleiras no Reserve Já em Malanje.','_blank')); document.getElementById('facebookCard').onclick=()=>alert("Partilhe o seu hotel no Facebook: #ReserveJáMalanje"); document.getElementById('instagramCard').onclick=()=>alert("Publique no Instagram as maravilhas de Malanje."); document.getElementById('contactBuyerCard').onclick=()=>alert("Contacte os visitantes através de: turismo@reserveja.ao ou WhatsApp."); document.getElementById('qrCodeCard').onclick=()=>{ let produto=document.getElementById('searchProduct').value||"atração"; document.getElementById('qrcodeContainer').innerHTML=""; try{ new QRCode(document.getElementById('qrcodeContainer'),{ text:`https://reserveja.malanje.com/${encodeURIComponent(produto)}`, width:180, height:180 }); }catch(e){ document.getElementById('qrcodeContainer').innerHTML='<p>Erro QR</p>'; } new bootstrap.Modal(document.getElementById('qrModal')).show(); }; const themeBtn=document.getElementById('themeToggleBtn'); themeBtn.addEventListener('click',()=>{ document.body.classList.toggle('dark-mode'); const isDark=document.body.classList.contains('dark-mode'); document.getElementById('themeText').innerText=isDark?'Tema claro':'Tema escuro'; themeBtn.innerHTML=isDark?'<i class="fas fa-sun"></i> Claro':'<i class="fas fa-moon"></i> Escuro'; }); document.querySelectorAll('[data-lang]').forEach(el=>{ el.addEventListener('click',(e)=>{ currentLang=e.target.getAttribute('data-lang'); updateUIlanguage(); updateCharts(); updateStatsBar(markersData.filter(m=>{ const prod=document.getElementById('searchProduct').value.toLowerCase(); const prov=document.getElementById('provinceFilter').value; let ok=true; if(prod&&m.productDemandMap){ let found=false; for(let key in m.productDemandMap) if(key.includes(prod)) found=true; if(!found) ok=false; } if(prov!=='all'&&m.province!==prov) ok=false; return ok; })); updateMarkersAndUI(); }); }); function populateMunicipios(){ const prov=document.getElementById('provinceFilter').value; const munSelect=document.getElementById('municipalityFilter'); const communeSelect=document.getElementById('communeFilter'); munSelect.innerHTML='<option value="all">Todos</option>'; communeSelect.innerHTML='<option value="all">Todas</option>'; if(prov!=='all'){ const municipios=[...new Set(markersData.filter(m=>m.province===prov).map(m=>m.municipality))]; municipios.forEach(mun=>{ munSelect.innerHTML+=`<option value="${mun}">${mun}</option>`; }); } else { const allMuns=[...new Set(markersData.map(m=>m.municipality))]; allMuns.forEach(mun=>{ munSelect.innerHTML+=`<option value="${mun}">${mun}</option>`; }); } munSelect.addEventListener('change',()=>{ const munVal=munSelect.value; communeSelect.innerHTML='<option value="all">Todas</option>'; let communes=[]; if(munVal!=='all'){ communes=[...new Set(markersData.filter(m=>m.municipality===munVal).map(m=>m.commune))]; } else { communes=[...new Set(markersData.map(m=>m.commune))]; } communes.forEach(com=>{ communeSelect.innerHTML+=`<option value="${com}">${com}</option>`; }); }); } document.addEventListener('DOMContentLoaded',()=>{ initMap(); updateUIlanguage(); renderHistory(); populateMunicipios(); setTimeout(()=>{ if(markersData.length){ const first=markersData[0]; const dist=haversineDistance(farmerCoord.lat,farmerCoord.lng,first.lat,first.lng); showRegionDetails(first,dist); } },500); }); (function(){ const modal=document.getElementById('modalAgroLux'); const btnFechar=document.getElementById('fecharModalAgroLux'); const floatingBtn=document.getElementById('floatingAgroLuxBtn'); let timeoutModal=null; const INTERVALO_MS=10*60*1000; const STORAGE_KEY='reserveja_ultimo_fechamento'; function abrirModal(){ if(!modal) return; if(modal.style.display==='flex') return; modal.style.display='flex'; document.body.style.overflow='hidden'; } function fecharModal(){ if(!modal) return; if(modal.style.display!=='flex') return; modal.style.display='none'; document.body.style.overflow=''; const agora=Date.now(); localStorage.setItem(STORAGE_KEY,agora.toString()); if(timeoutModal){ clearTimeout(timeoutModal); timeoutModal=null; } timeoutModal=setTimeout(()=>{ abrirModal(); timeoutModal=null; },INTERVALO_MS); } function inicializarModalComIntervalo(){ const ultimoFechamento=localStorage.getItem(STORAGE_KEY); if(!ultimoFechamento){ abrirModal(); return; } const tempoDecorrido=Date.now()-parseInt(ultimoFechamento,10); if(tempoDecorrido>=INTERVALO_MS){ abrirModal(); }else{ const tempoRestante=INTERVALO_MS-tempoDecorrido; timeoutModal=setTimeout(()=>{ abrirModal(); timeoutModal=null; },tempoRestante); } } if(btnFechar) btnFechar.addEventListener('click',(e)=>{ e.preventDefault(); fecharModal(); }); if(modal) modal.addEventListener('click',(e)=>{ if(e.target===modal) fecharModal(); }); const modalCard=document.querySelector('.modal-card'); if(modalCard) modalCard.addEventListener('click',(e)=>e.stopPropagation()); document.addEventListener('keydown',(e)=>{ if(e.key==='Escape'&&modal&&modal.style.display==='flex') fecharModal(); }); if(floatingBtn) floatingBtn.addEventListener('click',(e)=>{ e.preventDefault(); e.stopPropagation(); if(modal&&modal.style.display!=='flex') abrirModal(); }); inicializarModalComIntervalo(); })();
+</script>
+</body>
+</html>

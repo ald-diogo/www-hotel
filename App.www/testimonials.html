@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Reserve Já - Turismo em Malanje | Avaliações de Hotéis</title>
+    
+    <!-- Bootstrap + Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Leaflet para mapa interativo -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --info-color: #1abc9c;
+            --body-bg: #f5f7fa;
+            --body-color: #212529;
+            --card-bg: #ffffff;
+            --card-color: #212529;
+            --input-bg: #ffffff;
+            --input-color: #212529;
+            --border-color: #dee2e6;
+            --chat-user-bg: #e9ecef;
+            --chat-bot-bg: #d4e6f1;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        [data-bs-theme="dark"] {
+            --primary-color: #4dabf7;
+            --secondary-color: #343a40;
+            --success-color: #69db7c;
+            --warning-color: #ffa94d;
+            --danger-color: #ff8787;
+            --info-color: #3bc9db;
+            --body-bg: #121212;
+            --body-color: #f8f9fa;
+            --card-bg: #1e1e1e;
+            --card-color: #f8f9fa;
+            --input-bg: #2d2d2d;
+            --input-color: #f8f9fa;
+            --border-color: #444;
+            --chat-user-bg: #2c2c2c;
+            --chat-bot-bg: #1a3e50;
+            --glass-bg: rgba(0, 0, 0, 0.3);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--body-bg);
+            color: var(--body-color);
+            transition: background-color 0.3s, color 0.3s;
+            overflow-x: hidden;
+        }
+
+        /* Language dropdown */
+        .language-selector {
+            position: relative;
+            display: inline-block;
+        }
+        .lang-btn {
+            background: rgba(128, 128, 128, 0.08);
+            border: 1px solid var(--border-color);
+            border-radius: 40px;
+            padding: 6px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            color: var(--body-color);
+        }
+        .lang-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        .lang-dropdown {
+            position: absolute;
+            top: 110%;
+            right: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            min-width: 170px;
+            z-index: 1050;
+            display: none;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.2);
+            backdrop-filter: blur(2px);
+            overflow: hidden;
+        }
+        .lang-dropdown.show { display: block; animation: fadeIn 0.2s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px);} to { opacity: 1; transform: translateY(0);} }
+        .lang-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            text-decoration: none;
+            color: var(--body-color);
+            font-size: 0.9rem;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+        .lang-option:hover { background: rgba(52, 152, 219, 0.15); }
+        .lang-flag { width: 22px; height: 15px; object-fit: cover; border-radius: 3px; }
+
+        /* Hero slides */
+        .hero-section {
+            position: relative;
+            color: white;
+            padding: 100px 0;
+            margin-bottom: 40px;
+            overflow: hidden;
+            min-height: 600px;
+            display: flex;
+            align-items: center;
+        }
+        .slideshow-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .mySlides {
+            display: none;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+        }
+        .mySlides.active { display: block; opacity: 1; }
+        .slide-background {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .slide-background::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4));
+        }
+        .hero-content { position: relative; z-index: 2; width: 100%; }
+        .card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            background-color: var(--card-bg);
+            color: var(--card-color);
+        }
+        .card:hover { transform: translateY(-6px); box-shadow: 0 20px 25px -12px rgba(0,0,0,0.2); }
+        .btn-premium {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            border: none;
+            font-weight: bold;
+            padding: 12px 30px;
+            border-radius: 50px;
+            box-shadow: 0 0 15px rgba(243, 156, 18, 0.5);
+            transition: all 0.3s;
+        }
+        .stat-number { font-size: 2.5rem; font-weight: bold; color: var(--primary-color); }
+        .theme-toggle { position: relative; display: inline-block; width: 55px; height: 28px; }
+        .theme-toggle input { opacity: 0; width: 0; height: 0; }
+        .theme-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .theme-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .theme-slider { background-color: var(--primary-color); }
+        input:checked + .theme-slider:before { transform: translateX(27px); }
+        .fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+            cursor: pointer;
+        }
+        @media (max-width: 768px) {
+            .hero-section { padding: 60px 0; min-height: 500px; }
+        }
+        .map-container iframe {
+            border-radius: 20px;
+            width: 100%;
+            height: 280px;
+            border: 0;
+        }
+        .address-highlight {
+            background: rgba(52,152,219,0.1);
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-weight: 500;
+        }
+        
+        /* Logo */
+        .navbar-brand-custom {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            text-decoration: none;
+        }
+        .logo-img {
+            height: 70px;
+            width: 150px;
+            object-fit: contain;
+            margin: 0;
+            padding: 0;
+            border: 0;
+            display: block;
+        }
+        .brand-text {
+            line-height: 1.2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin: 0;
+            padding: 0;
+        }
+        .brand-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            letter-spacing: -0.3px;
+            color: var(--body-color);
+            margin-bottom: 0;
+            line-height: 1.2;
+        }
+        .brand-sub {
+            font-size: 0.68rem;
+            opacity: 0.8;
+            margin-top: 0px;
+            line-height: 1.3;
+            color: var(--body-color);
+        }
+        @media (max-width: 576px) {
+            .navbar-brand-custom { gap: 0.3rem; }
+            .logo-img { height: 40px; max-width: 44px; }
+            .brand-title { font-size: 1.1rem; }
+            .brand-sub { font-size: 0.55rem; }
+        }
+        .store-badge { height: 50px; width: auto; transition: transform 0.2s; }
+        .store-badge:hover { transform: scale(1.02); }
+        @media (max-width: 576px) { .store-badge { height: 40px; } }
+        
+        /* Chatbot */
+        .chat-messages { max-height: 350px; overflow-y: auto; padding: 15px; background: var(--body-bg); border-radius: 16px; margin-bottom: 15px; }
+        .message { margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px; }
+        .message.user { justify-content: flex-end; }
+        .message.bot .avatar, .message.user .avatar {
+            width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: white;
+        }
+        .message.bot .avatar { background: var(--primary-color); }
+        .message.user .avatar { background: var(--success-color); }
+        .bubble { max-width: 75%; padding: 10px 14px; border-radius: 18px; word-wrap: break-word; }
+        .bot .bubble { background: var(--chat-bot-bg); color: var(--body-color); }
+        .user .bubble { background: var(--primary-color); color: white; }
+        .quick-replies { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; margin-bottom: 12px; }
+        .quick-reply-btn {
+            background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 30px;
+            padding: 5px 12px; font-size: 0.8rem; transition: all 0.2s;
+        }
+        .quick-reply-btn:hover { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .btn-saber-mais {
+            background: linear-gradient(135deg, #f39c12, #e67e22); border: none; font-weight: bold;
+            border-radius: 60px; padding: 14px 30px; font-size: 1.2rem; box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+            transition: all 0.3s; margin-top: 20px;
+        }
+        .btn-saber-mais-modal {
+            background: linear-gradient(135deg, #2ecc71, #27ae60); border: none; font-weight: bold;
+            border-radius: 60px; padding: 10px 20px; font-size: 1rem; width: 100%; margin-bottom: 15px;
+            transition: all 0.3s; color: white;
+        }
+        .btn-saber-mais-modal:hover { transform: scale(1.02); background: linear-gradient(135deg, #27ae60, #1e8449); color: white; }
+        
+        /* Toast container */
+        .toast-container-custom {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1100;
+        }
+        .toast-custom {
+            min-width: 280px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            padding: 14px 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-left: 5px solid;
+            animation: slideInRight 0.3s ease;
+        }
+        .toast-custom.success { border-left-color: #2ecc71; background: #f0fff4; }
+        .toast-custom.error { border-left-color: #e74c3c; background: #fff5f5; }
+        [data-bs-theme="dark"] .toast-custom.success { background: #1e2a1e; color: #e0e0e0; }
+        [data-bs-theme="dark"] .toast-custom.error { background: #2a1e1e; color: #e0e0e0; }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        /* Seção de benefícios */
+        .benefit-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        /* ========== ESTILOS EXCLUSIVOS PARA AVALIAÇÕES ========== */
+        .hero-avaliacoes {
+            background: linear-gradient(135deg, rgba(0,0,0,0.7), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600');
+            background-size: cover;
+            background-position: center;
+            border-radius: 0 0 50px 50px;
+            padding: 80px 0;
+        }
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            transition: all 0.3s;
+        }
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+        .review-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .stars {
+            color: #ffc107;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+        }
+        .review-gallery img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 16px;
+            margin-right: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .hotel-response {
+            background: rgba(var(--primary-color-rgb), 0.1);
+            border-left: 4px solid var(--primary-color);
+            padding: 12px;
+            border-radius: 16px;
+            margin-top: 12px;
+        }
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+        .star-rating input { display: none; }
+        .star-rating label {
+            font-size: 2rem;
+            color: #ccc;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .star-rating input:checked ~ label,
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: #ffc107;
+        }
+        .dropzone {
+            border: 2px dashed var(--border-color);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .dropzone.drag-over {
+            border-color: var(--primary-color);
+            background: rgba(52,152,219,0.1);
+        }
+        .faq-accordion .accordion-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            margin-bottom: 12px;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .faq-accordion .accordion-button {
+            background: var(--card-bg);
+            color: var(--body-color);
+        }
+        .faq-accordion .accordion-button:not(.collapsed) {
+            background: var(--primary-color);
+            color: white;
+        }
+        #reviewsMap {
+            height: 400px;
+            border-radius: 28px;
+            z-index: 1;
+        }
+        .filter-dropdown {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 40px;
+            padding: 8px 20px;
+            color: var(--body-color);
+        }
+        .logo-dots, .logo-modal, .logo-user-ia {
+            border-radius: 50%;
+        }
+        .logo-dots { width: 60px; height: 60px; }
+        .logo-modal { width: 30px; height: 30px; }
+        .logo-user-ia { width: 40px; height: 40px; }
+    </style>
+</head>
+<body data-bs-theme="light">
+    <div class="toast-container-custom" id="toastContainer"></div>
+
+    <!-- NAVBAR (sem link para destinos) -->
+    <nav class="navbar navbar-expand-lg sticky-top" style="background: var(--card-bg); box-shadow: 0 2px 12px rgba(0,0,0,0.05);">
+        <div class="container">
+            <a class="navbar-brand-custom" href="index.html">
+                <img src="images/palanca-real-rbg.png" class="logo-img" alt="Reserve Já">
+               
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-1">
+                    <li class="nav-item"><a class="nav-link px-3" href="home.html" data-i18n="navBenefits">Para Hotéis</a></li>
+                    <li class="nav-item"><a class="nav-link px-3" href="#avaliacoes" data-i18n="navAvaliacoes">Avaliações</a></li>
+                    <li class="nav-item"><a class="nav-link px-3" href="offer.html" data-i18n="navOffers">Ofertas</a></li>
+                    <li class="nav-item"><a class="nav-link px-3" href="contact.html" data-i18n="navContact">Contacto</a></li>
+                </ul>
+                <div class="d-flex align-items-center ms-lg-4 mt-3 mt-lg-0 gap-2">
+                    <div class="language-selector me-2">
+                        <button class="lang-btn" id="langBtn"><i class="bi bi-translate"></i><span id="currentLang">PT</span><i class="bi bi-chevron-down"></i></button>
+                        <div class="lang-dropdown" id="langDropdown">
+                            <div class="lang-option" data-lang="pt"><span class="lang-flag">🇵🇹</span> Português</div>
+                            <div class="lang-option" data-lang="en"><span class="lang-flag">🇬🇧</span> English</div>
+                            <div class="lang-option" data-lang="fr"><span class="lang-flag">🇫🇷</span> Français</div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center me-3">
+                        <i class="bi bi-sun me-1"></i>
+                        <label class="theme-toggle"><input type="checkbox" id="themeSwitch"><span class="theme-slider"></span></label>
+                        <i class="bi bi-moon ms-1"></i>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="login.html" class="btn btn-outline-primary btn-sm"  data-bs-target="#loginModal"><span data-i18n="btnLogin">Entrar</span> <i class="fas fa-door-open"></i></a>
+                        <a href="401.html" class="btn btn-primary btn-sm"  data-bs-target="#registerModal" data-i18n="btnRegister">Cadastrar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero com slides (original) -->
+    <section class="hero-section">
+        <div class="slideshow-container">
+            <div class="mySlides active"><div class="slide-background" style="background-image: url('images/musseje.png')"></div></div>
+            <div class="mySlides"><div class="slide-background" style="background-image: url('images/kalandula.png')"></div></div>
+            <div class="mySlides"><div class="slide-background" style="background-image: url('images/pungo-an-dongo.png')"></div></div>
+        </div>
+        <div class="container hero-content text-center">
+            <h1 class="display-4 fw-bold mb-3" data-i18n="heroTitle">Uma plataforma moderna para hotéis e turistas em Malanje</h1>
+            <p class="lead mb-4" data-i18n="heroSubtitle">Ferramentas digitais para promover o turismo local, divulgar hotéis e facilitar reservas online de forma simples e eficiente.</p>
+            <a href="#" class="btn btn-premium btn-lg me-3" id="btnCadastrarHotel" data-i18n="btnRegisterHotel">📢 Cadastrar meu hotel</a>
+            <a href="#avaliacoes" class="btn btn-outline-light btn-lg"><span data-i18n="btnExploreReviews">Ver Avaliações</span> <i class="fas fa-star"></i></a>
+            <div class="text-center mt-4">
+                <button class="btn btn-saber-mais" id="btnSaberMaisAmina"><i class="bi bi-robot"></i> Conheça a assistente A.M.I.N.A</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefícios / Para Hotéis -->
+    <section class="container mb-5" id="benefits">
+        <h2 class="fw-bold text-center mb-5" data-i18n="benefitsTitle">Ferramentas para o seu hotel</h2>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3 text-center"><div class="benefit-icon"><i class="bi bi-display"></i></div><h5 data-i18n="benefit1Title">Divulgação online</h5><p data-i18n="benefit1Text">Mostre seu hotel a turistas que pesquisam por hospedagem em Malanje.</p></div>
+            <div class="col-md-6 col-lg-3 text-center"><div class="benefit-icon"><i class="bi bi-calendar-check"></i></div><h5 data-i18n="benefit2Title">Reservas digitais</h5><p data-i18n="benefit2Text">Facilite a recepção de pedidos de reserva através da plataforma.</p></div>
+            <div class="col-md-6 col-lg-3 text-center"><div class="benefit-icon"><i class="bi bi-share"></i></div><h5 data-i18n="benefit3Title">Integração social</h5><p data-i18n="benefit3Text">Partilhe as suas ofertas e novidades nas redes sociais com poucos cliques.</p></div>
+            <div class="col-md-6 col-lg-3 text-center"><div class="benefit-icon"><i class="bi bi-robot"></i></div><h5 data-i18n="benefit4Title">Apoio de IA</h5><p data-i18n="benefit4Text">A nossa assistente inteligente pode ajudar turistas a descobrir o seu hotel.</p></div>
+        </div>
+    </section>
+
+    <!-- ==================== SEÇÃO DE AVALIAÇÕES COMPLETA ==================== -->
+    <!-- Hero avaliações -->
+    <section class="hero-avaliacoes text-center text-white py-5 mb-5">
+        <div class="container">
+            <h1 class="display-4 fw-bold mb-3" data-i18n="avaliacoesHeroTitle">Experiências compartilhadas por turistas</h1>
+            <p class="lead mb-4" data-i18n="avaliacoesHeroSubtitle">Descubra opiniões, comentários e avaliações sobre hotéis e destinos em Malanje.</p>
+            <div class="d-flex gap-3 justify-content-center">
+                <a href="#reviewsList" class="btn btn-primary btn-lg px-4"><i class="bi bi-star-fill"></i> <span data-i18n="btnVerAvaliacoes">Ver Avaliações</span></a>
+                <button class="btn btn-outline-light btn-lg px-4" data-bs-toggle="modal" data-bs-target="#avaliarHotelModal"><i class="bi bi-pencil-square"></i> <span data-i18n="btnAvaliarHotel">Avaliar Hotel</span></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Estatísticas -->
+    <section class="container mb-5">
+        <div class="row g-4 text-center">
+            <div class="col-md-3"><div class="glass-card p-4"><div class="stat-number" id="avgRating">4.8</div><p><i class="bi bi-star-fill text-warning"></i> <span data-i18n="statMedia">Avaliação Média</span></p></div></div>
+            <div class="col-md-3"><div class="glass-card p-4"><div class="stat-number" id="totalReviews">0</div><p><i class="bi bi-chat-dots"></i> <span data-i18n="statComentarios">Comentários Publicados</span></p></div></div>
+            <div class="col-md-3"><div class="glass-card p-4"><div class="stat-number" id="totalHotels">0</div><p><i class="bi bi-building"></i> <span data-i18n="statHoteis">Hotéis Avaliados</span></p></div></div>
+            <div class="col-md-3"><div class="glass-card p-4"><div class="stat-number" id="totalFotos">0</div><p><i class="bi bi-images"></i> <span data-i18n="statFotos">Fotos Compartilhadas</span></p></div></div>
+        </div>
+    </section>
+
+    <!-- Filtros -->
+    <section class="container mb-4">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-3"><select id="filterHotel" class="form-select filter-dropdown"><option value="">Todos os hotéis</option></select></div>
+            <div class="col-md-2"><select id="filterStars" class="form-select filter-dropdown"><option value="">Estrelas</option><option value="5">5 estrelas</option><option value="4">4+</option><option value="3">3+</option></select></div>
+            <div class="col-md-2"><select id="filterPrice" class="form-select filter-dropdown"><option value="">Preço</option><option value="low">Menor preço</option><option value="high">Maior preço</option></select></div>
+            <div class="col-md-2"><select id="filterRecent" class="form-select filter-dropdown"><option value="recent">Mais recentes</option><option value="best">Melhor avaliados</option></select></div>
+            <div class="col-md-3"><button id="applyFiltersBtn" class="btn btn-primary w-100"><i class="bi bi-funnel"></i> Aplicar Filtros</button></div>
+        </div>
+    </section>
+
+    <!-- Lista de avaliações + Sidebar -->
+    <div class="container mb-5" id="avaliacoes">
+        <div class="row">
+            <div class="col-lg-8" id="reviewsList"></div>
+            <div class="col-lg-4">
+                <div class="glass-card p-4 mb-4"><h4><i class="bi bi-trophy-fill text-warning"></i> <span data-i18n="bestHotelsTitle">Hotéis mais bem avaliados</span></h4><div id="topHotelsList"></div></div>
+                <div class="glass-card p-4">
+                    <h5>
+                        <i class="bi bi-share-fill"></i> 
+                        <span data-i18n="shareTitle">Compartilhe esta página</span>
+                    </h5>
+                    
+                    <div class="d-flex gap-2 mt-3">
+                        <button class="btn btn-outline-success share-btn" data-platform="whatsapp">
+                    <i class="fa fa-whatsapp"></i> WhatsApp
+                    </button>
+                        
+                        
+                        
+                        
+                    <button class="btn btn-outline-primary share-btn" data-platform="facebook">
+                        <i class="fa fa-facebook"></i> Facebook
+                    </button>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <small><i class="bi bi-qr-code"></i> 
+                            <span data-i18n="qrCodeText">
+                                QR Code gerado automaticamente
+                            </span>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mapa interativo -->
+    <section class="container mb-5"><h2 class="fw-bold mb-4"><i class="bi bi-map"></i> <span data-i18n="mapHotelsTitle">Hotéis avaliados no mapa</span></h2><div id="reviewsMap" style="height: 400px; border-radius: 28px;"></div></section>
+
+    <!-- FAQ -->
+    <section class="container mb-5"><h2 class="fw-bold mb-4"><span data-i18n="faqTitle">Perguntas frequentes</span></h2><div class="accordion faq-accordion" id="faqAccordion"><div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1"><span data-i18n="faq1q">Como publicar uma avaliação?</span></button></h2><div id="faq1" class="accordion-collapse collapse show"><div class="accordion-body" data-i18n="faq1a">Clique em "Avaliar Hotel", preencha o formulário e publique. Sua opinião ajuda outros viajantes.</div></div></div><div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2"><span data-i18n="faq2q">Posso editar meu comentário?</span></button></h2><div id="faq2" class="accordion-collapse collapse"><div class="accordion-body" data-i18n="faq2a">Sim, entre na sua conta e acesse "Minhas Avaliações".</div></div></div><div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3"><span data-i18n="faq3q">Como denunciar uma avaliação?</span></button></h2><div id="faq3" class="accordion-collapse collapse"><div class="accordion-body" data-i18n="faq3a">Use o botão "Denunciar" no card. Nossa equipe analisará o conteúdo.</div></div></div></div></section>
+
+    <!-- Chamada final -->
+    <section class="container mb-5 text-center"><div class="glass-card p-5"><h2 class="display-5 fw-bold" data-i18n="ctaTitle">Compartilhe sua experiência.</h2><p class="lead" data-i18n="ctaSubtitle">Ajude outros turistas a descobrir hotéis e destinos em Malanje.</p><button class="btn btn-primary btn-lg px-5 mt-3" data-bs-toggle="modal" data-bs-target="#avaliarHotelModal"><i class="bi bi-pencil-square"></i> <span data-i18n="ctaButton">Escrever Avaliação</span></button></div></section>
+
+    <!-- SEÇÃO OFERTAS (original) -->
+    <section class="container mb-5" id="offers">
+        <h2 class="fw-bold text-center mb-4" data-i18n="sectionOffers">📢 Crie campanhas promocionais</h2>
+        <div class="row g-4">
+            <div class="col-md-4"><div class="card text-center p-4"><i class="bi bi-tags fs-1 text-primary"></i><h5 class="mt-3" data-i18n="offer1Title">Descontos sazonais</h5><p data-i18n="offer1Text">Ofereça tarifas especiais em épocas de menor movimento e atraia mais viajantes.</p></div></div>
+            <div class="col-md-4"><div class="card text-center p-4"><i class="bi bi-gift fs-1 text-primary"></i><h5 class="mt-3" data-i18n="offer2Title">Pacotes experienciais</h5><p data-i18n="offer2Text">Crie combos de hospedagem com passeios locais para valorizar a estadia.</p></div></div>
+            <div class="col-md-4"><div class="card text-center p-4"><i class="bi bi-megaphone fs-1 text-primary"></i><h5 class="mt-3" data-i18n="offer3Title">Divulgação direcionada</h5><p data-i18n="offer3Text">Utilize as nossas ferramentas para promover ofertas exclusivas a turistas interessados.</p></div></div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO DE VÍDEOS (com os vídeos locais) -->
+    <section class="container mb-5" id="videos">
+        <div class="d-flex justify-content-between align-items-center flex-wrap"><h2 class="fw-bold" data-i18n="sectionVideos">🎥 Explore Malanje em Vídeo</h2>
+            <a href="video.html" data-i18n="btnMoreVideos">Mais vídeos</a></div>
+        <div class="row mt-4">
+            <div class="col-md-6 mb-4"><div class="card h-100"><div class="ratio ratio-16x9"><iframe src="video/quedas-rei.mp4" title="Quedas de Kalandula" allowfullscreen></iframe></div><div class="card-body"><h5 data-i18n="video1Title">Quedas de Kalandula - Império das Águas</h5><p data-i18n="video1Desc">Veja a majestade das maiores quedas de água em volume de África, um espetáculo da natureza.</p></div></div></div>
+            <div class="col-md-6 mb-4"><div class="card h-100"><div class="ratio ratio-16x9"><iframe src="video/pungo-dongo.mp4" title="Pedras Negras" allowfullscreen></iframe></div><div class="card-body"><h5 data-i18n="video2Title">Pedras Negras de Pungo Andongo - Mística e História</h5><p data-i18n="video2Desc">Conheça as formações rochosas lendárias e a vista panorâmica sobre a savana angolana.</p></div></div></div>
+        </div>
+    </section>
+
+    <!-- Contacto / Mapa (original) -->
+    <section class="container mb-5" id="contact">
+        <h2 class="fw-bold text-center mb-4" data-i18n="sectionContact">Onde Estamos & Contacto</h2>
+        <div class="row g-4">
+            <div class="col-lg-6"><div class="card h-100 p-3"><h4 class="mb-3"><i class="bi bi-pin-map-fill text-danger"></i> <span data-i18n="mapTitle">Nossa Localização</span></h4><div class="map-container"><iframe src="https://maps.google.com/maps?q=Bairro%20Ritondo%2C%20Malanje%2C%20Angola&t=&z=15&ie=UTF8&iwloc=&output=embed" allowfullscreen="" loading="lazy"></iframe></div><div class="mt-3"><p class="mb-1"><i class="bi bi-geo-alt-fill text-primary"></i> <strong data-i18n="addressLabel">Sede principal:</strong> <span class="address-highlight">Bairro Ritondo, Malanje, Angola</span></p><p><i class="bi bi-telephone"></i> +244 921 151 685 &nbsp;|&nbsp; <i class="bi bi-envelope"></i> antoniodiogo958@gmail.com</p></div></div></div>
+            <div class="col-lg-6"><div class="card h-100 p-3"><h4 class="mb-3"><i class="bi bi-chat-dots"></i> <span data-i18n="contactFormTitle">Fale connosco</span></h4><form id="contactForm"><div class="mb-3"><label class="form-label" data-i18n="formName">Nome completo</label><input type="text" class="form-control" id="contactName"></div><div class="mb-3"><label class="form-label" data-i18n="formEmail">E-mail</label><input type="email" class="form-control" id="contactEmail"></div><div class="mb-3"><label class="form-label" data-i18n="formMessage">Mensagem</label><textarea class="form-control" rows="4" id="contactMessage"></textarea></div><button type="submit" class="btn btn-primary w-100"><span data-i18n="btnSendMessage">Enviar mensagem</span> <i class="fas fa-paper-plane"></i></button></form></div></div>
+        </div>
+    </section>
+
+    <!-- NEWSLETTER -->
+    <section class="newsletter-section bg-primary text-white p-5 text-center rounded-4 container mb-5"><h2 data-i18n="newsletterTitle">Receba novidades e dicas de turismo</h2><div class="d-flex flex-wrap justify-content-center gap-2 mt-3"><input type="email" id="newsletterEmail" class="form-control w-auto" style="min-width: 250px;" placeholder="seu@email.com" data-i18n-placeholder="newsletterPlaceholder"><button id="btnSubscribeNewsletter" class="btn btn-light"><span data-i18n="btnSubscribe">Assinar</span> <i class="fas fa-envelope-open-text"></i></button></div></section>
+
+    <!-- FOOTER -->
+    <footer class="footer bg-dark text-white pt-5 pb-3"><div class="container"><div class="row"><div class="col-md-5 mb-4"><h5>Reserve Já</h5><p data-i18n="footerDescription">Plataforma digital de apoio ao turismo e hotelaria em Malanje – conectando viajantes a experiências autênticas e oferecendo ferramentas modernas para hotéis.</p></div><div class="col-md-4 mb-4"><h5 data-i18n="footerUsefulLinks">Links úteis</h5><ul class="list-unstyled"><li>
+        <a href="about-us.html" class="text-white-50">Sobre nós</a></li>
+        <li><a href="term.html" class="text-white-50">Termos e Condições</a></li>
+        <li><a href="privacy.html" class="text-white-50">Política de Privacidade</a>
+        </li></ul></div><div class="col-md-3 mb-4"><h5>Baixe o App</h5><div class="d-flex flex-row gap-3"><a href="https://play.google.com/store" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play" class="store-badge" style="height: 50px;"></a><a href="https://www.apple.com/app-store/" target="_blank"><img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="App Store" class="store-badge" style="height: 50px;"></a></div></div></div><hr class="bg-secondary"><div class="text-center small">&copy; 2025 Reserve Já - Turismo em Malanje | Bairro Ritondo, Malanje, Angola</div></div></footer>
+
+    <!-- Floating Chat Button -->
+    <a href="#" class="fab" data-bs-toggle="modal" data-bs-target="#chatModal"><img src="images/amina-chat.png" class="logo-dots"/></a>
+
+    <!-- MODAL A.M.I.N.A (CHATBOT) -->
+    <div class="modal fade" id="chatModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content"><div class="modal-header bg-primary text-white"><h5 class="modal-title"><img src="images/amina-chat.png" class="logo-modal"/> A.M.I.N.A <span class="small">(Adaptativa, Multitarefa, Inteligente, Neural, Analítica)</span></h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body p-3"><div class="mb-2 small text-muted text-center fst-italic">“Aquela em que podemos confiar” – Contexto Africano de confiança</div><div id="chatMessagesContainer" class="chat-messages"></div><div id="quickReplies" class="quick-replies"></div>
+       <a href="front-ia.html">
+           <button class="btn btn-saber-mais-modal" id="btnSaberMaisModal">   
+            <i class="bi bi-question-circle-fill"></i>
+            Saber mais sobre a plataforma
+        </button>
+        </a>
+        
+        
+        <div class="chat-input-group mt-2 d-flex gap-2"><input type="text" id="chatInput" class="form-control" placeholder="Escreva sua pergunta..."><button id="sendChatBtn" class="btn btn-primary"><i class="bi bi-send"></i></button></div></div></div></div></div>
+
+    <!-- MODAL AVALIAR HOTEL -->
+    <div class="modal fade" id="avaliarHotelModal" tabindex="-1"><div class="modal-dialog modal-lg modal-dialog-centered"><div class="modal-content glass-card"><div class="modal-header"><h5 class="modal-title"><i class="bi bi-star-fill text-warning"></i> <span data-i18n="avaliarTitulo">Avaliar Hotel</span></h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="formAvaliacao"><div class="mb-3"><label class="form-label">Hotel</label><select id="avaliacaoHotel" class="form-select" required></select></div><div class="mb-3"><label class="form-label">Sua nota</label><div class="star-rating" id="starRatingWidget"><input type="radio" name="rating" value="5" id="star5"><label for="star5">★</label><input type="radio" name="rating" value="4" id="star4"><label for="star4">★</label><input type="radio" name="rating" value="3" id="star3"><label for="star3">★</label><input type="radio" name="rating" value="2" id="star2"><label for="star2">★</label><input type="radio" name="rating" value="1" id="star1"><label for="star1">★</label></div></div><div class="mb-3"><label class="form-label">Comentário</label><textarea id="avaliacaoComentario" class="form-control" rows="3" required></textarea></div><div class="mb-3"><label class="form-label">Fotos (opcional)</label><div id="dropzone" class="dropzone"><i class="bi bi-cloud-upload fs-1"></i><p>Arraste fotos ou clique para selecionar</p><input type="file" id="fotosInput" multiple accept="image/*" style="display:none"></div><div id="previewFotos" class="d-flex flex-wrap gap-2 mt-2"></div></div><div class="alert alert-info" id="iaModerationMsg" style="display:none;"><i class="bi bi-robot"></i> <span data-i18n="iaChecking">IA está verificando o conteúdo...</span></div><button type="submit" class="btn btn-primary w-100"><span data-i18n="publicarBtn">Publicar Avaliação</span></button></form></div></div></div></div>
+
+    <!-- Modais Login/Register -->
+    <div class="modal fade" id="loginModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Login</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form><input type="email" class="form-control mb-2" placeholder="Email"><input type="password" class="form-control mb-2" placeholder="Senha"><button class="btn btn-primary w-100">Entrar</button></form></div></div></div></div>
+    <div class="modal fade" id="registerModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Cadastrar</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form><input type="text" class="form-control mb-2" placeholder="Nome"><input type="email" class="form-control mb-2" placeholder="Email"><input type="password" class="form-control mb-2" placeholder="Senha"><button class="btn btn-primary w-100">Registrar</button></form></div></div></div></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ===================== DADOS PARA AVALIAÇÕES =====================
+        const hoteis = [
+            { id: 1, nome: "Hotel Kalandula Palace", lat: -9.5333, lng: 16.35, precoMedio: 45000, estrelas: 5 },
+            { id: 2, nome: "Pungo Andongo Lodge", lat: -9.6667, lng: 16.0667, precoMedio: 38000, estrelas: 4 },
+            { id: 3, nome: "Residencial Cangandala", lat: -9.5333, lng: 16.35, precoMedio: 25000, estrelas: 3 },
+            { id: 4, nome: "Hotel Malanje Central", lat: -9.5333, lng: 16.35, precoMedio: 55000, estrelas: 5 }
+        ];
+        let avaliacoes = [
+            { id: 1, hotelId: 1, usuario: "Carlos M.", nota: 5, comentario: "Hotel fantástico, vista incrível para as quedas! Atendimento excelente.", data: "2025-05-10", fotos: [], respostas: [{ hotelId: 1, texto: "Agradecemos seu feedback! Volte sempre.", data: "2025-05-11" }] },
+            { id: 2, hotelId: 2, usuario: "Ana S.", nota: 4, comentario: "Lugar tranquilo, próximo às pedras negras. Café da manhã muito bom.", data: "2025-05-05", fotos: [], respostas: [] },
+            { id: 3, hotelId: 3, usuario: "João P.", nota: 3, comentario: "Bom custo-benefício, mas precisa melhorar o Wi-Fi.", data: "2025-04-28", fotos: [], respostas: [{ hotelId: 3, texto: "Estamos melhorando a infraestrutura, obrigado pela dica!", data: "2025-04-29" }] },
+            { id: 4, hotelId: 4, usuario: "Mariana L.", nota: 5, comentario: "Quartos luxuosos, piscina aquecida. Recomendo!", data: "2025-05-01", fotos: [], respostas: [] }
+        ];
+        let proximoId = 5;
+        let fotosTemp = [];
+
+        function showToast(message, type) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast-custom ${type}`;
+            toast.innerHTML = `<span>${type==='success'?'✅':'❌'}</span><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 4000);
+        }
+
+        function updateStats() {
+            const total = avaliacoes.length;
+            const media = (avaliacoes.reduce((a,b)=>a+b.nota,0)/total).toFixed(1);
+            const hoteisUnicos = new Set(avaliacoes.map(a=>a.hotelId)).size;
+            const totalFotos = avaliacoes.reduce((a,b)=>a+b.fotos.length,0);
+            document.getElementById('avgRating').innerText = media;
+            document.getElementById('totalReviews').innerText = total;
+            document.getElementById('totalHotels').innerText = hoteisUnicos;
+            document.getElementById('totalFotos').innerText = totalFotos;
+        }
+
+        function renderReviews(filters={}) {
+            let filtered = [...avaliacoes];
+            if(filters.hotelId) filtered = filtered.filter(r=>r.hotelId==filters.hotelId);
+            if(filters.minStars) filtered = filtered.filter(r=>r.nota>=parseInt(filters.minStars));
+            if(filters.sort==='best') filtered.sort((a,b)=>b.nota-a.nota);
+            else if(filters.sort==='recent') filtered.sort((a,b)=>new Date(b.data)-new Date(a.data));
+            const container = document.getElementById('reviewsList');
+            container.innerHTML = '';
+            filtered.forEach(rev => {
+                const hotel = hoteis.find(h=>h.id==rev.hotelId);
+                const card = document.createElement('div');
+                card.className = 'review-card';
+                card.innerHTML = `
+                    <div class="d-flex gap-3"><div style="width:50px;height:50px;background:#ccc;border-radius:50%;display:flex;align-items:center;justify-content:center;"><i class="bi bi-person-circle fs-1"></i></div>
+                    <div class="flex-grow-1"><div class="d-flex justify-content-between"><h5>${rev.usuario}</h5><small>📅 ${new Date(rev.data).toLocaleDateString()}</small></div>
+                    <div class="stars">${'★'.repeat(rev.nota)}${'☆'.repeat(5-rev.nota)}</div><p class="mt-2">${rev.comentario}</p>
+                    <div class="review-gallery d-flex flex-wrap">${rev.fotos.map(f=>`<img src="${f}" style="width:80px;height:80px;object-fit:cover;border-radius:12px;margin-right:8px;" onclick="window.open('${f}')">`).join('')}</div>
+                    ${rev.respostas.map(r=>`<div class="hotel-response mt-2"><i class="bi bi-building"></i> <strong>${hotel?.nome}</strong>: ${r.texto} <small class="text-muted">${new Date(r.data).toLocaleDateString()}</small></div>`).join('')}
+                    <div class="mt-2 d-flex gap-3"><button class="btn btn-sm btn-outline-secondary"><i class="bi bi-hand-thumbs-up"></i> Útil</button><button class="btn btn-sm btn-outline-secondary"><i class="bi bi-reply"></i> Responder</button></div></div></div>`;
+                container.appendChild(card);
+            });
+            // Top hotéis
+            const hotelRatings = {};
+            avaliacoes.forEach(rev => { if(!hotelRatings[rev.hotelId]) hotelRatings[rev.hotelId]={soma:0,count:0}; hotelRatings[rev.hotelId].soma+=rev.nota; hotelRatings[rev.hotelId].count++; });
+            const top = Object.entries(hotelRatings).map(([id,val])=>({id:parseInt(id),media:val.soma/val.count})).sort((a,b)=>b.media-a.media).slice(0,3);
+            document.getElementById('topHotelsList').innerHTML = top.map(h=>{const hotel=hoteis.find(hot=>hot.id===h.id); return `<div class="mb-2"><i class="bi bi-star-fill text-warning"></i> ${hotel?.nome} - ${h.media.toFixed(1)} ★</div>`;}).join('');
+        }
+
+        function moderateComment(text) {
+            const offensive = ['bosta','merda','idiota','lixo','otario'];
+            for(let w of offensive) if(text.toLowerCase().includes(w)) return false;
+            return true;
+        }
+
+        document.getElementById('formAvaliacao')?.addEventListener('submit', function(e){
+            e.preventDefault();
+            const hotelId = parseInt(document.getElementById('avaliacaoHotel').value);
+            const nota = parseInt(document.querySelector('input[name="rating"]:checked')?.value);
+            const comentario = document.getElementById('avaliacaoComentario').value;
+            if(!hotelId || !nota || !comentario) { showToast('Preencha todos os campos', 'error'); return; }
+            const iaDiv = document.getElementById('iaModerationMsg');
+            iaDiv.style.display = 'block';
+            setTimeout(()=>{
+                if(!moderateComment(comentario)) { showToast('Comentário contém linguagem ofensiva', 'error'); iaDiv.style.display='none'; return; }
+                const newReview = { id: proximoId++, hotelId, usuario: "Visitante Anônimo", nota, comentario, data: new Date().toISOString().slice(0,10), fotos: fotosTemp.slice(), respostas: [] };
+                avaliacoes.push(newReview);
+                updateStats();
+                renderReviews({});
+                showToast('Avaliação publicada com sucesso!', 'success');
+                document.getElementById('formAvaliacao').reset();
+                document.getElementById('previewFotos').innerHTML = '';
+                fotosTemp = [];
+                iaDiv.style.display = 'none';
+                bootstrap.Modal.getInstance(document.getElementById('avaliarHotelModal')).hide();
+            }, 800);
+        });
+
+        // Upload de fotos
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fotosInput');
+        dropzone.addEventListener('click',()=>fileInput.click());
+        dropzone.addEventListener('dragover',e=>{e.preventDefault(); dropzone.classList.add('drag-over');});
+        dropzone.addEventListener('dragleave',()=>dropzone.classList.remove('drag-over'));
+        dropzone.addEventListener('drop',e=>{e.preventDefault(); dropzone.classList.remove('drag-over'); handleFiles(Array.from(e.dataTransfer.files));});
+        fileInput.addEventListener('change',e=>handleFiles(Array.from(e.target.files)));
+        function handleFiles(files){
+            files.forEach(file=>{
+                const reader = new FileReader();
+                reader.onload = ev=>{
+                    fotosTemp.push(ev.target.result);
+                    const preview = document.getElementById('previewFotos');
+                    const img = document.createElement('img');
+                    img.src = ev.target.result;
+                    img.style.width='80px'; img.style.height='80px'; img.style.objectFit='cover'; img.style.borderRadius='12px';
+                    preview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Filtros
+        document.getElementById('applyFiltersBtn')?.addEventListener('click',()=>{
+            const hotelId = document.getElementById('filterHotel').value;
+            const stars = document.getElementById('filterStars').value;
+            const sort = document.getElementById('filterRecent').value;
+            renderReviews({ hotelId: hotelId||null, minStars: stars, sort: sort });
+        });
+
+        function populateHotelSelects(){
+            ['avaliacaoHotel','filterHotel'].forEach(id=>{
+                const select = document.getElementById(id);
+                if(select) hoteis.forEach(h=>{const opt=document.createElement('option'); opt.value=h.id; opt.innerText=h.nome; select.appendChild(opt);});
+            });
+        }
+
+        // Mapa Leaflet
+        function initMap(){
+            const map = L.map('reviewsMap').setView([-9.5333,16.35],10);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'}).addTo(map);
+            hoteis.forEach(hotel=>{
+                const marker = L.marker([hotel.lat,hotel.lng]).addTo(map);
+                marker.bindPopup(`<b>${hotel.nome}</b><br>⭐ ${hotel.estrelas} estrelas<br><button onclick="document.getElementById('avaliacoes').scrollIntoView()">Ver avaliações</button>`);
+            });
+        }
+
+        // Compartilhamento
+        document.querySelectorAll('.share-btn').forEach(btn=>{
+            btn.addEventListener('click',()=>{
+                const url = encodeURIComponent(window.location.href);
+                const text = encodeURIComponent('Confira as avaliações de hotéis em Malanje no Reserve Já!');
+                if(btn.dataset.platform==='whatsapp') window.open(`https://wa.me/?text=${text}%20${url}`,'_blank');
+                else if(btn.dataset.platform==='facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`,'_blank');
+            });
+        });
+
+        // ===================== TRADUÇÕES COMPLETAS (PT, EN, FR) =====================
+        const translations = {
+            pt: { navBenefits:"Para Hotéis", navAvaliacoes:"Avaliações", navOffers:"Ofertas", navContact:"Contacto", btnLogin:"Entrar", btnRegister:"Cadastrar",
+                  heroTitle:"Uma plataforma moderna para hotéis e turistas em Malanje", heroSubtitle:"Ferramentas digitais para promover o turismo local, divulgar hotéis e facilitar reservas online.",
+                  btnRegisterHotel:"📢 Cadastrar meu hotel", btnExploreReviews:"Ver Avaliações", benefitsTitle:"Ferramentas para o seu hotel",
+                  benefit1Title:"Divulgação online", benefit1Text:"Mostre seu hotel a turistas que pesquisam por hospedagem em Malanje.",
+                  benefit2Title:"Reservas digitais", benefit2Text:"Facilite a recepção de pedidos de reserva através da plataforma.",
+                  benefit3Title:"Integração social", benefit3Text:"Partilhe as suas ofertas e novidades nas redes sociais com poucos cliques.",
+                  benefit4Title:"Apoio de IA", benefit4Text:"A nossa assistente inteligente pode ajudar turistas a descobrir o seu hotel.",
+                  sectionOffers:"📢 Crie campanhas promocionais", offer1Title:"Descontos sazonais", offer1Text:"Ofereça tarifas especiais em épocas de menor movimento.",
+                  offer2Title:"Pacotes experienciais", offer2Text:"Crie combos de hospedagem com passeios locais.",
+                  offer3Title:"Divulgação direcionada", offer3Text:"Utilize as nossas ferramentas para promover ofertas exclusivas.",
+                  sectionVideos:"🎥 Explore Malanje em Vídeo", btnMoreVideos:"Mais vídeos", video1Title:"Quedas de Kalandula - Império das Águas", video1Desc:"Veja a majestade das maiores quedas de água em volume de África.",
+                  video2Title:"Pedras Negras de Pungo Andongo - Mística e História", video2Desc:"Conheça as formações rochosas lendárias e a vista panorâmica sobre a savana angolana.",
+                  sectionContact:"Onde Estamos & Contacto", mapTitle:"Nossa Localização", addressLabel:"Sede principal:", contactFormTitle:"Fale connosco",
+                  formName:"Nome completo", formEmail:"E-mail", formMessage:"Mensagem", btnSendMessage:"Enviar mensagem",
+                  newsletterTitle:"Receba novidades e dicas de turismo", newsletterPlaceholder:"seu@email.com", btnSubscribe:"Assinar",
+                  footerDescription:"Plataforma digital de apoio ao turismo e hotelaria em Malanje – conectando viajantes a experiências autênticas.",
+                  footerUsefulLinks:"Links úteis",
+                  avaliacoesHeroTitle:"Experiências compartilhadas por turistas", avaliacoesHeroSubtitle:"Descubra opiniões, comentários e avaliações sobre hotéis e destinos em Malanje.",
+                  btnVerAvaliacoes:"Ver Avaliações", btnAvaliarHotel:"Avaliar Hotel", statMedia:"Avaliação Média", statComentarios:"Comentários Publicados",
+                  statHoteis:"Hotéis Avaliados", statFotos:"Fotos Compartilhadas", bestHotelsTitle:"Hotéis mais bem avaliados", shareTitle:"Compartilhe esta página",
+                  qrCodeText:"QR Code gerado automaticamente", mapHotelsTitle:"Hotéis avaliados no mapa", faqTitle:"Perguntas frequentes",
+                  faq1q:"Como publicar uma avaliação?", faq1a:"Clique em 'Avaliar Hotel', preencha o formulário e publique.",
+                  faq2q:"Posso editar meu comentário?", faq2a:"Sim, entre na sua conta e acesse 'Minhas Avaliações'.",
+                  faq3q:"Como denunciar uma avaliação?", faq3a:"Use o botão 'Denunciar' no card.",
+                  ctaTitle:"Compartilhe sua experiência.", ctaSubtitle:"Ajude outros turistas a descobrir hotéis e destinos em Malanje.",
+                  ctaButton:"Escrever Avaliação", avaliarTitulo:"Avaliar Hotel", publicarBtn:"Publicar Avaliação", iaChecking:"IA está verificando o conteúdo..."
+                },
+            en: { navBenefits:"For Hotels", navAvaliacoes:"Reviews", navOffers:"Offers", navContact:"Contact", btnLogin:"Login", btnRegister:"Sign Up",
+                  heroTitle:"A modern platform for hotels and tourists in Malanje", heroSubtitle:"Digital tools to promote local tourism, advertise hotels and facilitate online bookings simply and efficiently.",
+                  btnRegisterHotel:"📢 Register my hotel", btnExploreReviews:"View Reviews", benefitsTitle:"Tools for your hotel",
+                  benefit1Title:"Online visibility", benefit1Text:"Show your hotel to tourists searching for accommodation in Malanje.",
+                  benefit2Title:"Digital bookings", benefit2Text:"Simplify receiving booking requests through the platform.",
+                  benefit3Title:"Social integration", benefit3Text:"Share your offers and news on social media with a few clicks.",
+                  benefit4Title:"AI support", benefit4Text:"Our intelligent assistant can help tourists discover your hotel.",
+                  sectionOffers:"📢 Create promotional campaigns", offer1Title:"Seasonal discounts", offer1Text:"Offer special rates during low season and attract more travelers.",
+                  offer2Title:"Experience packages", offer2Text:"Create accommodation combos with local tours to enhance the stay.",
+                  offer3Title:"Targeted promotion", offer3Text:"Use our tools to promote exclusive offers to interested tourists.",
+                  sectionVideos:"🎥 Explore Malanje in Video", btnMoreVideos:"More videos", video1Title:"Kalandula Falls - Empire of Waters", video1Desc:"See the majesty of Africa's largest waterfalls by volume, a natural spectacle.",
+                  video2Title:"Black Rocks of Pungo Andongo - Mystique and History", video2Desc:"Discover the legendary rock formations and the panoramic view over the Angolan savanna.",
+                  sectionContact:"Where We Are & Contact", mapTitle:"Our Location", addressLabel:"Main office:", contactFormTitle:"Contact us",
+                  formName:"Full name", formEmail:"Email", formMessage:"Message", btnSendMessage:"Send message",
+                  newsletterTitle:"Receive news and travel tips", newsletterPlaceholder:"your@email.com", btnSubscribe:"Subscribe",
+                  footerDescription:"Digital platform supporting tourism and hospitality in Malanje – connecting travelers to authentic experiences.",
+                  footerUsefulLinks:"Useful links",
+                  avaliacoesHeroTitle:"Experiences shared by tourists", avaliacoesHeroSubtitle:"Discover opinions, comments and reviews about hotels and destinations in Malanje.",
+                  btnVerAvaliacoes:"View Reviews", btnAvaliarHotel:"Rate Hotel", statMedia:"Average Rating", statComentarios:"Published Comments",
+                  statHoteis:"Hotels Rated", statFotos:"Photos Shared", bestHotelsTitle:"Top Rated Hotels", shareTitle:"Share this page",
+                  qrCodeText:"QR Code generated automatically", mapHotelsTitle:"Rated hotels on map", faqTitle:"Frequently Asked Questions",
+                  faq1q:"How to post a review?", faq1a:"Click 'Rate Hotel', fill out the form and publish. Your opinion helps other travelers.",
+                  faq2q:"Can I edit my comment?", faq2a:"Yes, log into your account and access 'My Reviews'.",
+                  faq3q:"How to report a review?", faq3a:"Use the 'Report' button on the card. Our team will analyze the content.",
+                  ctaTitle:"Share your experience.", ctaSubtitle:"Help other tourists discover hotels and destinations in Malanje.",
+                  ctaButton:"Write a Review", avaliarTitulo:"Rate Hotel", publicarBtn:"Publish Review", iaChecking:"AI is checking the content..."
+                },
+            fr: { navBenefits:"Pour Hôtels", navAvaliacoes:"Avis", navOffers:"Offres", navContact:"Contact", btnLogin:"Connexion", btnRegister:"S'inscrire",
+                  heroTitle:"Une plateforme moderne pour hôtels et touristes à Malanje", heroSubtitle:"Outils numériques pour promouvoir le tourisme local, faire connaître les hôtels et faciliter les réservations en ligne.",
+                  btnRegisterHotel:"📢 Enregistrer mon hôtel", btnExploreReviews:"Voir les avis", benefitsTitle:"Outils pour votre hôtel",
+                  benefit1Title:"Visibilité en ligne", benefit1Text:"Montrez votre hôtel aux touristes recherchant un hébergement à Malanje.",
+                  benefit2Title:"Réservations numériques", benefit2Text:"Facilitez la réception des demandes de réservation via la plateforme.",
+                  benefit3Title:"Intégration sociale", benefit3Text:"Partagez vos offres et actualités sur les réseaux sociaux en quelques clics.",
+                  benefit4Title:"Support IA", benefit4Text:"Notre assistante intelligente peut aider les touristes à découvrir votre hôtel.",
+                  sectionOffers:"📢 Créez des campagnes promotionnelles", offer1Title:"Réductions saisonnières", offer1Text:"Proposez des tarifs spéciaux en basse saison et attirez plus de voyageurs.",
+                  offer2Title:"Forfaits expérientiels", offer2Text:"Créez des combos hébergement avec visites locales pour valoriser le séjour.",
+                  offer3Title:"Promotion ciblée", offer3Text:"Utilisez nos outils pour promouvoir des offres exclusives aux touristes intéressés.",
+                  sectionVideos:"🎥 Explorez Malanje en vidéo", btnMoreVideos:"Plus de vidéos", video1Title:"Chutes de Kalandula - Empire des eaux", video1Desc:"Découvrez la majesté des plus grandes chutes d'eau d'Afrique en volume, un spectacle naturel.",
+                  video2Title:"Pierres noires de Pungo Andongo - Mystique et Histoire", video2Desc:"Découvrez les formations rocheuses légendaires et la vue panoramique sur la savane angolaise.",
+                  sectionContact:"Où nous sommes & Contact", mapTitle:"Notre emplacement", addressLabel:"Siège social:", contactFormTitle:"Contactez-nous",
+                  formName:"Nom complet", formEmail:"E-mail", formMessage:"Message", btnSendMessage:"Envoyer le message",
+                  newsletterTitle:"Recevez des nouvelles et conseils de voyage", newsletterPlaceholder:"votre@email.com", btnSubscribe:"S'abonner",
+                  footerDescription:"Plateforme numérique de soutien au tourisme et à l'hôtellerie à Malanje – connectant les voyageurs à des expériences authentiques.",
+                  footerUsefulLinks:"Liens utiles",
+                  avaliacoesHeroTitle:"Expériences partagées par les touristes", avaliacoesHeroSubtitle:"Découvrez les opinions, commentaires et avis sur les hôtels et destinations à Malanje.",
+                  btnVerAvaliacoes:"Voir les avis", btnAvaliarHotel:"Évaluer un hôtel", statMedia:"Note moyenne", statComentarios:"Commentaires publiés",
+                  statHoteis:"Hôtels évalués", statFotos:"Photos partagées", bestHotelsTitle:"Hôtels les mieux notés", shareTitle:"Partagez cette page",
+                  qrCodeText:"Code QR généré automatiquement", mapHotelsTitle:"Hôtels évalués sur la carte", faqTitle:"Foire aux questions",
+                  faq1q:"Comment publier un avis ?", faq1a:"Cliquez sur 'Évaluer un hôtel', remplissez le formulaire et publiez. Votre avis aide les autres voyageurs.",
+                  faq2q:"Puis-je modifier mon commentaire ?", faq2a:"Oui, connectez-vous à votre compte et accédez à 'Mes avis'.",
+                  faq3q:"Comment signaler un avis ?", faq3a:"Utilisez le bouton 'Signaler' sur la carte. Notre équipe analysera le contenu.",
+                  ctaTitle:"Partagez votre expérience.", ctaSubtitle:"Aidez d'autres touristes à découvrir les hôtels et destinations à Malanje.",
+                  ctaButton:"Écrire un avis", avaliarTitulo:"Évaluer un hôtel", publicarBtn:"Publier l'avis", iaChecking:"L'IA vérifie le contenu..."
+                }
+        };
+
+        // CHATBOT multilíngue
+        const botResponses = {
+            pt: { welcome: (g) => `${g} Sou a A.M.I.N.A, assistente virtual. Posso ajudar com avaliações, hotéis ou dúvidas sobre a plataforma.`, hotels: "✨ Para proprietários: ferramentas de visibilidade e reservas.", touristBenefits: "🌍 Viajante, encontre hotéis e veja avaliações reais.", price: "💰 Preços a partir de 4.500 AOA.", attraction: "🏞️ Kalandula, Pungo Andongo, Musseleje, Cangandala.", moreInfo: "📢 Reserve Já conecta turistas e hoteleiros de forma ética.", default: "Obrigado! Posso ajudar com hotéis, avaliações ou cadastro." },
+            en: { welcome: (g) => `${g} I'm A.M.I.N.A, virtual assistant. I can help with reviews, hotels or platform questions.`, hotels: "✨ For owners: visibility and booking tools.", touristBenefits: "🌍 Traveler, find hotels and see real reviews.", price: "💰 Prices starting at 4,500 AOA.", attraction: "🏞️ Kalandula, Pungo Andongo, Musseleje, Cangandala.", moreInfo: "📢 Reserve Já connects tourists and hoteliers ethically.", default: "Thank you! I can help with hotels, reviews or registration." },
+            fr: { welcome: (g) => `${g} Je suis A.M.I.N.A, assistante virtuelle. Je peux aider avec les avis, les hôtels ou des questions sur la plateforme.`, hotels: "✨ Pour les propriétaires : outils de visibilité et de réservation.", touristBenefits: "🌍 Voyageur, trouvez des hôtels et consultez de vrais avis.", price: "💰 Prix à partir de 4 500 AOA.", attraction: "🏞️ Kalandula, Pungo Andongo, Musseleje, Cangandala.", moreInfo: "📢 Reserve Já connecte les touristes et les hôteliers de manière éthique.", default: "Merci ! Je peux vous aider avec les hôtels, les avis ou l'inscription." }
+        };
+
+        function getBotReply(msg, lang) {
+            const lowerMsg = msg.toLowerCase();
+            if (lowerMsg.includes('hotel') || lowerMsg.includes('hôtel') || lowerMsg.includes('hoteis')) return botResponses[lang]?.hotels || botResponses.pt.hotels;
+            if (lowerMsg.includes('viajante') || lowerMsg.includes('viajar') || lowerMsg.includes('turista') || lowerMsg.includes('travel')) return botResponses[lang]?.touristBenefits || botResponses.pt.touristBenefits;
+            if (lowerMsg.includes('preço') || lowerMsg.includes('price') || lowerMsg.includes('prix')) return botResponses[lang]?.price || botResponses.pt.price;
+            if (lowerMsg.includes('atração') || lowerMsg.includes('passeio') || lowerMsg.includes('attraction')) return botResponses[lang]?.attraction || botResponses.pt.attraction;
+            if (lowerMsg.includes('saber mais') || lowerMsg.includes('plataforma') || lowerMsg.includes('platform')) return botResponses[lang]?.moreInfo || botResponses.pt.moreInfo;
+            return botResponses[lang]?.default || botResponses.pt.default;
+        }
+
+        let chatHistory = [];
+        function renderChat() {
+            const container = document.getElementById('chatMessagesContainer');
+            if (!container) return;
+            container.innerHTML = '';
+            chatHistory.forEach(msg => {
+                const div = document.createElement('div');
+                div.className = `message ${msg.sender}`;
+                div.innerHTML = `<div class="avatar">${msg.sender === 'bot' ? '🤖' : '👤'}</div><div class="bubble">${msg.text}</div>`;
+                container.appendChild(div);
+            });
+            container.scrollTop = container.scrollHeight;
+        }
+        function addMessage(sender, text) { chatHistory.push({ sender, text }); renderChat(); }
+        function sendUserMessage(text = null) {
+            const input = document.getElementById('chatInput');
+            const msg = text !== null ? text : input.value.trim();
+            if (!msg) return;
+            addMessage('user', msg);
+            if (text === null) input.value = '';
+            setTimeout(() => { addMessage('bot', getBotReply(msg, currentLanguage)); }, 400);
+        }
+        function resetChat() {
+            chatHistory = [];
+            const greeting = (() => { const hour = new Date().getHours(); if (currentLanguage === 'pt') return hour < 12 ? "Bom dia! 🌅" : hour < 18 ? "Boa tarde! ☀️" : "Boa noite! 🌙"; if (currentLanguage === 'en') return hour < 12 ? "Good morning! 🌅" : hour < 18 ? "Good afternoon! ☀️" : "Good evening! 🌙"; return hour < 12 ? "Bonjour! 🌅" : hour < 18 ? "Bon après-midi! ☀️" : "Bonsoir! 🌙"; })();
+            const welcomeMsg = (botResponses[currentLanguage]?.welcome?.(greeting)) || botResponses.pt.welcome(greeting);
+            addMessage('bot', welcomeMsg);
+        }
+
+        document.getElementById('sendChatBtn')?.addEventListener('click', () => sendUserMessage());
+        document.getElementById('chatInput')?.addEventListener('keypress', e => { if (e.key === 'Enter') sendUserMessage(); });
+        document.getElementById('chatModal')?.addEventListener('shown.bs.modal', () => { if (chatHistory.length === 0) resetChat(); });
+        document.getElementById('btnSaberMaisAmina')?.addEventListener('click', () => new bootstrap.Modal(document.getElementById('chatModal')).show());
+        document.getElementById('btnSaberMaisModal')?.addEventListener('click', () => sendUserMessage("Quero saber mais sobre a plataforma"));
+        document.getElementById('btnCadastrarHotel')?.addEventListener('click', () => showToast('🔐 Acesse a área de parceiros para cadastrar seu hotel.', 'success'));
+
+        // Função de atualização de textos com suporte a atributos data-i18n
+        function updateAllTexts(lang) {
+            const dict = translations[lang] || translations.pt;
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (dict[key]) el.innerText = dict[key];
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (dict[key]) el.placeholder = dict[key];
+            });
+        }
+
+        let currentLanguage = localStorage.getItem('languagePreference') || 'pt';
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            document.getElementById('currentLang').innerText = lang.toUpperCase();
+            localStorage.setItem('languagePreference', lang);
+            updateAllTexts(lang);
+        }
+        document.getElementById('langBtn')?.addEventListener('click', e => { document.getElementById('langDropdown').classList.toggle('show'); e.stopPropagation(); });
+        document.querySelectorAll('.lang-option').forEach(opt => opt.addEventListener('click', () => { setLanguage(opt.dataset.lang); document.getElementById('langDropdown').classList.remove('show'); }));
+        document.addEventListener('click', () => document.getElementById('langDropdown')?.classList.remove('show'));
+        setLanguage(currentLanguage);
+
+        const themeSwitch = document.getElementById('themeSwitch');
+        const applyTheme = (theme) => { document.body.setAttribute('data-bs-theme', theme); localStorage.setItem('themePreference', theme); themeSwitch.checked = (theme === 'dark'); };
+        applyTheme(localStorage.getItem('themePreference') || 'light');
+        themeSwitch.addEventListener('change', () => applyTheme(themeSwitch.checked ? 'dark' : 'light'));
+
+        // Slideshow
+        let currentSlide = 0, slides = document.getElementsByClassName("mySlides"), slideInterval;
+        function showSlide(n) { for (let i = 0; i < slides.length; i++) slides[i].classList.remove('active'); if (n >= slides.length) currentSlide = 0; if (n < 0) currentSlide = slides.length - 1; slides[currentSlide].classList.add('active'); }
+        function nextSlide() { currentSlide++; showSlide(currentSlide); resetAutoSlide(); }
+        function startAutoSlide() { slideInterval = setInterval(nextSlide, 5000); }
+        function resetAutoSlide() { clearInterval(slideInterval); startAutoSlide(); }
+        startAutoSlide();
+
+        document.getElementById('btnSubscribeNewsletter')?.addEventListener('click', e => { e.preventDefault(); const email = document.getElementById('newsletterEmail').value.trim(); if (email && email.includes('@')) { showToast('✅ Inscrição confirmada!', 'success'); document.getElementById('newsletterEmail').value = ''; } else showToast('Email inválido', 'error'); });
+        document.getElementById('contactForm')?.addEventListener('submit', e => { e.preventDefault(); const nome = document.getElementById('contactName').value.trim(), email = document.getElementById('contactEmail').value.trim(), msg = document.getElementById('contactMessage').value.trim(); if (!nome || !email || !msg) showToast('Preencha todos os campos', 'error'); else if (!email.includes('@')) showToast('Email inválido', 'error'); else { showToast('Mensagem enviada!', 'success'); e.target.reset(); } });
+
+        populateHotelSelects();
+        updateStats();
+        renderReviews({});
+        initMap();
+    </script>
+</body>
+</html>

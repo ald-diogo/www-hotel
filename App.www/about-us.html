@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Reserve Já - Conectando Turismo e Hotelaria em Malanje</title>
+    
+    <!-- Bootstrap + Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Leaflet (Mapa estilo Google Maps) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- GSAP + ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    
+    <!-- Particles.js -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Times New Roman', Times, serif; }
+
+        /* Temas: Dark (padrão) e Light */
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --body-bg: #0a0a0f;
+            --body-color: #f0f0f0;
+            --card-bg: rgba(15, 25, 35, 0.7);
+            --card-color: #ffffff;
+            --glass-bg: rgba(10, 20, 30, 0.4);
+            --glass-border: rgba(52, 152, 219, 0.2);
+            --glow-primary: 0 0 15px rgba(52,152,219,0.5);
+            --navbar-bg: rgba(0, 0, 0, 0.7);
+            --footer-bg: rgba(0, 0, 0, 0.9);
+            --map-filter: brightness(0.9) contrast(1.1);
+        }
+        [data-bs-theme="light"] {
+            --body-bg: #f0f4f8;
+            --body-color: #1a2a3a;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --card-color: #1e2a3a;
+            --glass-bg: rgba(255, 255, 255, 0.6);
+            --glass-border: rgba(52, 152, 219, 0.4);
+            --glow-primary: 0 0 12px rgba(52,152,219,0.6);
+            --navbar-bg: rgba(255, 255, 255, 0.9);
+            --footer-bg: rgba(0, 0, 0, 0.95);
+            --map-filter: brightness(1) contrast(1);
+        }
+        
+        body {
+            font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--body-bg);
+            color: var(--body-color);
+            transition: background-color 0.3s, color 0.3s;
+            overflow-x: hidden;
+        }
+
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Glassmorphism e cards */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+        .glass-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--glow-primary);
+            border-color: var(--primary-color);
+        }
+
+        .btn-back {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1100;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 50px;
+            padding: 10px 20px;
+            color: white;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-back:hover {
+            background: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px rgba(52,152,219,0.6);
+            color: white;
+        }
+
+        /* Hero cinematográfico */
+        .hero-cinematic {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+            z-index: 1;
+            padding: 120px 0;
+        }
+        .hero-bg-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+        }
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0,0,0,0.7), rgba(0,0,0,0.4));
+            z-index: -1;
+        }
+        [data-bs-theme="light"] .hero-overlay {
+            background: linear-gradient(135deg, rgba(0,0,0,0.5), rgba(0,0,0,0.3));
+        }
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #4dabf7, #9b59b6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+        }
+        .btn-glow {
+            background: linear-gradient(45deg, #3498db, #9b59b6);
+            border: none;
+            padding: 12px 32px;
+            border-radius: 50px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 0 15px rgba(52,152,219,0.5);
+            color: white;
+        }
+        .btn-glow:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(52,152,219,0.9);
+            color: white;
+        }
+        .btn-outline-glow {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            padding: 12px 32px;
+            border-radius: 50px;
+            color: var(--body-color);
+            transition: all 0.3s;
+        }
+        .btn-outline-glow:hover {
+            background: var(--primary-color);
+            box-shadow: 0 0 20px var(--primary-color);
+            color: white;
+        }
+
+        /* Cards de paisagens exóticas */
+        .exotic-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(8px);
+            border-radius: 24px;
+            overflow: hidden;
+            transition: all 0.4s;
+            height: 100%;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .exotic-card:hover {
+            transform: translateY(-12px);
+            box-shadow: var(--glow-primary);
+            border-color: var(--primary-color);
+        }
+        .exotic-img {
+            height: 220px;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.5s;
+        }
+        .exotic-card:hover .exotic-img {
+            transform: scale(1.05);
+        }
+        .exotic-body {
+            padding: 1.5rem;
+        }
+
+        /* Mapa interativo */
+        .map-container {
+            border-radius: 32px;
+            overflow: hidden;
+            border: 2px solid var(--glass-border);
+            box-shadow: var(--glow-primary);
+            height: 450px;
+            background: #1a2a3a;
+        }
+        .leaflet-container {
+            filter: var(--map-filter);
+            background: #1e2a3a;
+        }
+
+        /* Seção Dizeres / Destaque */
+        .slogan-block {
+            background: linear-gradient(135deg, rgba(52,152,219,0.2), rgba(155,89,182,0.2));
+            border-left: 5px solid var(--primary-color);
+            border-radius: 20px;
+        }
+        .icon-glow-big {
+            font-size: 3rem;
+            color: var(--primary-color);
+            text-shadow: 0 0 15px var(--primary-color);
+        }
+
+        /* Estatísticas animadas */
+        .stat-card {
+            text-align: center;
+            padding: 2rem;
+            background: var(--glass-bg);
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+        }
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #4dabf7);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Footer e tema */
+        .footer-premium {
+            background: var(--footer-bg);
+            backdrop-filter: blur(15px);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 50px 0 30px;
+            color: #ccc;
+        }
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            transition: all 0.3s;
+            margin-right: 10px;
+            color: white;
+        }
+        .social-icon:hover {
+            background: var(--primary-color);
+            transform: translateY(-5px);
+        }
+        .theme-toggle {
+            position: relative;
+            display: inline-block;
+            width: 55px;
+            height: 28px;
+        }
+        .theme-toggle input { opacity: 0; width: 0; height: 0; }
+        .theme-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .theme-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .theme-slider { background-color: var(--primary-color); }
+        input:checked + .theme-slider:before { transform: translateX(27px); }
+        
+        /* Language Dropdown */
+        .lang-selector {
+            position: relative;
+            display: inline-block;
+        }
+        .lang-btn {
+            background: rgba(128,128,128,0.2);
+            border: 1px solid var(--glass-border);
+            border-radius: 40px;
+            padding: 6px 14px;
+            color: var(--body-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .lang-dropdown {
+            position: absolute;
+            top: 110%;
+            right: 0;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            min-width: 150px;
+            z-index: 1050;
+            display: none;
+            overflow: hidden;
+        }
+        .lang-dropdown.show {
+            display: block;
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .lang-option {
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+            color: var(--body-color);
+        }
+        .lang-option:hover {
+            background: rgba(52,152,219,0.2);
+        }
+        .lang-flag {
+            font-size: 1.2rem;
+        }
+        
+        .fade-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .map-container { height: 320px; }
+        }
+        
+        .amina-bot{
+            height: 500px;
+            width: 750px;
+        }
+        
+        /* Botão de som - adicionado para controle de áudio do vídeo */
+        .sound-control-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 15;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+        }
+        .sound-control-btn:hover {
+            background: var(--primary-color);
+            transform: scale(1.1);
+            box-shadow: 0 0 15px var(--primary-color);
+        }
+        @media (max-width: 768px) {
+            .sound-control-btn { width: 40px; height: 40px; font-size: 1.2rem; bottom: 15px; right: 15px; }
+        }
+        
+        .tratado{
+            width: 200px;
+            height: 250px;
+        }
+    </style>
+</head>
+<body data-bs-theme="dark">
+    <div id="particles-js"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg sticky-top" style="background: var(--navbar-bg); backdrop-filter: blur(12px); z-index: 1050;">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="d-flex align-items-center ms-lg-4 mt-3 mt-lg-0 gap-2">
+                    
+                    <div class="d-flex align-items-center me-3">
+                        <a href="home.html" class="btn-back" id="backButton">
+        <i class="fas fa-arrow-left"></i> <span data-i18n="backBtn">Voltar</span>
+    </a>
+                    </div>
+                    
+                    <!-- Language Dropdown -->
+                    <div class="lang-selector me-2">
+                        <div class="lang-btn" id="langBtn">
+                            <i class="bi bi-translate"></i> <span id="currentLang">PT</span> <i class="bi bi-chevron-down"></i>
+                        </div>
+                        <div class="lang-dropdown" id="langDropdown">
+                            <div class="lang-option" data-lang="pt"><span class="lang-flag">🇵🇹</span> Português</div>
+                            <div class="lang-option" data-lang="en"><span class="lang-flag">🇬🇧</span> English</div>
+                            <div class="lang-option" data-lang="fr"><span class="lang-flag">🇫🇷</span> Français</div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center me-3">
+                        <i class="bi bi-sun me-1"></i>
+                        <label class="theme-toggle"><input type="checkbox" id="themeSwitch"><span class="theme-slider"></span></label>
+                        <i class="bi bi-moon ms-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO com vídeo e controle de som -->
+    <section class="hero-cinematic" id="hero">
+        <video class="hero-bg-video" id="heroVideo" autoplay loop playsinline poster="images/about.jpg">
+            <source src="video/about.mp4" type="video/mp4">
+            Seu navegador não suporta vídeo.
+        </video>
+        <div class="hero-overlay"></div>
+        <!-- Botão de controle de som -->
+        <div class="sound-control-btn" id="soundToggleBtn">
+            <i class="fas fa-volume-mute" id="soundIcon"></i>
+        </div>
+        <div class="container position-relative z-2">
+            <h1 class="hero-title fade-up" data-i18n="heroTitle">
+                Reserve Já: A revolução digital do turismo em Malanje
+            </h1>
+            <p class="lead text-white-50 mb-4 fade-up" data-i18n="heroSub">
+                Conectamos viajantes, hotéis e paisagens únicas com tecnologia inteligente e sem burocracia.
+            </p>
+        </div>
+    </section>
+
+    <!-- QUEM SOMOS + MISSÃO -->
+    <section class="container my-5 pt-5" id="quem-somos">
+        <div class="glass-card p-5 text-center fade-up">
+            <h2 class="display-5 fw-bold mb-4" data-i18n="whoWeAre">Quem Somos</h2>
+            <p class="lead" data-i18n="whoText">
+                Plataforma angolana que une hotelaria, turismo e inovação, oferecendo visibilidade para hotéis de Malanje e facilitando a descoberta das maravilhas da província com o apoio de inteligência artificial.
+            </p>
+        </div>
+    </section>
+
+    <!-- DESTAQUE DOS DIZERES - PROPÓSITO DA PLATAFORMA -->
+    <section class="container my-5" id="dizeres">
+        <div class="slogan-block glass-card p-5 fade-up">
+            <div class="row align-items-center">
+                <div class="col-md-3 text-center">
+                    <img class="tratado" src="images/compromisso.png"/>
+                </div>
+                <div class="col-md-9">
+                    <h3 class="fw-bold" data-i18n="promiseTitle">🌟 O nosso compromisso com o turismo em Malanje</h3>
+                    <p class="lead mt-2" data-i18n="promiseText"><strong>Reserve Já</strong> é um software inteligente criado para <strong>reduzir burocracias</strong>, dar <strong>visibilidade a hotéis através das redes sociais</strong>, conectar hóspedes a experiências únicas e usar <strong>Inteligência Artificial</strong> para guiar turistas pelas maravilhas da província — das Pedras Negras às Quedas de Calandula. Facilitamos reservas, impulsionamos a hotelaria local e mostramos o melhor de Malanje sem complicações.</p>
+                    <div class="mt-3 d-flex flex-wrap gap-3">
+                        <span class="badge bg-primary p-2"><i class="fas fa-hotel"></i> +24 Hotéis parceiros</span>
+                        <span class="badge bg-success p-2"><i class="fas fa-map-marked-alt"></i> 12+ Destinos</span>
+                        <span class="badge bg-warning p-2"><i class="fas fa-brain"></i> Assistente IA</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CARD DAS MARAVILHAS EXÓTICAS DE MALANJE -->
+    <section class="container my-5" id="maravilhas">
+        <h2 class="text-center display-6 fw-bold mb-5" data-i18n="wondersTitle">🌍 Paisagens mais exóticas de Malanje</h2>
+        <div class="row g-4">
+            <div class="col-md-4 col-lg-3 fade-up"><div class="exotic-card">
+                <div class="exotic-img" 
+                     style="background-image: url('images/pungo-an-dongo.png');">
+                </div>
+                <div class="exotic-body">
+                    <h5>Pedras Negras do Pungo Andongo</h5>
+                    <p class="small">
+                        Monólitos místicos e pegadas lendárias. Símbolo histórico e cultural único em Angola.
+                    </p>
+                    <i class="fas fa-map-marker-alt text-primary"></i> 
+                    <small>Pungo Andongo</small>
+                </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-3 fade-up">
+                <div class="exotic-card">
+                    <div class="exotic-img" style="background-image: url('images/kalandula.png');">
+                    </div>
+                    <div class="exotic-body">
+                        <h5>Quedas de Calandula</h5>
+                        <p class="small">
+                            Uma das maiores quedas de água de África, com 105 metros de altura e beleza arrasadora.</p>
+                        <i class="fas fa-map-marker-alt text-primary"></i>
+                        <small>Calandula</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-3 fade-up">
+                <div class="exotic-card">
+                <div class="exotic-img"
+                     style="background-image: url('images/parque-cangandala.png');">
+                    </div><div class="exotic-body">
+                    <h5>Palanca Negra Gigante</h5>
+                    <p class="small">
+                        Ícone da fauna angolana, símbolo de resistência e conservação no Parque Nacional da Cangandala.
+                    </p>
+                    <i class="fas fa-map-marker-alt text-primary"></i> 
+                    <small>Cangandala</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-3 fade-up">
+                <div class="exotic-card">
+                    <div class="exotic-img" 
+                         style="background-image: url('images/musseje.png');">
+                    </div>
+                    <div class="exotic-body">
+                        <h5>Lagoa do Musseque</h5>
+                        <p class="small">
+                            Paraíso escondido em Cacuso, águas cristalinas e vegetação exuberante ideal para ecoturismo.
+                        </p>
+                        <i class="fas fa-map-marker-alt text-primary"></i> 
+                        <small>Cacuso</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAPA INTERATIVO -->
+    <section class="container my-5" id="mapa">
+        <h2 class="text-center display-6 fw-bold mb-4" data-i18n="mapTitle">🗺️ Explore as maravilhas no mapa</h2>
+        <div class="map-container mx-auto"><div id="map" style="height: 100%; width: 100%;"></div></div>
+        <p class="text-center mt-3 text-muted" data-i18n="mapHint">Clique nos marcadores para saber mais sobre cada atração.</p>
+    </section>
+
+    <!-- POR QUE FOI CRIADA -->
+    <section class="container my-5">
+        <h2 class="text-center display-6 fw-bold mb-5" data-i18n="whyTitle">Por que o Reserve Já transforma o turismo?</h2>
+        <div class="row g-4">
+            <div class="col-md-4 fade-up"><div class="glass-card p-4 text-center h-100"><i class="fas fa-chart-line fa-3x text-primary mb-3"></i><h5 data-i18n="why1">Visibilidade em Redes Sociais</h5><p data-i18n="why1txt">Divulgação automática de hotéis e destinos, aumentando o alcance orgânico.</p></div></div>
+            <div class="col-md-4 fade-up"><div class="glass-card p-4 text-center h-100"><i class="fas fa-file-signature fa-3x text-primary mb-3"></i><h5 data-i18n="why2">Fim da Burocracia</h5><p data-i18n="why2txt">Reservas simplificadas, sem processos demorados. Tudo digital e ágil.</p></div></div>
+            <div class="col-md-4 fade-up"><div class="glass-card p-4 text-center h-100"><i class="fas fa-microchip fa-3x text-primary mb-3"></i><h5 data-i18n="why3">IA para Turistas</h5><p data-i18n="why3txt">Assistente virtual recomenda roteiros personalizados e hotspots de Malanje.</p></div></div>
+        </div>
+    </section>
+
+    <!-- ESTATÍSTICAS -->
+    <section class="container my-5">
+        <div class="row g-4 text-center">
+            <div class="col-md-3 fade-up"><div class="stat-card"><div class="stat-number" id="statHotels">0</div><p><i class="fas fa-hotel"></i> <span data-i18n="statHotels">Hotéis cadastrados</span></p></div></div>
+            <div class="col-md-3 fade-up"><div class="stat-card"><div class="stat-number" id="statDestinos">0</div><p><i class="fas fa-umbrella-beach"></i> <span data-i18n="statDestinos">Pontos turísticos</span></p></div></div>
+            <div class="col-md-3 fade-up"><div class="stat-card"><div class="stat-number" id="statReservas">0</div><p><i class="fas fa-calendar-check"></i> <span data-i18n="statReservas">Reservas facilitadas</span></p></div></div>
+            <div class="col-md-3 fade-up"><div class="stat-card"><div class="stat-number" id="statUsuarios">0</div><p><i class="fas fa-users"></i> <span data-i18n="statUsuarios">Viajantes conectados</span></p></div></div>
+        </div>
+    </section>
+
+    <!-- TECH + IA -->
+    <section class="container my-5 text-center">
+        <div class="glass-card p-5">
+            <img class="amina-bot" src="images/amina-chat.png" alt="Assistente IA Amina"/>
+            <h2 data-i18n="iaTitle">Inteligência Artificial a favor do turista</h2>
+            <p class="lead w-75 mx-auto" data-i18n="iaText">Nossa IA "Amina" sugere os melhores hotéis, roteiros personalizados e responde dúvidas sobre Malanje em tempo real — tudo integrado às redes sociais e mapa interativo.</p>
+           <a href="front-ia.html">
+               <button class="btn btn-glow mt-3" 
+                    style="color: pink; background-color: transparent">
+                <i class="fas fa-comment-dots"></i> Experimentar Assistente IA
+            </button>
+            </a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer-premium">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-5 mb-4">
+                    <h5>Reserve Já</h5>
+                    <p data-i18n="footerDesc">Simplificando o turismo em Malanje com tecnologia, transparência e amor pela nossa terra.</p>
+                    <div class="mt-4">
+                        <a href="#" class="social-icon">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="https://www.instagram.com/921151685" class="social-icon">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                        <a href="https://www.linkedin.com/in/921151685" class="social-icon">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="https://wa.me/921151685" class="social-icon">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        <a href="https://t.me/921151685" class="social-icon">
+                            <i class="fab fa-telegram"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h5 data-i18n="footerLinks">Links</h5>
+                    <ul class="list-unstyled"><li>
+                        <a href="#" class="text-white-50" data-i18n="aboutLink">Sobre nós</a></li><li>
+                        <a href="term.html" class="text-white-50" data-i18n="termsLink">Termos</a></li>
+                        <li><a href="privacy.html" class="text-white-50" data-i18n="privacyLink">Privacidade</a></li></ul></div>
+                <div class="col-md-4 mb-4"><h5 data-i18n="contactTitle">Contacto</h5><p><i class="fas fa-envelope"></i> antoniodiogo958@gmail.com</p><p><i class="fas fa-phone-alt"></i> +244 921 151 685</p><p><i class="fas fa-map-pin"></i> Bairro Ritondo, Malanje, Angola</p></div>
+            </div>
+            <hr><div class="text-center small">&copy; 2025 Reserve Já - Conectando corações a Malanje</div>
+        </div>
+    </footer>
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        particlesJS("particles-js", { 
+            particles: {
+                number: { 
+                    value: 70 
+                }, 
+                color: { 
+                    value: "#3498db"
+                },
+                opacity: { 
+                    value: 0.3
+                },
+                size: { 
+                    value: 2 
+                }, 
+                move: { 
+                    speed: 1 
+                } 
+            }, 
+            interactivity: { 
+                events: {
+                    onhover: { 
+                        enable: true,
+                        mode: "repulse" 
+                    } 
+                } 
+            }
+        });
+        
+        gsap.registerPlugin(ScrollTrigger);
+        document.querySelectorAll('.fade-up').forEach(el => { gsap.fromTo(el, { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.8, scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "play none none reverse" } }); });
+        
+        function animateCounter(id, target) { let start = 0, element = document.getElementById(id); if (!element) return; let step = target / 60; let interval = setInterval(() => { start += step; if (start >= target) { element.innerText = target; clearInterval(interval); } else element.innerText = Math.floor(start); }, 20); }
+        animateCounter('statHotels', 28); animateCounter('statDestinos', 16); animateCounter('statReservas', 1240); animateCounter('statUsuarios', 2570);
+        
+        // Mapa Leaflet
+        var map = L.map('map').setView([-9.5449, 16.3452], 9);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> & CartoDB', subdomains: 'abcd', maxZoom: 18 }).addTo(map);
+        var customIcon = L.icon({ iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [25,41], iconAnchor: [12,41] });
+        var pontos = [
+            { nome: "Pedras Negras do Pungo Andongo", lat: -9.6732, lng: 15.5806, desc: "Monólitos históricos." },
+            { nome: "Quedas de Calandula", lat: -9.0747, lng: 16.0025, desc: "Magníficas cachoeiras." },
+            { nome: "Palanca Negra (Parque Cangandala)", lat: -9.8333, lng: 16.7000, desc: "Santuário da espécie." },
+            { nome: "Lagoa do Musseque", lat: -9.2906, lng: 15.7758, desc: "Ecoturismo e águas serenas." },
+            { nome: "Quedas do Luando", lat: -9.4150, lng: 16.3680, desc: "Cachoeira selvagem." },
+            { nome: "Monte da Mussanga", lat: -9.5274, lng: 16.3615, desc: "Mirante da cidade." }
+        ];
+        pontos.forEach(p => { L.marker([p.lat, p.lng], { icon: customIcon }).addTo(map).bindPopup(`<b>${p.nome}</b><br>${p.desc}<br><i class="fas fa-star text-warning"></i> Maravilha de Malanje`); });
+        
+        // ========== TRADUÇÕES COMPLETAS (PT, EN, FR) ==========
+        const translations = {
+            pt: {
+                backBtn:"Voltar", navHome:"Início", navAbout:"Sobre", navWonders:"Maravilhas", navMap:"Mapa", navPromise:"Propósito",
+                btnLogin:"Entrar", btnRegister:"Cadastrar", heroTitle:"Reserve Já: A revolução digital do turismo em Malanje", heroSub:"Conectamos viajantes, hotéis e paisagens únicas com tecnologia inteligente e sem burocracia.",
+                btnExplore:"Explorar Hotéis", btnRegisterHotel:"Sou Hoteleiro", whoWeAre:"Quem Somos", whoText:"Plataforma angolana que une hotelaria, turismo e inovação, oferecendo visibilidade para hotéis de Malanje e facilitando a descoberta das maravilhas da província com o apoio de inteligência artificial.",
+                promiseTitle:"🌟 O nosso compromisso com o turismo em Malanje", promiseText:"Reserve Já é um software inteligente criado para reduzir burocracias, dar visibilidade a hotéis através das redes sociais, conectar hóspedes a experiências únicas e usar Inteligência Artificial para guiar turistas pelas maravilhas da província — das Pedras Negras às Quedas de Calandula. Facilitamos reservas, impulsionamos a hotelaria local e mostramos o melhor de Malanje sem complicações.",
+                wondersTitle:"🌍 Paisagens mais exóticas de Malanje", mapTitle:"🗺️ Explore as maravilhas no mapa", mapHint:"Clique nos marcadores para saber mais sobre cada atração.",
+                whyTitle:"Por que o Reserve Já transforma o turismo?", why1:"Visibilidade em Redes Sociais", why1txt:"Divulgação automática de hotéis e destinos, aumentando o alcance orgânico.",
+                why2:"Fim da Burocracia", why2txt:"Reservas simplificadas, sem processos demorados. Tudo digital e ágil.", why3:"IA para Turistas", why3txt:"Assistente virtual recomenda roteiros personalizados e hotspots de Malanje.",
+                statHotels:"Hotéis cadastrados", statDestinos:"Pontos turísticos", statReservas:"Reservas facilitadas", statUsuarios:"Viajantes conectados",
+                iaTitle:"Inteligência Artificial a favor do turista", iaText:"Nossa IA 'Amina' sugere os melhores hotéis, roteiros personalizados e responde dúvidas sobre Malanje em tempo real — tudo integrado às redes sociais e mapa interativo.",
+                footerDesc:"Simplificando o turismo em Malanje com tecnologia, transparência e amor pela nossa terra.", footerLinks:"Links", aboutLink:"Sobre nós", termsLink:"Termos", privacyLink:"Privacidade", contactTitle:"Contacto"
+            },
+            en: {
+                backBtn:"Back", navHome:"Home", navAbout:"About", navWonders:"Wonders", navMap:"Map", navPromise:"Mission",
+                btnLogin:"Login", btnRegister:"Sign Up", heroTitle:"Reserve Já: The digital revolution of tourism in Malanje", heroSub:"We connect travelers, hotels and unique landscapes with smart tech and no bureaucracy.",
+                btnExplore:"Explore Hotels", btnRegisterHotel:"I'm a Hotelier", whoWeAre:"Who We Are", whoText:"Angolan platform that unites hospitality, tourism and innovation, offering visibility for hotels in Malanje and facilitating the discovery of the province's wonders with the support of artificial intelligence.",
+                promiseTitle:"🌟 Our commitment to tourism in Malanje", promiseText:"Reserve Já is an intelligent software created to reduce bureaucracy, give visibility to hotels through social media, connect guests to unique experiences and use Artificial Intelligence to guide tourists through the wonders of the province — from Black Rocks to Calandula Falls. We facilitate bookings, boost local hospitality and show the best of Malanje without complications.",
+                wondersTitle:"🌍 Most exotic landscapes of Malanje", mapTitle:"🗺️ Explore wonders on the map", mapHint:"Click on markers to learn more about each attraction.",
+                whyTitle:"Why does Reserve Já transform tourism?", why1:"Social Media Visibility", why1txt:"Automatic promotion of hotels and destinations, increasing organic reach.",
+                why2:"End of Bureaucracy", why2txt:"Simplified, agile bookings. Everything digital and fast.", why3:"AI for Tourists", why3txt:"Virtual assistant recommends personalized itineraries and Malanje hotspots.",
+                statHotels:"Hotels registered", statDestinos:"Tourist spots", statReservas:"Bookings facilitated", statUsuarios:"Travelers connected",
+                iaTitle:"Artificial Intelligence for travelers", iaText:"Our AI 'Amina' suggests the best hotels, personalized itineraries and answers questions about Malanje in real time — fully integrated with social media and interactive map.",
+                footerDesc:"Simplifying tourism in Malanje with technology, transparency and love for our land.", footerLinks:"Links", aboutLink:"About", termsLink:"Terms", privacyLink:"Privacy", contactTitle:"Contact"
+            },
+            fr: {
+                backBtn:"Retour", navHome:"Accueil", navAbout:"À propos", navWonders:"Merveilles", navMap:"Carte", navPromise:"Mission",
+                btnLogin:"Connexion", btnRegister:"S'inscrire", heroTitle:"Reserve Já : La révolution numérique du tourisme à Malanje", heroSub:"Nous connectons voyageurs, hôtels et paysages uniques avec une technologie intelligente et sans bureaucratie.",
+                btnExplore:"Explorer les hôtels", btnRegisterHotel:"Je suis hôtelier", whoWeAre:"Qui sommes-nous", whoText:"Plateforme angolaise qui unit hôtellerie, tourisme et innovation, offrant une visibilité aux hôtels de Malanje et facilitant la découverte des merveilles de la province avec le soutien de l'intelligence artificielle.",
+                promiseTitle:"🌟 Notre engagement pour le tourisme à Malanje", promiseText:"Reserve Já est un logiciel intelligent créé pour réduire la bureaucratie, donner de la visibilité aux hôtels via les réseaux sociaux, connecter les hôtes à des expériences uniques et utiliser l'intelligence artificielle pour guider les touristes à travers les merveilles de la province — des Pierres Noires aux Chutes de Calandula. Nous facilitons les réservations, boostons l'hôtellerie locale et montrons le meilleur de Malanje sans complications.",
+                wondersTitle:"🌍 Les paysages les plus exotiques de Malanje", mapTitle:"🗺️ Explorez les merveilles sur la carte", mapHint:"Cliquez sur les marqueurs pour en savoir plus sur chaque attraction.",
+                whyTitle:"Pourquoi Reserve Já transforme le tourisme ?", why1:"Visibilité sur les réseaux sociaux", why1txt:"Promotion automatique des hôtels et destinations, augmentant la portée organique.",
+                why2:"Fin de la bureaucratie", why2txt:"Réservations simplifiées, sans processus longs. Tout numérique et rapide.", why3:"IA pour les touristes", why3txt:"Un assistant virtuel recommande des itinéraires personnalisés et les hotspots de Malanje.",
+                statHotels:"Hôtels enregistrés", statDestinos:"Sites touristiques", statReservas:"Réservations facilitées", statUsuarios:"Voyageurs connectés",
+                iaTitle:"Intelligence artificielle au service du touriste", iaText:"Notre IA 'Amina' suggère les meilleurs hôtels, des itinéraires personnalisés et répond aux questions sur Malanje en temps réel — le tout intégré aux réseaux sociaux et à la carte interactive.",
+                footerDesc:"Simplifier le tourisme à Malanje avec la technologie, la transparence et l'amour pour notre terre.", footerLinks:"Liens", aboutLink:"À propos", termsLink:"Conditions", privacyLink:"Confidentialité", contactTitle:"Contact"
+            }
+        };
+        
+        let currentLang = localStorage.getItem('languagePreference') || 'pt';
+        function updateTexts(lang) {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                let key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.placeholder = translations[lang][key];
+                    else el.innerText = translations[lang][key];
+                }
+            });
+        }
+        // Dropdown language logic
+        const langBtn = document.getElementById('langBtn');
+        const langDropdown = document.getElementById('langDropdown');
+        langBtn.addEventListener('click', (e) => { e.stopPropagation(); langDropdown.classList.toggle('show'); });
+        document.querySelectorAll('.lang-option').forEach(opt => {
+            opt.addEventListener('click', () => {
+                currentLang = opt.dataset.lang;
+                localStorage.setItem('languagePreference', currentLang);
+                updateTexts(currentLang);
+                document.getElementById('currentLang').innerText = currentLang.toUpperCase();
+                langDropdown.classList.remove('show');
+            });
+        });
+        document.addEventListener('click', () => langDropdown.classList.remove('show'));
+        updateTexts(currentLang);
+        document.getElementById('currentLang').innerText = currentLang.toUpperCase();
+        
+        // Theme Toggle
+        const themeSwitch = document.getElementById('themeSwitch');
+        const savedTheme = localStorage.getItem('themePreference') || 'dark';
+        document.body.setAttribute('data-bs-theme', savedTheme);
+        themeSwitch.checked = (savedTheme === 'dark');
+        themeSwitch.addEventListener('change', () => {
+            const newTheme = themeSwitch.checked ? 'dark' : 'light';
+            document.body.setAttribute('data-bs-theme', newTheme);
+            localStorage.setItem('themePreference', newTheme);
+        });
+        
+        // ========== CONTROLE DE SOM DO VÍDEO ==========
+        const video = document.getElementById('heroVideo');
+        const soundBtn = document.getElementById('soundToggleBtn');
+        const soundIcon = document.getElementById('soundIcon');
+        
+        // Inicialmente o vídeo está sem som (muted) para garantir autoplay permitido pelo navegador
+        video.muted = true;
+        soundIcon.className = 'fas fa-volume-mute';
+        
+        // Função para alternar o som
+        function toggleSound() {
+            if (video.muted) {
+                video.muted = false;
+                soundIcon.className = 'fas fa-volume-up';
+                // Pequeno ajuste: alguns navegadores exigem que o usuário interaja com o documento para ativar som
+                // Como o clique no botão já é uma interação, funciona perfeitamente.
+            } else {
+                video.muted = true;
+                soundIcon.className = 'fas fa-volume-mute';
+            }
+        }
+        
+        // Adicionar evento de clique ao botão
+        soundBtn.addEventListener('click', toggleSound);
+        
+        // Opcional: garantir que o vídeo seja reproduzido (caso o autoplay seja bloqueado, o botão pode ser usado para dar play)
+        // Forçar tentativa de play ao carregar a página (útil para mobile)
+        window.addEventListener('load', () => {
+            video.play().catch(e => console.log("Autoplay bloqueado, use o botão de som para ativar áudio e reprodução."));
+        });
+    </script>
+</body>
+</html>

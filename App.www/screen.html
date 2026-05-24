@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Captura de Tela - Sistema Completo</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .container-custom {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .card-demo {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .content-to-capture {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 40px;
+            margin: 20px 0;
+            text-align: center;
+            border: 2px dashed #667eea;
+        }
+        
+        .info-box {
+            background: #e8f4f8;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .btn-capture {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 50px;
+            transition: transform 0.3s;
+        }
+        
+        .btn-capture:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .capturing {
+            animation: pulse 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-custom">
+        <!-- Conteúdo demo para capturar -->
+        <div class="card-demo">
+            <h1 class="text-center mb-4">
+                <i class="fas fa-camera-retro"></i> 
+                Sistema de Captura de Tela
+            </h1>
+            
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                <strong>Como funciona:</strong> Clique no botão "Tirar Captura" abaixo para capturar toda esta área. 
+                A imagem será exibida em um modal onde você poderá baixar ou compartilhar.
+            </div>
+            
+            <!-- Área que será capturada -->
+            <div id="areaParaCapturar" class="content-to-capture">
+                <h2><i class="fas fa-image"></i> Área Demonstrativa</h2>
+                <p>Esta é a área que será capturada na screenshot.</p>
+                <p>Todos os elementos visíveis aqui serão incluídos na imagem.</p>
+                
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number">1,234</div>
+                        <div>Visualizações</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">567</div>
+                        <div>Compartilhamentos</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">89</div>
+                        <div>Capturas</div>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <span class="badge bg-primary"><i class="fas fa-star"></i> Destaque</span>
+                    <span class="badge bg-success"><i class="fas fa-check"></i> Ativo</span>
+                    <span class="badge bg-info"><i class="fas fa-clock"></i> Tempo Real</span>
+                </div>
+                
+                <div class="mt-3">
+                    <i class="fas fa-chart-line fa-2x text-primary"></i>
+                    <i class="fas fa-users fa-2x text-success mx-2"></i>
+                    <i class="fas fa-chart-bar fa-2x text-info"></i>
+                </div>
+            </div>
+            
+            <!-- Botão principal para capturar -->
+            <div class="text-center mt-4">
+                <button type="button" class="btn btn-capture" id="btnCapturarTela">
+                    <i class="fas fa-camera"></i> Tirar Captura de Tela
+                </button>
+                <p class="text-muted mt-2">
+                    <small><i class="fas fa-mouse-pointer"></i> Clique para capturar a área acima</small>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para exibir a captura -->
+    <div class="modal fade" id="modalCompartilhar" tabindex="-1" aria-labelledby="modalCompartilharLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title" id="modalCompartilharLabel">
+                        <i class="fas fa-share-alt"></i> Partilhar Imagem Capturada
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div id="previewCaptura" style="max-height: 500px; overflow: auto;">
+                        <canvas id="canvasCaptura" style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"></canvas>
+                    </div>
+                    <div class="mt-3 text-muted">
+                        <small><i class="fas fa-info-circle"></i> A captura foi realizada com sucesso!</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> Fechar
+                    </button>
+                    <button type="button" class="btn btn-success" id="btnBaixarCaptura">
+                        <i class="fas fa-download"></i> Baixar Imagem
+                    </button>
+                    <button type="button" class="btn btn-primary" id="btnPartilharCaptura">
+                        <i class="fas fa-share-alt"></i> Partilhar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bibliotecas necessárias -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <script>
+        // Aguarda o DOM carregar completamente
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elementos do DOM
+            const btnCapturar = document.getElementById('btnCapturarTela');
+            const modalElement = document.getElementById('modalCompartilhar');
+            const canvas = document.getElementById('canvasCaptura');
+            const btnBaixar = document.getElementById('btnBaixarCaptura');
+            const btnPartilhar = document.getElementById('btnPartilharCaptura');
+            
+            // Variável para armazenar a imagem capturada
+            let imagemCapturada = null;
+            
+            // Inicializa o modal do Bootstrap
+            let modalCompartilhar = null;
+            if (typeof bootstrap !== 'undefined') {
+                modalCompartilhar = new bootstrap.Modal(modalElement);
+            }
+            
+            // Função principal para capturar tela
+            async function capturarTela() {
+                try {
+                    // Elemento específico que queremos capturar
+                    const elementoParaCapturar = document.getElementById('areaParaCapturar');
+                    
+                    if (!elementoParaCapturar) {
+                        throw new Error('Elemento para capturar não encontrado');
+                    }
+                    
+                    // Adiciona efeito visual de captura
+                    elementoParaCapturar.classList.add('capturing');
+                    
+                    // Configurações da captura
+                    const configuracao = {
+                        scale: 2,                    // Alta qualidade
+                        backgroundColor: '#ffffff',  // Fundo branco
+                        logging: false,              // Desabilita logs
+                        useCORS: true,               // Permite imagens externas
+                        allowTaint: false,
+                        foreignObjectRendering: false
+                    };
+                    
+                    // Realiza a captura com html2canvas
+                    const captura = await html2canvas(elementoParaCapturar, configuracao);
+                    
+                    // Remove o efeito visual
+                    elementoParaCapturar.classList.remove('capturing');
+                    
+                    // Configura o canvas com a imagem capturada
+                    canvas.width = captura.width;
+                    canvas.height = captura.height;
+                    const contexto = canvas.getContext('2d');
+                    contexto.drawImage(captura, 0, 0);
+                    
+                    // Converte para URL base64
+                    imagemCapturada = captura.toDataURL('image/png');
+                    
+                    return true;
+                    
+                } catch (erro) {
+                    console.error('Erro detalhado:', erro);
+                    alert('Erro ao capturar tela: ' + erro.message);
+                    return false;
+                }
+            }
+            
+            // Evento do botão principal de captura
+            if (btnCapturar) {
+                btnCapturar.addEventListener('click', async function() {
+                    try {
+                        // Desabilita o botão e mostra loading
+                        btnCapturar.disabled = true;
+                        const textoOriginal = btnCapturar.innerHTML;
+                        btnCapturar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Capturando...';
+                        
+                        // Executa a captura
+                        const sucesso = await capturarTela();
+                        
+                        if (sucesso && imagemCapturada) {
+                            // Abre o modal
+                            if (modalCompartilhar) {
+                                modalCompartilhar.show();
+                            } else {
+                                // Fallback se Bootstrap não carregou
+                                modalElement.style.display = 'block';
+                                modalElement.classList.add('show');
+                            }
+                        } else {
+                            alert('Não foi possível capturar a imagem. Tente novamente.');
+                        }
+                        
+                        // Restaura o botão
+                        btnCapturar.disabled = false;
+                        btnCapturar.innerHTML = '<i class="fas fa-camera"></i> Tirar Captura de Tela';
+                        
+                    } catch (erro) {
+                        console.error('Erro no evento de captura:', erro);
+                        alert('Erro ao processar a captura: ' + erro.message);
+                        btnCapturar.disabled = false;
+                        btnCapturar.innerHTML = '<i class="fas fa-camera"></i> Tirar Captura de Tela';
+                    }
+                });
+            }
+            
+            // Botão para baixar a captura
+            if (btnBaixar) {
+                btnBaixar.addEventListener('click', function() {
+                    if (imagemCapturada) {
+                        try {
+                            // Cria link para download
+                            const link = document.createElement('a');
+                            const dataAtual = new Date();
+                            const timestamp = `${dataAtual.getFullYear()}-${dataAtual.getMonth()+1}-${dataAtual.getDate()}_${dataAtual.getHours()}-${dataAtual.getMinutes()}-${dataAtual.getSeconds()}`;
+                            link.download = `captura-tela_${timestamp}.png`;
+                            link.href = imagemCapturada;
+                            link.click();
+                            
+                            // Feedback visual
+                            btnBaixar.innerHTML = '<i class="fas fa-check"></i> Baixado!';
+                            setTimeout(() => {
+                                btnBaixar.innerHTML = '<i class="fas fa-download"></i> Baixar Imagem';
+                            }, 2000);
+                        } catch (erro) {
+                            console.error('Erro ao baixar:', erro);
+                            alert('Erro ao baixar a imagem');
+                        }
+                    } else {
+                        alert('Nenhuma imagem disponível para baixar');
+                    }
+                });
+            }
+            
+            // Botão para partilhar/compartilhar
+            if (btnPartilhar) {
+                btnPartilhar.addEventListener('click', async function() {
+                    if (!imagemCapturada) {
+                        alert('Nenhuma imagem disponível para compartilhar');
+                        return;
+                    }
+                    
+                    try {
+                        // Converte base64 para blob
+                        const resposta = await fetch(imagemCapturada);
+                        const blob = await resposta.blob();
+                        const arquivo = new File([blob], `captura-${Date.now()}.png`, { type: 'image/png' });
+                        
+                        // Verifica se a Web Share API é suportada
+                        if (navigator.share && navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+                            await navigator.share({
+                                title: 'Captura de Tela',
+                                text: 'Veja esta captura de tela que eu fiz!',
+                                files: [arquivo]
+                            });
+                            
+                            // Feedback visual
+                            btnPartilhar.innerHTML = '<i class="fas fa-check"></i> Partilhado!';
+                            setTimeout(() => {
+                                btnPartilhar.innerHTML = '<i class="fas fa-share-alt"></i> Partilhar';
+                            }, 2000);
+                        } else {
+                            // Fallback para navegadores sem suporte
+                            const link = document.createElement('a');
+                            link.download = `captura-${Date.now()}.png`;
+                            link.href = imagemCapturada;
+                            link.click();
+                            alert('Seu navegador não suporta compartilhamento direto.\nA imagem foi baixada automaticamente.');
+                        }
+                    } catch (erro) {
+                        console.error('Erro ao compartilhar:', erro);
+                        if (erro.name !== 'AbortError') {
+                            alert('Erro ao compartilhar: ' + erro.message);
+                        }
+                    }
+                });
+            }
+            
+            // Fecha modal ao clicar fora (garantia)
+            if (modalElement) {
+                modalElement.addEventListener('hidden.bs.modal', function () {
+                    // Limpa o canvas para economizar memória (opcional)
+                    // const contexto = canvas.getContext('2d');
+                    // contexto.clearRect(0, 0, canvas.width, canvas.height);
+                });
+            }
+            
+            // Mensagem de sucesso no console
+            console.log('Sistema de captura de tela inicializado com sucesso!');
+        });
+    </script>
+</body>
+</html>

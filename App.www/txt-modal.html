@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Reserve Já · Hotéis e Turismo em Malanje · Angola</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #eef5f0 0%, #dde6df 100%);
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            position: relative;
+        }
+
+        /* Página principal – Reserve Já */
+        .page-content {
+            max-width: 1300px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .hero {
+            background: linear-gradient(105deg, #0f3b2c 0%, #1b5e4a 100%);
+            border-radius: 48px;
+            padding: 2rem 2rem;
+            color: white;
+            box-shadow: 0 25px 40px -12px rgba(0,0,0,0.25);
+            margin-bottom: 2.5rem;
+        }
+
+        .hero h1 {
+            font-size: 2.6rem;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+
+        .hero h1 i {
+            margin-right: 12px;
+            color: #f5b042;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-top: 0.8rem;
+            opacity: 0.92;
+            max-width: 750px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .aviso-transparencia {
+            background: rgba(255,255,245,0.15);
+            display: inline-block;
+            padding: 0.45rem 1.2rem;
+            border-radius: 80px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-top: 1rem;
+            backdrop-filter: blur(2px);
+        }
+
+        .aviso-transparencia i {
+            margin-right: 6px;
+        }
+
+        .grade-servicos {
+            margin-top: 2rem;
+        }
+
+        .grade-servicos h2 {
+            font-size: 1.9rem;
+            color: #1e3a2f;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .cards-negocios {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.8rem;
+        }
+
+        .card-negocio {
+            background: white;
+            border-radius: 32px;
+            padding: 1.6rem 1.2rem;
+            width: 260px;
+            text-align: center;
+            transition: all 0.25s ease;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.05);
+            cursor: pointer;
+            border: 1px solid #dce5e0;
+        }
+
+        .card-negocio i {
+            font-size: 2.6rem;
+            color: #c27e2e;
+            margin-bottom: 0.8rem;
+        }
+
+        .card-negocio h3 {
+            font-size: 1.3rem;
+            color: #1c473a;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-negocio p {
+            font-size: 0.85rem;
+            color: #4f5a55;
+        }
+
+        .card-negocio:hover {
+            transform: translateY(-7px);
+            background: #fffcf0;
+            box-shadow: 0 22px 30px rgba(0,0,0,0.1);
+            border-color: #edd18e;
+        }
+
+        .cta-principal {
+            margin: 2.5rem auto 1rem;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #c27e2e;
+            padding: 0.9rem 2rem;
+            border-radius: 60px;
+            font-weight: bold;
+            color: #c27e2e;
+            font-size: 1rem;
+            transition: 0.2s;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-outline:hover {
+            background: #c27e2e;
+            color: white;
+            border-color: #c27e2e;
+            transform: scale(1.02);
+        }
+
+        /* ===== MODAL PRINCIPAL (VANTAGENS) ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(6px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 1.5rem;
+        }
+
+        .modal-card {
+            max-width: 920px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 32px 55px rgba(0, 0, 0, 0.4);
+            animation: modalFadeUp 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        @keyframes modalFadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(28px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-flex {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .modal-imagem {
+            flex: 0.9;
+            background: #1f3d31;
+            position: relative;
+            overflow: hidden;
+            min-height: 200px;
+            display: flex;
+            align-items: stretch;
+        }
+
+        .img-wrapper {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .img-biorisk {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            flex: 1;
+        }
+
+        .overlay-social {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(0,0,0,0.2) 0%, rgba(27, 94, 74, 0.3) 100%);
+            pointer-events: none;
+        }
+
+        .modal-conteudo {
+            flex: 1.2;
+            padding: 2rem 2rem;
+            background: #fffef9;
+            position: relative;
+        }
+
+        .btn-fechar {
+            position: absolute;
+            top: 18px;
+            right: 20px;
+            background: #f0ede5;
+            width: 34px;
+            height: 34px;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #2d3e2c;
+            font-size: 1.2rem;
+            z-index: 10;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        .btn-fechar:hover {
+            background: #e6e0d0;
+            transform: scale(1.02);
+            color: #b34e2e;
+        }
+
+        .titulo-software {
+            font-size: 1.9rem;
+            font-weight: 800;
+            color: #2c5a42;
+            margin-bottom: 0.5rem;
+            line-height: 1.25;
+            border-left: 5px solid #f5b042;
+            padding-left: 18px;
+        }
+
+        .titulo-software i {
+            color: #f5b042;
+            margin-right: 8px;
+            font-size: 1.7rem;
+        }
+
+        .descricao-principal {
+            font-size: 0.95rem;
+            color: #2a3b2e;
+            margin: 0.5rem 0 1rem 0;
+            line-height: 1.45;
+        }
+
+        .lista-vantagens-biorisk {
+            list-style: none;
+            margin: 1rem 0 1.2rem 0;
+        }
+
+        .lista-vantagens-biorisk li {
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #1f3b1a;
+        }
+
+        .lista-vantagens-biorisk i {
+            color: #f5b042;
+            font-size: 1.2rem;
+            width: 26px;
+        }
+
+        .nota-importante {
+            background: #fef4e8;
+            border-radius: 20px;
+            padding: 0.8rem 1rem;
+            margin: 0.8rem 0 1.2rem 0;
+            font-size: 0.8rem;
+            border-left: 3px solid #e4a022;
+        }
+
+        .nota-importante i {
+            color: #d48f2b;
+            margin-right: 8px;
+        }
+
+        .btn-acao {
+            display: block;
+            background: linear-gradient(95deg, #ca9622, #b47c10);
+            border: none;
+            width: 100%;
+            border-radius: 60px;
+            text-align: center;
+            transition: all 0.2s;
+            box-shadow: 0 8px 18px rgba(180, 124, 16, 0.3);
+            cursor: pointer;
+            text-decoration: none;
+            padding: 13px 12px;
+            font-weight: bold;
+            font-size: 1rem;
+            color: white;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-acao:hover {
+            transform: scale(1.01);
+            background: linear-gradient(95deg, #e0a82e, #cc8c1a);
+            box-shadow: 0 10px 22px rgba(180, 124, 16, 0.45);
+        }
+
+        .texto-info {
+            font-size: 0.7rem;
+            text-align: center;
+            color: #a16207;
+            background: #fff1cf;
+            display: inline-block;
+            width: 100%;
+            padding: 6px 10px;
+            border-radius: 40px;
+            margin-top: 14px;
+        }
+
+        /* ===== NOVO MODAL DE ACORDO / DIREITOS DO USUÁRIO E NEWSLETTER ===== */
+        .modal-acordo-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2100;
+            padding: 1.5rem;
+        }
+
+        .modal-acordo-card {
+            max-width: 500px;
+            width: 100%;
+            background: linear-gradient(145deg, #ffffff 0%, #fef9ef 100%);
+            border-radius: 32px;
+            box-shadow: 0 30px 45px rgba(0, 0, 0, 0.4);
+            animation: modalFadeUp 0.3s ease;
+            overflow: hidden;
+            border: 1px solid #f0deaa;
+        }
+
+        .modal-acordo-header {
+            background: #1b5e4a;
+            padding: 1.2rem 1.5rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .modal-acordo-header i {
+            font-size: 1.6rem;
+            color: #f5b042;
+        }
+
+        .modal-acordo-header h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .modal-acordo-body {
+            padding: 1.6rem 1.5rem;
+        }
+
+        .direitos-lista {
+            background: #f2f6f0;
+            padding: 1rem;
+            border-radius: 20px;
+            margin-bottom: 1.5rem;
+        }
+
+        .direitos-lista p {
+            font-weight: bold;
+            color: #1e3a2f;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .direitos-lista ul {
+            margin-left: 1.2rem;
+            color: #2c4b3a;
+            font-size: 0.8rem;
+            line-height: 1.5;
+        }
+
+        .direitos-lista li {
+            margin: 6px 0;
+        }
+
+        .newsletter-area {
+            background: white;
+            border-radius: 20px;
+            padding: 1rem;
+            border: 1px solid #e2dbbc;
+            margin-bottom: 1.2rem;
+        }
+
+        .newsletter-area label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            color: #2c5a42;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .input-email-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .input-email-group input {
+            flex: 1;
+            padding: 12px 14px;
+            border-radius: 60px;
+            border: 1.5px solid #ddd6bf;
+            font-size: 0.9rem;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .input-email-group input:focus {
+            border-color: #ca9622;
+            box-shadow: 0 0 0 2px rgba(202, 150, 34, 0.2);
+        }
+
+        .btn-inscrever {
+            background: #1b5e4a;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 60px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-inscrever:hover {
+            background: #0f4637;
+            transform: scale(1.02);
+        }
+
+        .msg-sucesso {
+            background: #d4edda;
+            color: #155724;
+            padding: 8px 12px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+
+        .btn-fechar-acordo {
+            background: #e9e0ce;
+            border: none;
+            padding: 10px;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 12px;
+            color: #4a3b1c;
+            transition: 0.2s;
+        }
+
+        .btn-fechar-acordo:hover {
+            background: #ddd0b6;
+        }
+
+        .btn-aceitar {
+            background: linear-gradient(95deg, #ca9622, #b47c10);
+            border: none;
+            padding: 12px;
+            border-radius: 40px;
+            color: white;
+            font-weight: bold;
+            width: 100%;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-aceitar:hover {
+            background: linear-gradient(95deg, #e0a82e, #cc8c1a);
+        }
+
+        .small-note {
+            font-size: 0.65rem;
+            text-align: center;
+            color: #8b7a55;
+            margin-top: 10px;
+        }
+
+        /* Ícone flutuante */
+        .floating-biorisk {
+            position: fixed;
+            bottom: 26px;
+            right: 26px;
+            background: linear-gradient(135deg, #1b4e3f, #0c352a);
+            width: 62px;
+            height: 62px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 15px 28px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(245,176,66,0.7);
+            z-index: 1500;
+            transition: all 0.2s ease;
+            animation: softPulse 2.2s infinite;
+        }
+
+        .floating-biorisk i {
+            font-size: 2rem;
+            color: #FFDF8c;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+
+        .floating-biorisk:hover {
+            transform: scale(1.08);
+            background: linear-gradient(135deg, #2a6b56, #15523f);
+            box-shadow: 0 18px 32px rgba(0, 0, 0, 0.35), 0 0 0 4px #ffda77;
+        }
+
+        @keyframes softPulse {
+            0% { box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25), 0 0 0 3px rgba(245,176,66,0.6); }
+            50% { box-shadow: 0 16px 28px rgba(0, 0, 0, 0.35), 0 0 0 5px rgba(255, 200, 70, 0.9); }
+            100% { box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25), 0 0 0 3px rgba(245,176,66,0.6); }
+        }
+
+        .floating-biorisk::after {
+            content: "Reserve Já · Hotéis e Turismo em Malanje";
+            position: absolute;
+            bottom: 72px;
+            right: 0;
+            background: #1a2f28;
+            color: #ffecb3;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 5px 12px;
+            border-radius: 40px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.2s;
+            font-family: 'Segoe UI', system-ui;
+        }
+
+        .floating-biorisk:hover::after {
+            opacity: 1;
+            bottom: 70px;
+        }
+
+        @media (max-width: 780px) {
+            body { padding: 1rem; }
+            .modal-flex { flex-direction: column; }
+            .modal-imagem { min-height: 200px; flex: auto; }
+            .modal-conteudo { padding: 1.5rem; }
+            .titulo-software { font-size: 1.5rem; }
+            .hero h1 { font-size: 1.9rem; }
+            .cards-negocios { gap: 1rem; }
+            .card-negocio { width: 220px; }
+            .input-email-group { flex-wrap: wrap; }
+            .btn-inscrever { width: 100%; }
+        }
+        @media (max-width: 560px) {
+            .card-negocio { width: 100%; max-width: 280px; }
+            .hero { padding: 1.5rem; }
+            .floating-biorisk { width: 50px; height: 50px; bottom: 20px; right: 20px; }
+            .floating-biorisk i { font-size: 1.6rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!--
+    <div class="page-content">
+        <div class="hero">
+            <h1><i class="fas fa-hotel"></i> Reserve Já · Hotéis e Turismo<br> em Malanje, Angola</h1>
+            <p>A plataforma que valoriza a hospitalidade e os encantos da província de Malanje. Divulgue hotéis, pousadas, roteiros turísticos e fortaleça a identidade cultural e natural da região.</p>
+            <div class="aviso-transparencia">
+                <i class="fas fa-shield-alt"></i> Conectamos viajantes e empreendimentos · Promoção responsável do turismo local
+            </div>
+        </div>
+
+        <div class="grade-servicos">
+            <h2><i class="fas fa-umbrella-beach"></i> Frentes de atuação estratégica</h2>
+            <div class="cards-negocios">
+                <div class="card-negocio" data-modal="abrir">
+                    <i class="fas fa-building"></i>
+                    <h3>Vitrine de hotéis</h3>
+                    <p>Destaque para hotéis, pousadas e resorts de Malanje. Fotos, serviços, localização e contato direto com o hóspede.</p>
+                </div>
+                <div class="card-negocio" data-modal="abrir">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <h3>Guias turísticos</h3>
+                    <p>Roteiros pelas Quedas de Kalandula, Pedras Negras do Pungo Andongo, Lagoa da Sungue e muito mais.</p>
+                </div>
+                <div class="card-negocio" data-modal="abrir">
+                    <i class="fas fa-chalkboard-user"></i>
+                    <h3>Capacitação hoteleira</h3>
+                    <p>Treinamentos em hospitalidade, gestão de reservas e marketing digital para hotéis e agências locais.</p>
+                </div>
+                <div class="card-negocio" data-modal="abrir">
+                    <i class="fas fa-draw-polygon"></i>
+                    <h3>Mapeamento turístico</h3>
+                    <p>Registro colaborativo de pontos de interesse, hospedagens e experiências autênticas em Malanje.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="cta-principal">
+            <button id="btnAbrirModalPrincipal" class="btn-outline">
+                <i class="fas fa-hotel"></i> Conhecer vantagens para hotéis e viajantes
+            </button>
+        </div>
+    </div>
+    -->
+
+    <!-- MODAL PRINCIPAL – VANTAGENS (original) -->
+    <div id="modalBioRisk" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-flex">
+                <div class="modal-imagem">
+                    <div class="img-wrapper">
+                        <img class="img-biorisk" 
+                             src="images/fraude-html.png"
+                             alt="Reserve Já - Hotéis e Turismo em Malanje, Angola"
+                             onerror="this.src='https://placehold.co/700x480/1b5e4a/f5e5b0?text=🏨+Reserve+Já:+Hotéis+e+Turismo+em+Malanje&font=roboto'">
+                        <div class="overlay-social"></div>
+                    </div>
+                </div>
+                <div class="modal-conteudo">
+                    <div class="btn-fechar" id="fecharModalBioRisk">
+                        <i class="fas fa-times"></i>
+                    </div>
+                    <div class="titulo-software">
+                        <i class="fas fa-hotel"></i> Reserve Já – Visibilidade para Hotéis<br>
+                        <span style="font-size: 0.9rem; color: #e4a022;">Promovendo o turismo e a hotelaria na província de Malanje, Angola</span>
+                    </div>
+                    <p class="descricao-principal">
+                        Conectamos viajantes, agências e hóspedes aos melhores hotéis, pousadas e experiências de Malanje. Valorizamos a cultura, a natureza e a hospitalidade local com ferramentas digitais e redes sociais.
+                    </p>
+                    <ul class="lista-vantagens-biorisk">
+                        <li><i class="fab fa-whatsapp"></i> <strong>Divulgação por WhatsApp</strong> – compartilhe ofertas, disponibilidade e diferenciais dos hotéis diretamente com viajantes e agências.</li>
+                        <li><i class="fab fa-instagram"></i> <strong>Conteúdo nos stories</strong> – mostre quartos, café da manhã, paisagens e pontos turísticos próximos para engajar novos hóspedes.</li>
+                        <li><i class="fab fa-facebook"></i> <strong>Comunidade de hotelaria e turismo</strong> – troca de experiências entre gestores de hotéis, guias e viajantes que amam Malanje.</li>
+                        <li><i class="fas fa-chart-simple"></i> <strong>Dashboard de desempenho</strong> – visualize a eficácia das campanhas, origem dos hóspedes e sazonalidade para planejar melhorias.</li>
+                        <li><i class="fas fa-hand-holding-heart"></i> <strong>Apoio à gestão hoteleira</strong> – dicas de boas práticas, captação de reservas e fidelização de clientes.</li>
+                    </ul>
+                    <div class="nota-importante">
+                        <i class="fas fa-exclamation-triangle"></i> <strong>Direitos e responsabilidades:</strong> O Reserve Já actua como plataforma de divulgação e conexão. <u>Não realiza vendas directas</u> e <u>não substitui os canais oficiais de reserva</u> dos hotéis. Nosso compromisso é com a transparência, a promoção ética do turismo local e o respeito às leis angolanas.
+                    </div>
+                    <a href="contract.html">
+                        <button class="btn-acao">
+                        <i class="fab fa-whatsapp"></i> Quero Saber Mais Sobre a Plataforma
+                    </button>
+                    </a>
+                    
+                    <div class="texto-info">
+                        <i class="fas fa-clock"></i> Cadastro rápido · Primeiros 3 meses com recursos especiais
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOVO MODAL: ACORDO + DIREITOS + NEWSLETTER (inscrição por email) -->
+    <div id="modalAcordo" class="modal-acordo-overlay">
+        <div class="modal-acordo-card">
+            <div class="modal-acordo-header">
+                <i class="fas fa-handshake"></i>
+                <h3>Termo de Consentimento e Direitos</h3>
+            </div>
+            <div class="modal-acordo-body">
+                <div class="direitos-lista">
+                    <p><i class="fas fa-shield-alt"></i> Seus direitos como usuário:</p>
+                    <ul>
+                        <li><i class="fas fa-check-circle"></i> Acesso transparente às informações da plataforma Reserve Já.</li>
+                        <li><i class="fas fa-check-circle"></i> Proteção de dados pessoais conforme a legislação angolana.</li>
+                        <li><i class="fas fa-check-circle"></i> Liberdade de cancelar notificações ou solicitar remoção de dados a qualquer momento.</li>
+                        <li><i class="fas fa-check-circle"></i> A plataforma não partilha seu email com terceiros sem autorização explícita.</li>
+                        <li><i class="fas fa-check-circle"></i> Conteúdo é meramente informativo; reservas são feitas diretamente com hotéis.</li>
+                    </ul>
+                </div>
+                
+                <div class="newsletter-area">
+                    <label><i class="fas fa-envelope"></i> Receba novidades e ofertas por e-mail:</label>
+                    <div class="input-email-group">
+                        <input type="email" id="emailNotificacao" placeholder="seuemail@exemplo.com" autocomplete="email">
+                        <button id="btnInscreverEmail" class="btn-inscrever"><i class="fas fa-bell"></i> Inscrever</button>
+                    </div>
+                    <div id="msgSucessoEmail" class="msg-sucesso">
+                        <i class="fas fa-check-circle"></i> Obrigado! Você receberá notificações sobre hotéis e turismo em Malanje.
+                    </div>
+                    <div class="small-note">
+                        <i class="fas fa-lock"></i> Seu email será usado apenas para enviar conteúdos e novidades do Reserve Já. Você pode cancelar a qualquer momento.
+                    </div>
+                </div>
+                
+                <button id="btnAceitarAcordo" class="btn-aceitar"><i class="fas fa-check"></i> Li e concordo com os termos</button>
+                <button id="btnFecharAcordo" class="btn-fechar-acordo"><i class="fas fa-times-circle"></i> Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ícone flutuante -->
+    <div class="floating-biorisk" id="floatingBioRiskBtn" aria-label="Abrir Reserve Já" title="Reserve Já - Hotéis e Turismo em Malanje">
+        <i class="fas fa-hotel"></i>
+    </div>
+
+    <script>
+        (function() {
+            // Elementos do modal principal
+            const modalVantagens = document.getElementById('modalBioRisk');
+            const btnFecharVantagens = document.getElementById('fecharModalBioRisk');
+            const floatingBtn = document.getElementById('floatingBioRiskBtn');
+            const btnCtaPrincipal = document.getElementById('btnAbrirModalPrincipal');
+            const btnAcaoModal = document.getElementById('btnQueroBioRisk');
+            const cardsAbrir = document.querySelectorAll('.card-negocio[data-modal="abrir"]');
+            
+            // Elementos do novo modal de ACORDO + NEWSLETTER
+            const modalAcordo = document.getElementById('modalAcordo');
+            const btnAceitarAcordo = document.getElementById('btnAceitarAcordo');
+            const btnFecharAcordo = document.getElementById('btnFecharAcordo');
+            const btnInscreverEmail = document.getElementById('btnInscreverEmail');
+            const emailInput = document.getElementById('emailNotificacao');
+            const msgSucesso = document.getElementById('msgSucessoEmail');
+            
+            // Lógica de reaparecimento (modal principal)
+            let timeoutModal = null;
+            const INTERVALO_MS = 10 * 60 * 1000;
+            const STORAGE_KEY = 'reserveja_ultimo_fechamento';
+            
+            // Flag para saber se o usuário já aceitou o acordo nesta sessão
+            let acordoAceito = localStorage.getItem('reserveja_acordo_aceito') === 'true';
+            
+            function abrirModalVantagens() {
+                if (!modalVantagens) return;
+                if (modalVantagens.style.display === 'flex') return;
+                modalVantagens.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+            
+            function fecharModalVantagens() {
+                if (!modalVantagens) return;
+                if (modalVantagens.style.display !== 'flex') return;
+                modalVantagens.style.display = 'none';
+                document.body.style.overflow = '';
+                const agora = Date.now();
+                localStorage.setItem(STORAGE_KEY, agora.toString());
+                if (timeoutModal) clearTimeout(timeoutModal);
+                timeoutModal = setTimeout(() => {
+                    abrirModalVantagens();
+                    timeoutModal = null;
+                }, INTERVALO_MS);
+            }
+            
+            function inicializarModalComIntervalo() {
+                const ultimoFechamento = localStorage.getItem(STORAGE_KEY);
+                if (!ultimoFechamento) {
+                    abrirModalVantagens();
+                    return;
+                }
+                const tempoDecorrido = Date.now() - parseInt(ultimoFechamento, 10);
+                if (tempoDecorrido >= INTERVALO_MS) {
+                    abrirModalVantagens();
+                } else {
+                    const tempoRestante = INTERVALO_MS - tempoDecorrido;
+                    timeoutModal = setTimeout(() => {
+                        abrirModalVantagens();
+                        timeoutModal = null;
+                    }, tempoRestante);
+                }
+            }
+            
+            // FUNÇÃO PARA ABRIR MODAL DE ACORDO (se ainda não aceito)
+            function abrirModalAcordo() {
+                if (!acordoAceito && modalAcordo) {
+                    modalAcordo.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+            
+            function fecharModalAcordo() {
+                if (modalAcordo) {
+                    modalAcordo.style.display = 'none';
+                    document.body.style.overflow = '';
+                }
+            }
+            
+            // Aceitar acordo
+            function aceitarAcordo() {
+                acordoAceito = true;
+                localStorage.setItem('reserveja_acordo_aceito', 'true');
+                fecharModalAcordo();
+                // Opcional: pequeno alerta de confirmação
+                console.log('Acordo aceito pelo usuário');
+            }
+            
+            // Inscrição por email (simula envio)
+            function inscreverEmail() {
+                const email = emailInput.value.trim();
+                if (!email) {
+                    alert('Por favor, insira um endereço de email válido.');
+                    return;
+                }
+                if (!email.includes('@') || !email.includes('.')) {
+                    alert('Email inválido. Exemplo: nome@dominio.com');
+                    return;
+                }
+                // Simula subscrição (armazenar no localStorage para demonstração)
+                let inscricoes = JSON.parse(localStorage.getItem('reserveja_newsletters') || '[]');
+                if (!inscricoes.includes(email)) {
+                    inscricoes.push(email);
+                    localStorage.setItem('reserveja_newsletters', JSON.stringify(inscricoes));
+                }
+                msgSucesso.style.display = 'block';
+                emailInput.value = '';
+                setTimeout(() => {
+                    msgSucesso.style.display = 'none';
+                }, 4000);
+                // Aqui poderia integrar com backend real
+            }
+            
+            // Eventos do modal de vantagens (igual ao original)
+            if (btnFecharVantagens) {
+                btnFecharVantagens.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    fecharModalVantagens();
+                });
+            }
+            if (modalVantagens) {
+                modalVantagens.addEventListener('click', (e) => {
+                    if (e.target === modalVantagens) fecharModalVantagens();
+                });
+                const modalCard = document.querySelector('#modalBioRisk .modal-card');
+                if (modalCard) modalCard.addEventListener('click', (e) => e.stopPropagation());
+            }
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modalVantagens && modalVantagens.style.display === 'flex') fecharModalVantagens();
+                if (e.key === 'Escape' && modalAcordo && modalAcordo.style.display === 'flex') fecharModalAcordo();
+            });
+            if (floatingBtn) {
+                floatingBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (modalVantagens && modalVantagens.style.display !== 'flex') abrirModalVantagens();
+                });
+            }
+            if (btnCtaPrincipal) btnCtaPrincipal.addEventListener('click', () => abrirModalVantagens());
+            cardsAbrir.forEach(card => card.addEventListener('click', () => abrirModalVantagens()));
+            if (btnAcaoModal) {
+                btnAcaoModal.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    alert("🏨 Obrigado pelo interesse! Em breve nossa equipe entrará em contato para cadastrar seu hotel ou negócio de turismo em Malanje no Reserve Já — visibilidade e conexão com viajantes.");
+                    fecharModalVantagens();
+                });
+            }
+            
+            // Eventos do modal de acordo
+            if (btnAceitarAcordo) btnAceitarAcordo.addEventListener('click', aceitarAcordo);
+            if (btnFecharAcordo) btnFecharAcordo.addEventListener('click', fecharModalAcordo);
+            if (btnInscreverEmail) btnInscreverEmail.addEventListener('click', inscreverEmail);
+            if (modalAcordo) {
+                modalAcordo.addEventListener('click', (e) => {
+                    if (e.target === modalAcordo) fecharModalAcordo();
+                });
+                const acordoCard = document.querySelector('.modal-acordo-card');
+                if (acordoCard) acordoCard.addEventListener('click', (e) => e.stopPropagation());
+            }
+            
+            // Inicialização: mostra modal de acordo (se não aceito) APÓS carregar, sem travar os intervalos
+            setTimeout(() => {
+                abrirModalAcordo();
+            }, 500);
+            
+            inicializarModalComIntervalo();
+        })();
+    </script>
+</body>
+</html>

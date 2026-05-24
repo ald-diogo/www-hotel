@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>🏨 Reserve Já | Hotéis e Maravilhas de Malanje</title>
+  <!-- Bootstrap 5 (grelha) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s;
+      font-family: 'Times New Roman', Times, serif;
+    }
+    body {
+      background: var(--bg-body);
+      color: var(--text-primary);
+      font-family: 'Segoe UI', 'Roboto', 'Georgia', serif;
+      line-height: 1.5;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('images/quiz.jpg');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.15;
+      pointer-events: none;
+      z-index: -2;
+    }
+    :root {
+      --bg-body: #f4f7f2;
+      --bg-surface-trans: rgba(248, 250, 240, 0.88);
+      --border-light: #ced4da;
+      --text-primary: #1f2e1c;
+      --text-secondary: #2d4a22;
+      --accent: #2b6e2e;
+      --accent-bg: #e8f0e6;
+      --link: #1a5d1a;
+      --correct: #2b6e2e;
+      --wrong: #b33b2c;
+    }
+    body.dark-mode {
+      --bg-body: #121212;
+      --bg-surface-trans: rgba(28, 35, 28, 0.88);
+      --border-light: #3a4a3a;
+      --text-primary: #eef5e8;
+      --text-secondary: #c0d6b3;
+      --accent: #7cb342;
+      --accent-bg: #2e3b2e;
+      --link: #9ccc65;
+    }
+    .quiz-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
+    }
+    .quiz-header {
+      border-bottom: 2px solid var(--accent);
+      padding: 0.5rem 0 1rem;
+      margin-bottom: 1.8rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      background: transparent;
+    }
+    .logo-area h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), #4c9e2e);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      margin: 0;
+    }
+    .stats-bar {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+      background: var(--bg-surface-trans);
+      backdrop-filter: blur(4px);
+      padding: 0.4rem 1.2rem;
+      border-radius: 40px;
+      border: 1px solid var(--border-light);
+    }
+    .progress-custom {
+      width: 150px;
+      height: 8px;
+      background: #ccc;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      background: var(--accent);
+      transition: width 0.3s;
+    }
+    .theme-switch-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .theme-switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+    .theme-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      border-radius: 34px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "☀️";
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 20px;
+      width: 20px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+    input:checked + .slider:before {
+      content: "🌙";
+      transform: translateX(26px);
+    }
+    .quiz-card {
+      background: var(--bg-surface-trans);
+      backdrop-filter: blur(6px);
+      border: 1px solid var(--border-light);
+      border-radius: 32px;
+      padding: 1.8rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    .question-text {
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin: 1rem 0;
+    }
+    .option-btn {
+      width: 100%;
+      text-align: left;
+      background: rgba(0,0,0,0.05);
+      border: 1px solid var(--border-light);
+      border-radius: 60px;
+      padding: 0.8rem 1.2rem;
+      margin-bottom: 0.8rem;
+      font-size: 1rem;
+      transition: 0.1s;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .option-btn:hover:not(:disabled) {
+      background: var(--accent-bg);
+      transform: translateX(5px);
+    }
+    .correct-feedback {
+      background-color: var(--correct) !important;
+      border-color: var(--correct) !important;
+      color: white !important;
+    }
+    .wrong-feedback {
+      background-color: var(--wrong) !important;
+      border-color: var(--wrong) !important;
+      color: white !important;
+    }
+    .disabled-opt {
+      cursor: not-allowed;
+      opacity: 0.9;
+    }
+    .timer-circle {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--accent);
+    }
+    .assistant-card, .video-card-mini {
+      background: var(--bg-surface-trans);
+      backdrop-filter: blur(4px);
+      border-radius: 24px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border: 1px solid var(--border-light);
+    }
+    .btn-custom {
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 40px;
+      padding: 0.5rem 1.5rem;
+      font-weight: bold;
+    }
+    .btn-custom:hover {
+      background: #1e5a1e;
+      transform: scale(1.02);
+    }
+    .video-grid {
+      display: grid;
+      gap: 1rem;
+    }
+    footer {
+      text-align: center;
+      border-top: 1px solid var(--border-light);
+      padding: 1.5rem;
+      font-size: 0.85rem;
+    }
+    @media (max-width: 768px) {
+      .quiz-container { padding: 0.8rem; }
+      .question-text { font-size: 1.2rem; }
+    }
+      
+    /* Outher CSS */
+    .logo-maker{
+      border-radius: 50px;
+      width: 50px;
+      height: 50px;
+    }
+    
+    .logo-panel{
+      border-radius: 50px;
+      width: 30px;
+      height: 30px;
+    }
+        
+    .logo-panel { 
+      width: 24px;
+      height: 24px; 
+      vertical-align: middle;
+      margin-right: 5px; 
+    }
+    
+    .logo-point {
+      width: 100px; 
+      height: 70px;
+    }
+  </style>
+</head>
+<body>
+<div class="quiz-container">
+  <div class="quiz-header">
+    <div class="logo-area">
+      <h1>
+          <a href="index.html">
+              <img src="images/palanca-real-rbg.png" 
+                   class="logo-point" 
+                   onerror="this.style.display='none'"/>
+          </a></h1>
+      <div class="small text-secondary">Explore hotéis e maravilhas de Malanje ✨</div>
+    </div>
+      
+    <div class="stats-bar">
+          <a href="library.html">
+               <button class="btn btn-sm btn-outline-danger">
+            <i class="bi bi-arrow-left-circle"></i> Voltar
+        </button>
+            </a>
+       
+        
+      <div><i class="bi bi-star-fill text-warning"></i> <span id="scoreDisplay">0</span> pts</div>
+      <div class="progress-custom"><div class="progress-fill" id="progressFill"></div></div>
+      <div><i class="bi bi-question-circle"></i> <span id="questionCounter">1</span>/<span id="totalQuestions">0</span></div>
+      <div class="theme-switch-wrapper">
+        <i class="bi bi-sun"></i>
+        <label class="theme-switch"><input type="checkbox" id="darkModeCheckbox"><span class="slider"></span></label>
+        <i class="bi bi-moon"></i>
+      </div>
+      <button id="langSwitch" class="btn btn-sm btn-outline-secondary">🇬🇧 EN</button>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- COLUNA PRINCIPAL: QUIZ -->
+    <div class="col-lg-7">
+      <div class="quiz-card" id="quizCard">
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="badge bg-success" id="categoryBadge">Hotéis</span>
+          <div class="timer-circle"><i class="bi bi-hourglass-split"></i> <span id="timerSec">20</span>s</div>
+        </div>
+        <div class="question-text" id="questionText">Carregando pergunta...</div>
+        <div id="optionsContainer"></div>
+        <div class="d-flex justify-content-between mt-3">
+          <button id="restartBtn" class="btn-custom"><i class="bi bi-arrow-left-circle"></i> Reiniciar</button>
+          <button id="nextBtn" class="btn-custom" disabled>Próxima <i class="bi bi-arrow-right-circle"></i></button>
+        </div>
+      </div>
+      <!-- Resultado final (inicialmente escondido) -->
+      <div id="resultCard" class="quiz-card text-center" style="display: none;">
+        <h2><i class="bi bi-trophy-fill text-warning"></i> Resultado Final</h2>
+        <p id="finalScoreMsg"></p>
+        <button id="playAgainBtn" class="btn-custom mt-2"><i class="bi bi-arrow-repeat"></i> Jogar Novamente</button>
+      </div>
+    </div>
+
+    <!-- COLUNA LATERAL: ASSISTENTE + ESTATÍSTICAS + VÍDEOS -->
+    <div class="col-lg-5">
+      <div class="assistant-card">
+        <h5><i class="bi bi-robot"></i> <span data-i18n="assistant">Guia de Malanje</span></h5>
+        <p id="hintText" class="small mb-0">Clique numa opção para ver dicas ou espere...</p>
+      </div>
+      <div class="assistant-card">
+        <h5><i class="bi bi-graph-up"></i> Estatísticas da Sessão</h5>
+        <div>✅ Acertos: <span id="correctCount">0</span></div>
+        <div>❌ Erros: <span id="wrongCount">0</span></div>
+        <div>📊 Taxa: <span id="accuracyRate">0</span>%</div>
+      </div>
+      <div class="assistant-card">
+        <h5><i class="bi bi-camera-reels-fill"></i> Vídeos de Malanje</h5>
+        <div class="video-grid" id="videosContainer"></div>
+      </div>
+    </div>
+  </div>
+  <footer>
+    🏨 Reserve Já – Conheça os melhores hotéis e as maravilhas da província de Malanje 🌄
+  </footer>
+</div>
+
+<script>
+ // ======================= BASE DE PERGUNTAS (PT/EN) - Hotéis e Maravilhas de Malanje =======================
+const quizData = {
+  pt: [
+    { id:1, category:"Hotéis", question:"Qual é o hotel mais conhecido localizado no centro da cidade de Malanje?", options:["Hotel Vitória","Hotel Palmeiras","Hotel Kizomba","Hotel Malanje Plaza"], correct:0, hint:"Este hotel tem vista para a famosa Praça da Independência." },
+    { id:2, category:"Maravilhas", question:"Queda d'água símbolo de Malanje, uma das maiores de África?", options:["Quedas do Kalandula","Quedas do Duque de Bragança","Quedas da Huíla","Cachoeira do Binga"], correct:0, hint:"Localizada no rio Lucala, impressiona pela largura e beleza." },
+    { id:3, category:"Hotéis", question:"Qual hotel oferece acomodações de luxo e está perto do Aeroporto de Malanje?", options:["Hotel Kapanda","Hotel Mirante","Residencial Águas","Hotel Nova Malanje"], correct:0, hint:"Possui restaurante, piscina e fácil acesso ao aeroporto." },
+    { id:4, category:"Maravilhas", question:"Formação rochosa conhecida como 'Meca da Geologia' em Malanje?", options:["Pungo Andongo","Serra da Leba","Morro do Moco","Tundavala"], correct:0, hint:"Famoso pelas pegadas gigantes e as pedras negras." },
+    { id:5, category:"Hotéis", question:"Qual unidade hoteleira está situada às margens do rio Malanje?", options:["Rio Malanje Hotel","Hotel Residencial","Pousada do Rio","Hotel Rivera"], correct:0, hint:"Ambiente tranquilo com vista para o rio." },
+    { id:6, category:"Maravilhas", question:"A Lagoa Azul em Malanje é conhecida por?", options:["Águas cristalinas e esportes aquáticos","Ser um vulcão ativo","Ter cavernas pré-históricas","Ser um deserto"], correct:0, hint:"Lugar perfeito para quem busca lazer e contato com a natureza." },
+    { id:7, category:"Hotéis", question:"Qual hotel em Malanje é famoso pelo seu café da manhã regional e culinária angolana?", options:["Hotel de Conforto","Hotel Capital","Residencial Elite","Hotel Sol Nascente"], correct:0, hint:"Serve funge, calulu e frutas tropicais." },
+    { id:8, category:"Maravilhas", question:"Parque Nacional localizado em Malanje com grande biodiversidade?", options:["Parque Nacional da Cangandala","Parque do Iona","Parque da Quiçama","Parque da Mupa"], correct:0, hint:"Abriga a rara Palanca Negra Gigante." },
+    { id:9, category:"Hotéis", question:"Qual hotel oferece vista privilegiada para as Montanhas de Malanje?", options:["Hotel Serra Vista","Hotel Horizonte","Hotel Montanhês","Hotel Alto das Flores"], correct:0, hint:"Localizado em ponto elevado da cidade." },
+    { id:10, category:"Maravilhas", question:"As famosas 'Pegadas dos Gigantes' estão em qual região?", options:["Pungo Andongo","Calandula","Cacuso","Quirima"], correct:0, hint:"Monumento geológico lendário ligado ao rei Ngola Kiluanje." },
+    { id:11, category:"Hotéis", question:"Qual rede hoteleira é referência em hospitalidade no centro comercial de Malanje?", options:["Hotel Comercial","Hotel Center Plaza","Hotel Vitória","Hotel Palácio"], correct:2, hint:"Já mencionado anteriormente, é um dos mais tradicionais." },
+    { id:12, category:"Maravilhas", question:"Cascata com mais de 100 metros de altura localizada em Malanje?", options:["Quedas do Kalandula","Cachoeira do Luando","Quedas da Moma","Salto do Zenza"], correct:0, hint:"Uma das maiores em vazão do continente." },
+    { id:13, category:"Hotéis", question:"Hotel que dispõe de centro de conferências para grandes eventos em Malanje?", options:["Hotel Kapanda","Grand Hotel Malanje","Hotel Business Center","Palmeiras Resort"], correct:1, hint:"Moderno e preparado para receber executivos e turistas." },
+    { id:14, category:"Maravilhas", question:"A principal atividade turística na Lagoa Azul é?", options:["Passeios de barco e caiaque","Escalada","Rapel","Caminhadas radicais"], correct:0, hint:"Aproveite as águas calmas para remar." },
+    { id:15, category:"Hotéis", question:"Qual hotel oferece serviço de translado para as Quedas do Kalandula?", options:["Eco Hotel Kalandula","Hotel Nature","Reserva Hotel","Safari Lodge"], correct:0, hint:"Especializado em ecoturismo e excursões." },
+    { id:16, category:"Maravilhas", question:"A serra de Pungo Andongo é popular por suas formações geológicas chamadas?", options:["Pedras Negras","Rochas Vermelhas","Montanhas Azuis","Cristais de Quartzo"], correct:0, hint:"Blocos gigantes de pedra escura espalhados pela savana." },
+    { id:17, category:"Hotéis", question:"A melhor localização para quem busca hotéis baratos em Malanje?", options:["Bairro da Capunga","Bairro Popular","Centro da Cidade","Macâmbilo"], correct:2, hint:"Maior concentração de hotéis e serviços." },
+    { id:18, category:"Maravilhas", question:"Qual desses rios forma as Quedas do Kalandula?", options:["Rio Lucala","Rio Kwanza","Rio Bengo","Rio Dande"], correct:0, hint:"Afluente do rio Kwanza, com impressionante volume de água." },
+    { id:19, category:"Hotéis", question:"Hotel com academia, spa e piscina aquecida na cidade?", options:["Wellness Hotel Malanje","Hotel SPA Central","Resort Life","Palace Hotel"], correct:0, hint:"Ideal para relaxar após um dia de turismo." },
+    { id:20, category:"Maravilhas", question:"A Palanca Negra Gigante é símbolo nacional de Angola e vive principalmente em?", options:["Parque Nacional da Cangandala","Reserva do Luando","Malanje","Kalandula"], correct:0, hint:"Criado especialmente para proteger essa subespécie única." },
+    { id:21, category:"Hotéis", question:"Qual hotel é o mais próximo do Museu Regional de Malanje?", options:["Hotel Museum View","Hotel Central","Hotel Colonial","Hotel Antigo"], correct:0, hint:"Fica a poucos passos da história local." },
+    { id:22, category:"Maravilhas", question:"Além do Kalandula, outra cachoeira famosa em Malanje é?", options:["Quedas do Luando","Cascata do Cuanza","Quedas de Cambondo","Salto do Maravilha"], correct:0, hint:"Menos conhecida, mas igualmente bela." },
+    { id:23, category:"Hotéis", question:"Hotel que oferece pacotes românticos e lua de mel em Malanje?", options:["Love Hotel Malanje","Hotel Paraíso","Romance Hotel","Sweet Hotel"], correct:1, hint:"Ambiente acolhedor com suítes especiais." },
+    { id:24, category:"Maravilhas", question:"A Lenda das Pegadas de Pungo Andongo está associada a qual figura histórica?", options:["Rainha Ginga","Rei Kilemba","Ngola Kiluanje","General Bula"], correct:2, hint:"Conta-se que o rei teria marcado as rochas com seus pés." },
+    { id:25, category:"Hotéis", question:"Recomendação de hotel econômico com bom custo-benefício no centro?", options:["Hotel Económico","Residencial Sónia","Hotel Popular","Pousada Central"], correct:1, hint:"Ambiente familiar e boa localização." }
+  ],
+  en: [
+    { id:1, category:"Hotels", question:"Which is the most famous hotel in downtown Malanje?", options:["Hotel Vitória","Hotel Palmeiras","Hotel Kizomba","Malanje Plaza Hotel"], correct:0, hint:"This hotel overlooks Independence Square." },
+    { id:2, category:"Wonders", question:"Waterfall symbol of Malanje, one of the largest in Africa?", options:["Kalandula Falls","Duque de Bragança Falls","Huíla Falls","Binga Falls"], correct:0, hint:"Located on the Lucala River, impressive width and beauty." },
+    { id:3, category:"Hotels", question:"Which hotel offers luxury accommodations near Malanje Airport?", options:["Kapanda Hotel","Mirante Hotel","Águas Residence","Nova Malanje Hotel"], correct:0, hint:"Has a restaurant, pool and easy airport access." },
+    { id:4, category:"Wonders", question:"Rock formation known as 'Geology Mecca' in Malanje?", options:["Pungo Andongo","Leba Mountain","Moco Peak","Tundavala"], correct:0, hint:"Famous for giant footprints and black stones." },
+    { id:5, category:"Hotels", question:"Which hotel is located on the banks of the Malanje River?", options:["Rio Malanje Hotel","Residencial Hotel","River Inn","Rivera Hotel"], correct:0, hint:"Quiet atmosphere with a river view." },
+    { id:6, category:"Wonders", question:"Blue Lagoon in Malanje is known for?", options:["Crystal clear waters and water sports","Being an active volcano","Having prehistoric caves","Being a desert"], correct:0, hint:"Perfect place for leisure and nature contact." },
+    { id:7, category:"Hotels", question:"Which hotel in Malanje is famous for its regional breakfast?", options:["Conforto Hotel","Capital Hotel","Elite Residence","Sol Nascente Hotel"], correct:0, hint:"Serves funge, calulu and tropical fruits." },
+    { id:8, category:"Wonders", question:"National park located in Malanje with great biodiversity?", options:["Cangandala National Park","Iona Park","Quiçama Park","Mupa Park"], correct:0, hint:"Shelters the rare Giant Sable Antelope." },
+    { id:9, category:"Hotels", question:"Which hotel offers a privileged view of the Malanje Mountains?", options:["Serra Vista Hotel","Horizonte Hotel","Montanhês Hotel","Alto das Flores Hotel"], correct:0, hint:"Located at a high point of the city." },
+    { id:10, category:"Wonders", question:"The famous 'Footprints of the Giants' are located in which region?", options:["Pungo Andongo","Calandula","Cacuso","Quirima"], correct:0, hint:"Legendary geological monument linked to King Ngola Kiluanje." },
+    { id:11, category:"Hotels", question:"Which hotel chain is a reference for hospitality downtown Malanje?", options:["Comercial Hotel","Center Plaza Hotel","Vitória Hotel","Palácio Hotel"], correct:2, hint:"Mentioned before, one of the most traditional." },
+    { id:12, category:"Wonders", question:"Waterfall over 100 meters high located in Malanje?", options:["Kalandula Falls","Luando Falls","Moma Falls","Zenza Jump"], correct:0, hint:"One of the largest flows on the continent." },
+    { id:13, category:"Hotels", question:"Hotel with conference center for large events in Malanje?", options:["Kapanda Hotel","Grand Hotel Malanje","Business Center Hotel","Palmeiras Resort"], correct:1, hint:"Modern and prepared to host executives and tourists." },
+    { id:14, category:"Wonders", question:"The main tourist activity at Blue Lagoon is?", options:["Boat and kayak rides","Climbing","Rappel","Radical hiking"], correct:0, hint:"Enjoy the calm waters for paddling." },
+    { id:15, category:"Hotels", question:"Which hotel offers shuttle service to Kalandula Falls?", options:["Eco Hotel Kalandula","Nature Hotel","Reserva Hotel","Safari Lodge"], correct:0, hint:"Specialized in ecotourism and excursions." },
+    { id:16, category:"Wonders", question:"Pungo Andongo mountain range is known for its geological formations called?", options:["Black Stones","Red Rocks","Blue Mountains","Quartz Crystals"], correct:0, hint:"Giant dark rocks scattered across the savannah." },
+    { id:17, category:"Hotels", question:"Best location for budget hotels in Malanje?", options:["Capunga District","Popular District","City Center","Macambilo"], correct:2, hint:"Largest concentration of hotels and services." },
+    { id:18, category:"Wonders", question:"Which river forms Kalandula Falls?", options:["Lucala River","Kwanza River","Bengo River","Dande River"], correct:0, hint:"Tributary of the Kwanza River with impressive water volume." },
+    { id:19, category:"Hotels", question:"Hotel with gym, spa and heated pool in the city?", options:["Wellness Hotel Malanje","SPA Central Hotel","Life Resort","Palace Hotel"], correct:0, hint:"Ideal for relaxing after a day of tourism." },
+    { id:20, category:"Wonders", question:"The Giant Sable Antelope is a national symbol of Angola and lives mainly in?", options:["Cangandala National Park","Luando Reserve","Malanje","Kalandula"], correct:0, hint:"Created specifically to protect this unique subspecies." },
+    { id:21, category:"Hotels", question:"Which hotel is closest to the Malanje Regional Museum?", options:["Museum View Hotel","Central Hotel","Colonial Hotel","Antigo Hotel"], correct:0, hint:"Just steps from local history." },
+    { id:22, category:"Wonders", question:"Besides Kalandula, another famous waterfall in Malanje is?", options:["Luando Falls","Cuanza Cascade","Cambondo Falls","Maravilha Jump"], correct:0, hint:"Less known but equally beautiful." },
+    { id:23, category:"Hotels", question:"Hotel that offers romantic packages and honeymoon in Malanje?", options:["Love Hotel Malanje","Paraíso Hotel","Romance Hotel","Sweet Hotel"], correct:1, hint:"Welcoming atmosphere with special suites." },
+    { id:24, category:"Wonders", question:"The Legend of Pungo Andongo Footprints is associated with which historical figure?", options:["Queen Ginga","King Kilemba","Ngola Kiluanje","General Bula"], correct:2, hint:"Legend says the king marked the rocks with his feet." },
+    { id:25, category:"Hotels", question:"Budget hotel recommendation in the city center?", options:["Económico Hotel","Sónia Residence","Popular Hotel","Central Inn"], correct:1, hint:"Family atmosphere and good location." }
+  ]
+};
+
+  let currentLang = "pt";
+  let currentQuestions = [];
+  let currentIndex = 0;
+  let score = 0;
+  let correctAnswers = 0;
+  let wrongAnswers = 0;
+  let quizActive = true;
+  let timerInterval = null;
+  let timeLeft = 20;
+  let waitingForNext = false;
+
+  // DOM elements
+  const questionText = document.getElementById("questionText");
+  const optionsContainer = document.getElementById("optionsContainer");
+  const nextBtn = document.getElementById("nextBtn");
+  const restartBtn = document.getElementById("restartBtn");
+  const resultCard = document.getElementById("resultCard");
+  const quizCard = document.getElementById("quizCard");
+  const scoreDisplay = document.getElementById("scoreDisplay");
+  const progressFill = document.getElementById("progressFill");
+  const questionCounterSpan = document.getElementById("questionCounter");
+  const totalQuestionsSpan = document.getElementById("totalQuestions");
+  const categoryBadge = document.getElementById("categoryBadge");
+  const timerSecSpan = document.getElementById("timerSec");
+  const hintText = document.getElementById("hintText");
+  const correctCountSpan = document.getElementById("correctCount");
+  const wrongCountSpan = document.getElementById("wrongCount");
+  const accuracyRateSpan = document.getElementById("accuracyRate");
+  const finalScoreMsg = document.getElementById("finalScoreMsg");
+  const videosContainer = document.getElementById("videosContainer");
+
+  // Vídeos sobre Malanje
+  const videosData = {
+    pt: [
+      { title: "🏞️ Quedas do Kalandula - Malanje", url: "video/quedas-rei.mp4" },
+      { title: "⛰️ Pedras Negras do Pungo Andongo", url: "video/pungo-dongo.mp4" },
+      { title: "🏨 Hotéis em Malanje - Reserve Já", url: "video/apresentacao.mp4" }
+    ],
+    en: [
+      { title: "🏞️ Kalandula Falls - Malanje", url: "video/quedas-rei.mp4" },
+      { title: "⛰️ Black Stones of Pungo Andongo", url: "video/pungo-dongo.mp4" },
+      { title: "🏨 Hotels in Malanje - Reserve Já", url: "video/apresentacao.mp4" }
+    ]
+  };
+
+  function loadVideos() {
+    const vids = videosData[currentLang];
+    videosContainer.innerHTML = vids.map(v => `
+      <div class="video-card-mini">
+        <iframe width="100%" height="120" src="${v.url}?rel=0" frameborder="0" allowfullscreen loading="lazy"></iframe>
+        <div class="small mt-1">${v.title}</div>
+      </div>
+    `).join('');
+  }
+
+  function updateStatsUI() {
+    scoreDisplay.innerText = score;
+    correctCountSpan.innerText = correctAnswers;
+    wrongCountSpan.innerText = wrongAnswers;
+    let totalAnswered = correctAnswers + wrongAnswers;
+    let acc = totalAnswered === 0 ? 0 : Math.round((correctAnswers / totalAnswered) * 100);
+    accuracyRateSpan.innerText = acc;
+    let total = currentQuestions.length;
+    let percent = ((currentIndex) / total) * 100;
+    progressFill.style.width = `${percent}%`;
+    questionCounterSpan.innerText = currentIndex + 1;
+  }
+
+  function stopTimer() {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+  }
+
+  function startTimer() {
+    if (timerInterval) stopTimer();
+    timeLeft = 20;
+    timerSecSpan.innerText = timeLeft;
+    timerInterval = setInterval(() => {
+      if (!quizActive || waitingForNext) return;
+      if (timeLeft <= 1) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        if (quizActive && !waitingForNext) {
+          handleTimeout();
+        }
+      } else {
+        timeLeft--;
+        timerSecSpan.innerText = timeLeft;
+      }
+    }, 1000);
+  }
+
+  function handleTimeout() {
+    waitingForNext = true;
+    wrongAnswers++;
+    updateStatsUI();
+    document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
+    hintText.innerHTML = `<i class="bi bi-clock-history"></i> Tempo esgotado! A resposta correta era: ${currentQuestions[currentIndex].options[currentQuestions[currentIndex].correct]}`;
+    nextBtn.disabled = false;
+    quizActive = false;
+    stopTimer();
+  }
+
+  function loadQuestion() {
+    if (!quizActive && waitingForNext) return;
+    if (currentIndex >= currentQuestions.length) {
+      endQuiz();
+      return;
+    }
+    quizActive = true;
+    waitingForNext = false;
+    nextBtn.disabled = true;
+    const q = currentQuestions[currentIndex];
+    questionText.innerText = q.question;
+    categoryBadge.innerText = q.category;
+    hintText.innerHTML = `💡 Dica: ${q.hint}`;
+    optionsContainer.innerHTML = "";
+    q.options.forEach((opt, idx) => {
+      const btn = document.createElement("button");
+      btn.className = "option-btn";
+      btn.innerHTML = `<span class="fw-bold">${String.fromCharCode(65+idx)}.</span> ${opt}`;
+      btn.addEventListener("click", () => selectAnswer(idx, btn));
+      optionsContainer.appendChild(btn);
+    });
+    updateStatsUI();
+    startTimer();
+  }
+
+  function selectAnswer(selectedIdx, btnElement) {
+    if (!quizActive || waitingForNext) return;
+    const q = currentQuestions[currentIndex];
+    const isCorrect = (selectedIdx === q.correct);
+    const allBtns = document.querySelectorAll('.option-btn');
+    allBtns.forEach(btn => btn.disabled = true);
+    if (isCorrect) {
+      score += 10;
+      correctAnswers++;
+      btnElement.classList.add("correct-feedback");
+      hintText.innerHTML = `✅ Correto! ${q.options[q.correct]} é a resposta certa. +10 pts`;
+    } else {
+      wrongAnswers++;
+      btnElement.classList.add("wrong-feedback");
+      allBtns[q.correct].classList.add("correct-feedback");
+      hintText.innerHTML = `❌ Errado! A resposta correta era: ${q.options[q.correct]}.`;
+    }
+    updateStatsUI();
+    quizActive = false;
+    waitingForNext = true;
+    stopTimer();
+    nextBtn.disabled = false;
+  }
+
+  function nextQuestion() {
+    if (!waitingForNext && quizActive === false) return;
+    currentIndex++;
+    if (currentIndex < currentQuestions.length) {
+      waitingForNext = false;
+      quizActive = true;
+      loadQuestion();
+    } else {
+      endQuiz();
+    }
+  }
+
+  function endQuiz() {
+    stopTimer();
+    quizCard.style.display = "none";
+    resultCard.style.display = "block";
+    let total = currentQuestions.length;
+    let percent = Math.round((correctAnswers / total) * 100);
+    finalScoreMsg.innerHTML = `Você acertou ${correctAnswers} de ${total} perguntas!<br>Pontuação final: ${score} pontos<br>Taxa de acerto: ${percent}%<br>🏆 ${percent>=70 ? "Parabéns, você conhece bem Malanje!" : "Continue explorando as maravilhas de Malanje!"}`;
+  }
+
+  function restartQuiz() {
+    stopTimer();
+    currentIndex = 0;
+    score = 0;
+    correctAnswers = 0;
+    wrongAnswers = 0;
+    quizActive = true;
+    waitingForNext = false;
+    resultCard.style.display = "none";
+    quizCard.style.display = "block";
+    currentQuestions = [...quizData[currentLang]];
+    totalQuestionsSpan.innerText = currentQuestions.length;
+    loadQuestion();
+    updateStatsUI();
+  }
+
+  function initQuiz() {
+    currentQuestions = [...quizData[currentLang]];
+    totalQuestionsSpan.innerText = currentQuestions.length;
+    restartQuiz();
+    loadVideos();
+  }
+
+  document.getElementById("langSwitch").addEventListener("click", () => {
+    currentLang = currentLang === "pt" ? "en" : "pt";
+    localStorage.setItem("agrolang", currentLang);
+    document.getElementById("langSwitch").innerHTML = currentLang === "pt" ? "🇬🇧 EN" : "🇵🇹 PT";
+    initQuiz();
+  });
+
+  nextBtn.addEventListener("click", nextQuestion);
+  restartBtn.addEventListener("click", () => restartQuiz());
+  document.getElementById("playAgainBtn")?.addEventListener("click", () => restartQuiz());
+
+  // Dark mode
+  const darkToggle = document.getElementById("darkModeCheckbox");
+  if (localStorage.getItem("darkMode") === "true") {
+    document.body.classList.add("dark-mode");
+    darkToggle.checked = true;
+  }
+  darkToggle.addEventListener("change", (e) => {
+    if (e.target.checked) {
+      document.body.classList.add("dark-mode");
+      localStorage.setItem("darkMode", "true");
+    } else {
+      document.body.classList.remove("dark-mode");
+      localStorage.setItem("darkMode", "false");
+    }
+  });
+
+  // iniciar
+  initQuiz();
+</script>
+</body>
+</html>

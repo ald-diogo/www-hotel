@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>LightShot Subtil • Captura Rápida</title>
+    <!-- Bootstrap 5 (CSS mínimo para grid/toast) + Font Awesome 6 (ícones) + Google Fonts -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
+    <!-- html2canvas para captura real -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        body {
+            background: #f2f4f8;
+            min-height: 100vh;
+        }
+        /* --- Ícone flutuante tipo raio (triggers) --- */
+        .lightshot-trigger {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(145deg, #3f5b8a, #0f172a);
+            border-radius: 28px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 1000;
+            backdrop-filter: blur(2px);
+        }
+        .lightshot-trigger i {
+            font-size: 28px;
+            color: #ffb347;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+            transition: 0.2s;
+        }
+        .lightshot-trigger:hover {
+            transform: scale(1.08);
+            background: linear-gradient(145deg, #2d3a4e, #0f172a);
+            box-shadow: 0 15px 25px rgba(0,0,0,0.3);
+        }
+        .lightshot-trigger:hover i {
+            color: #ffcc66;
+        }
+
+        /* --- Mini barra de ferramentas (overlay flutuante, estilo LightShot) --- */
+        .toolbar-panel {
+            position: fixed;
+            bottom: 100px;
+            right: 28px;
+            background: rgba(20, 25, 35, 0.92);
+            backdrop-filter: blur(18px);
+            border-radius: 60px;
+            padding: 10px 18px;
+            box-shadow: 0 20px 35px -8px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.15);
+            z-index: 1001;
+            display: flex;
+            gap: 20px;
+            transition: 0.2s;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .toolbar-panel.hidden {
+            display: none;
+        }
+        .tool-btn {
+            background: transparent;
+            border: none;
+            color: #e2e8f0;
+            font-size: 22px;
+            cursor: pointer;
+            transition: 0.15s;
+            width: 44px;
+            height: 44px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .tool-btn:hover {
+            background: rgba(255, 180, 70, 0.25);
+            color: #ffb347;
+            transform: scale(1.05);
+        }
+        .tool-btn.active {
+            background: #ffb347;
+            color: #1e1f2c;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .color-picker-tool {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid white;
+            cursor: pointer;
+            background: #ffb347;
+            margin-top: 4px;
+        }
+        .divider {
+            width: 1px;
+            background: rgba(255,255,255,0.25);
+            margin: 8px 0;
+        }
+        /* Área de pré-visualização / editor (subtile, só aparece após captura) */
+        .editor-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.96);
+            background: #0f1219dd;
+            backdrop-filter: blur(20px);
+            border-radius: 32px;
+            padding: 20px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.4);
+            z-index: 1050;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: 0.2s;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            max-width: 90vw;
+            max-height: 85vh;
+        }
+        .editor-container.show {
+            display: flex;
+        }
+        .canvas-wrapper {
+            background: #1e1f2c;
+            border-radius: 24px;
+            padding: 8px;
+            box-shadow: inset 0 0 6px #00000055, 0 8px 20px rgba(0,0,0,0.3);
+        }
+        canvas {
+            display: block;
+            border-radius: 18px;
+            max-width: 100%;
+            height: auto;
+            cursor: crosshair;
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .editor-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .editor-actions button {
+            background: rgba(30,35,48,0.9);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: 0.2s;
+            backdrop-filter: blur(4px);
+        }
+        .editor-actions button i {
+            margin-right: 8px;
+        }
+        .editor-actions button:hover {
+            background: #ffb347;
+            color: #121212;
+            transform: translateY(-2px);
+        }
+        .close-editor {
+            position: absolute;
+            top: 18px;
+            right: 22px;
+            background: rgba(0,0,0,0.5);
+            border: none;
+            color: white;
+            font-size: 20px;
+            border-radius: 30px;
+            width: 36px;
+            height: 36px;
+        }
+        /* máscara de seleção (estilo lightshot puro) */
+        .selection-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.65);
+            z-index: 10000;
+            cursor: crosshair;
+        }
+        .selection-box {
+            position: absolute;
+            border: 2.5px solid #ffb347;
+            background: rgba(255, 180, 71, 0.08);
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.55);
+            display: none;
+        }
+        .toast-custom {
+            background: #1a1e2a;
+            color: #f0f0f0;
+            border-left: 6px solid #ffb347;
+        }
+        @media (max-width: 640px) {
+            .toolbar-panel { gap: 12px; padding: 8px 16px; bottom: 90px; right: 16px; }
+            .tool-btn { width: 38px; height: 38px; font-size: 18px; }
+            .editor-actions button { padding: 5px 12px; font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Layout vazio, apenas conteúdo subtil de exemplo -->
+    <div style="max-width: 900px; margin: 4rem auto; text-align: center; padding: 20px;">
+        <div style="background: rgba(0,0,0,0.02); border-radius: 2rem; padding: 2rem;">
+            <i class="fas fa-camera-retro" style="font-size: 54px; color: #ffb347; opacity: 0.6;"></i>
+            <h2 style="font-weight: 600; margin-top: 1rem;">LightShot Silencioso</h2>
+            <p style="color: #475569; max-width: 500px; margin: 1rem auto;">⚡ Clique no raio no canto inferior direito.<br>Selecione uma área, edite com setas, texto, retângulos e partilhe em segundos.</p>
+            <div style="background: #eef2ff; border-radius: 20px; padding: 20px; margin-top: 16px;">
+                <i class="fas fa-mouse-pointer"></i> Dica: Após capturar, use as ferramentas flutuantes (🔲 ➡️ 🖊️ 🛜) no canto direito.
+            </div>
+        </div>
+    </div>
+
+    <!-- Ícone de raio (trigger principal) -->
+    <div id="lightningTrigger" class="lightshot-trigger">
+        <i class="fas fa-bolt"></i>
+    </div>
+
+    <!-- Barra de ferramentas flutuante minimal (aparece após captura) -->
+    <div id="floatingTools" class="toolbar-panel hidden">
+        <button class="tool-btn" id="toolRectFs" title="Retângulo"><i class="fas fa-square"></i></button>
+        <button class="tool-btn" id="toolArrowFs" title="Seta"><i class="fas fa-arrow-right"></i></button>
+        <button class="tool-btn" id="toolTextFs" title="Texto"><i class="fas fa-font"></i></button>
+        <button class="tool-btn" id="toolPenFs" title="Pincel"><i class="fas fa-pencil-alt"></i></button>
+        <button class="tool-btn" id="undoFs" title="Desfazer"><i class="fas fa-undo-alt"></i></button>
+        <input type="color" id="colorPickerFs" value="#ffb347" class="color-picker-tool" title="Cor">
+        <div class="divider"></div>
+        <button class="tool-btn" id="saveImgFs" title="Guardar PNG"><i class="fas fa-save"></i></button>
+        <button class="tool-btn" id="copyImgFs" title="Copiar imagem"><i class="fas fa-copy"></i></button>
+        <button class="tool-btn" id="shareFs" title="Partilhar link"><i class="fas fa-share-alt"></i></button>
+    </div>
+
+    <!-- Editor principal (canvas) que aparece após captura -->
+    <div id="editorModal" class="editor-container">
+        <button id="closeEditorBtn" class="close-editor"><i class="fas fa-times"></i></button>
+        <div class="canvas-wrapper">
+            <canvas id="editorCanvas" width="700" height="400" style="width:100%; height:auto; max-width:700px;"></canvas>
+        </div>
+        <div class="editor-actions">
+            <button id="downloadCanvasBtn"><i class="fas fa-download"></i></button>
+            <button id="copyCanvasBtn"><i class="fas fa-clipboard"></i></button>
+            <button id="shareLinkBtn"><i class="fas fa-link"></i> </button>
+            <button id="clearAnnotationsBtn"><i class="fas fa-trash-alt"></i> </button>
+        </div>
+        <small style="margin-top: 12px; color: #ccc;"><i class="fas fa-vector-square"></i> Use as ferramentas flutuantes (⚡ raio) para editar</small>
+    </div>
+
+    <!-- Overlay de seleção de área (captura) -->
+    <div id="selectionOverlay" class="selection-overlay">
+        <div id="selectionBox" class="selection-box"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ------------------ Variáveis globais ------------------
+        let originalImage = null;       // imagem base capturada
+        let canvas = document.getElementById('editorCanvas');
+        let ctx = canvas.getContext('2d');
+        let historyStack = [];          // para desfazer
+        let currentTool = 'rect';       
+        let currentColor = '#ffb347';
+        let isDrawing = false;
+        let tempPenPoints = [];
+        let tempRectStart = null;
+        let tempArrowStart = null;
+        
+        // elementos DOM
+        const floatingToolsDiv = document.getElementById('floatingTools');
+        const editorModal = document.getElementById('editorModal');
+        const lightningBtn = document.getElementById('lightningTrigger');
+        const overlayDiv = document.getElementById('selectionOverlay');
+        const selectionBoxDiv = document.getElementById('selectionBox');
+        
+        // ferramentas flutuantes
+        const toolRect = document.getElementById('toolRectFs');
+        const toolArrow = document.getElementById('toolArrowFs');
+        const toolText = document.getElementById('toolTextFs');
+        const toolPen = document.getElementById('toolPenFs');
+        const undoBtn = document.getElementById('undoFs');
+        const colorPicker = document.getElementById('colorPickerFs');
+        const saveImgBtn = document.getElementById('saveImgFs');
+        const copyImgBtn = document.getElementById('copyImgFs');
+        const shareFsBtn = document.getElementById('shareFs');
+        
+        // ações do editor modal
+        const downloadCanvas = document.getElementById('downloadCanvasBtn');
+        const copyCanvas = document.getElementById('copyCanvasBtn');
+        const shareLink = document.getElementById('shareLinkBtn');
+        const clearAnnot = document.getElementById('clearAnnotationsBtn');
+        const closeModal = document.getElementById('closeEditorBtn');
+        
+        // ----- auxiliares / toast
+        function showToast(msg, type = "info") {
+            const toastContainer = document.createElement('div');
+            toastContainer.className = 'position-fixed bottom-0 end-0 p-3';
+            toastContainer.style.zIndex = '11000';
+            const toastEl = document.createElement('div');
+            toastEl.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : type === 'danger' ? 'danger' : 'dark'} border-0 show toast-custom`;
+            toastEl.setAttribute('role', 'alert');
+            toastEl.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body"><i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'} me-2"></i>${msg}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            toastContainer.appendChild(toastEl);
+            document.body.appendChild(toastContainer);
+            const bsToast = new bootstrap.Toast(toastEl, { delay: 2000 });
+            bsToast.show();
+            toastEl.addEventListener('hidden.bs.toast', () => toastContainer.remove());
+        }
+        
+        // Guardar estado do canvas no histórico
+        function saveStateToHistory() {
+            if (!originalImage) return;
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            historyStack.push(imageData);
+            if (historyStack.length > 30) historyStack.shift();
+        }
+        
+        function applyAndSave() {
+            saveStateToHistory();
+        }
+        
+        function undo() {
+            if (!originalImage) return;
+            if (historyStack.length <= 1) { showToast("Nada para desfazer", "info"); return; }
+            historyStack.pop();
+            const prev = historyStack[historyStack.length - 1];
+            ctx.putImageData(prev, 0, 0);
+            showToast("Desfeito ✓", "success");
+        }
+        
+        // desenhar primitivas
+        function drawRect(x1, y1, x2, y2) {
+            ctx.beginPath();
+            ctx.strokeStyle = currentColor;
+            ctx.lineWidth = 3;
+            ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+        }
+        function drawArrow(fromX, fromY, toX, toY) {
+            ctx.beginPath();
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.strokeStyle = currentColor;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            let angle = Math.atan2(toY - fromY, toX - fromX);
+            let arrowSize = 14;
+            let ax = toX, ay = toY;
+            ctx.beginPath();
+            ctx.moveTo(ax, ay);
+            ctx.lineTo(ax - arrowSize * Math.cos(angle - Math.PI/6), ay - arrowSize * Math.sin(angle - Math.PI/6));
+            ctx.lineTo(ax - arrowSize * Math.cos(angle + Math.PI/6), ay - arrowSize * Math.sin(angle + Math.PI/6));
+            ctx.fillStyle = currentColor;
+            ctx.fill();
+        }
+        function drawPenStroke(points) {
+            if (points.length < 2) return;
+            ctx.beginPath();
+            ctx.strokeStyle = currentColor;
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+            ctx.moveTo(points[0].x, points[0].y);
+            for (let i=1; i<points.length; i++) ctx.lineTo(points[i].x, points[i].y);
+            ctx.stroke();
+        }
+        function addTextAt(x,y) {
+            const txt = prompt("✏️ Escreva o texto:", "");
+            if (txt && txt.trim() !== "") {
+                ctx.font = "bold 26px 'Inter', sans-serif";
+                ctx.fillStyle = currentColor;
+                ctx.fillText(txt, x, y);
+                applyAndSave();
+            }
+        }
+        
+        // eventos de desenho no canvas
+        function getCanvasCoords(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            let clientX, clientY;
+            if (e.touches) { clientX = e.touches[0].clientX; clientY = e.touches[0].clientY; }
+            else { clientX = e.clientX; clientY = e.clientY; }
+            let cx = (clientX - rect.left) * scaleX;
+            let cy = (clientY - rect.top) * scaleY;
+            cx = Math.min(Math.max(0, cx), canvas.width);
+            cy = Math.min(Math.max(0, cy), canvas.height);
+            return { x: cx, y: cy };
+        }
+        
+        let drawingActive = false;
+        let penPointsArr = [];
+        let rectStartPt = null;
+        let arrowStartPt = null;
+        
+        function startDrawCanvas(e) {
+            e.preventDefault();
+            if (!originalImage) { showToast("Capture uma imagem primeiro", "warning"); return; }
+            const { x, y } = getCanvasCoords(e);
+            drawingActive = true;
+            if (currentTool === 'pen') {
+                penPointsArr = [{ x, y }];
+            } else if (currentTool === 'rect') {
+                rectStartPt = { x, y };
+            } else if (currentTool === 'arrow') {
+                arrowStartPt = { x, y };
+            } else if (currentTool === 'text') {
+                addTextAt(x, y);
+                drawingActive = false;
+            }
+        }
+        
+        function drawMoveCanvas(e) {
+            if (!drawingActive) return;
+            e.preventDefault();
+            const { x, y } = getCanvasCoords(e);
+            // restaura último estado do histórico
+            if (historyStack.length) {
+                ctx.putImageData(historyStack[historyStack.length-1], 0, 0);
+            } else if (originalImage) ctx.drawImage(originalImage,0,0);
+            
+            if (currentTool === 'pen' && penPointsArr) {
+                penPointsArr.push({ x, y });
+                drawPenStroke(penPointsArr);
+            } else if (currentTool === 'rect' && rectStartPt) {
+                drawRect(rectStartPt.x, rectStartPt.y, x, y);
+            } else if (currentTool === 'arrow' && arrowStartPt) {
+                drawArrow(arrowStartPt.x, arrowStartPt.y, x, y);
+            }
+        }
+        
+        function endDrawCanvas(e) {
+            if (!drawingActive) return;
+            e.preventDefault();
+            const { x, y } = getCanvasCoords(e);
+            if (currentTool === 'pen' && penPointsArr && penPointsArr.length > 1) {
+                if (historyStack.length) ctx.putImageData(historyStack[historyStack.length-1], 0, 0);
+                drawPenStroke(penPointsArr);
+                applyAndSave();
+            } 
+            else if (currentTool === 'rect' && rectStartPt) {
+                if (historyStack.length) ctx.putImageData(historyStack[historyStack.length-1], 0, 0);
+                drawRect(rectStartPt.x, rectStartPt.y, x, y);
+                applyAndSave();
+            }
+            else if (currentTool === 'arrow' && arrowStartPt) {
+                if (historyStack.length) ctx.putImageData(historyStack[historyStack.length-1], 0, 0);
+                drawArrow(arrowStartPt.x, arrowStartPt.y, x, y);
+                applyAndSave();
+            }
+            drawingActive = false;
+            penPointsArr = [];
+            rectStartPt = null;
+            arrowStartPt = null;
+        }
+        
+        canvas.addEventListener('mousedown', startDrawCanvas);
+        window.addEventListener('mousemove', drawMoveCanvas);
+        window.addEventListener('mouseup', endDrawCanvas);
+        canvas.addEventListener('touchstart', startDrawCanvas);
+        window.addEventListener('touchmove', drawMoveCanvas);
+        window.addEventListener('touchend', endDrawCanvas);
+        
+        // trocar ferramentas
+        function setTool(tool) {
+            currentTool = tool;
+            [toolRect, toolArrow, toolText, toolPen].forEach(btn => btn.classList.remove('active'));
+            if (tool === 'rect') toolRect.classList.add('active');
+            if (tool === 'arrow') toolArrow.classList.add('active');
+            if (tool === 'text') toolText.classList.add('active');
+            if (tool === 'pen') toolPen.classList.add('active');
+        }
+        toolRect.onclick = () => setTool('rect');
+        toolArrow.onclick = () => setTool('arrow');
+        toolText.onclick = () => setTool('text');
+        toolPen.onclick = () => setTool('pen');
+        undoBtn.onclick = () => undo();
+        colorPicker.onchange = (e) => { currentColor = e.target.value; };
+        
+        // Limpar anotações
+        function clearDrawings() {
+            if (!originalImage) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(originalImage, 0, 0);
+            saveStateToHistory();
+            showToast("Anotações removidas", "success");
+        }
+        clearAnnot.onclick = clearDrawings;
+        
+        // ------ Captura de ecrã com seleção (lightshot style) ------
+        let selecting = false;
+        let startX = 0, startY = 0;
+        function showSelectionOverlay() {
+            overlayDiv.style.display = 'block';
+            selectionBoxDiv.style.display = 'none';
+            selecting = false;
+        }
+        overlayDiv.addEventListener('mousedown', (e) => {
+            if (e.target === overlayDiv || e.target === selectionBoxDiv) {
+                selecting = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                selectionBoxDiv.style.left = startX + 'px';
+                selectionBoxDiv.style.top = startY + 'px';
+                selectionBoxDiv.style.width = '0px';
+                selectionBoxDiv.style.height = '0px';
+                selectionBoxDiv.style.display = 'block';
+            }
+        });
+        window.addEventListener('mousemove', (e) => {
+            if (!selecting) return;
+            let curX = e.clientX, curY = e.clientY;
+            let w = Math.abs(curX - startX), h = Math.abs(curY - startY);
+            let left = Math.min(startX, curX), top = Math.min(startY, curY);
+            selectionBoxDiv.style.left = left + 'px';
+            selectionBoxDiv.style.top = top + 'px';
+            selectionBoxDiv.style.width = w + 'px';
+            selectionBoxDiv.style.height = h + 'px';
+        });
+        window.addEventListener('mouseup', async (e) => {
+            if (!selecting) return;
+            selecting = false;
+            let left = parseFloat(selectionBoxDiv.style.left);
+            let top = parseFloat(selectionBoxDiv.style.top);
+            let w = parseFloat(selectionBoxDiv.style.width);
+            let h = parseFloat(selectionBoxDiv.style.height);
+            overlayDiv.style.display = 'none';
+            selectionBoxDiv.style.display = 'none';
+            if (w > 8 && h > 8) {
+                try {
+                    const fullCanvas = await html2canvas(document.body, { scale: 2, useCORS: true, logging: false, windowWidth: window.innerWidth, windowHeight: window.innerHeight });
+                    const regionCanvas = document.createElement('canvas');
+                    regionCanvas.width = w;
+                    regionCanvas.height = h;
+                    const rctx = regionCanvas.getContext('2d');
+                    rctx.drawImage(fullCanvas, left, top, w, h, 0, 0, w, h);
+                    const imgData = regionCanvas.toDataURL();
+                    const img = new Image();
+                    img.onload = () => {
+                        originalImage = img;
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        ctx.drawImage(img, 0, 0);
+                        historyStack = [];
+                        saveStateToHistory();
+                        // mostrar editor e barra de ferramentas
+                        editorModal.classList.add('show');
+                        floatingToolsDiv.classList.remove('hidden');
+                        showToast("Captura realizada! Use as ferramentas.", "success");
+                    };
+                    img.src = imgData;
+                } catch(err) { showToast("Erro na captura", "danger"); }
+            } else { showToast("Seleção muito pequena", "warning"); }
+        });
+        
+        // acionar captura pelo raio
+        lightningBtn.onclick = () => {
+            // esconder editor caso aberto (opcional)
+            editorModal.classList.remove('show');
+            floatingToolsDiv.classList.add('hidden');
+            showSelectionOverlay();
+        };
+        
+        // Guardar PNG (via botão da barra flutuante)
+        saveImgFs.onclick = () => {
+            if (!originalImage) { showToast("Nada para guardar", "warning"); return; }
+            const link = document.createElement('a');
+            link.download = 'lightshot_print.png';
+            link.href = canvas.toDataURL();
+            link.click();
+            showToast("Imagem guardada!", "success");
+            generateFakeLink();
+        };
+        copyImgFs.onclick = async () => {
+            if (!originalImage) { showToast("Nada copiar", "warning"); return; }
+            try {
+                canvas.toBlob(async (blob) => {
+                    await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+                    showToast("Imagem copiada ✓", "success");
+                });
+            } catch(e) { showToast("Permissão negada", "danger"); }
+            generateFakeLink();
+        };
+        shareFsBtn.onclick = () => { generateFakeLink(); showToast("Link simulado copiado!", "success"); };
+        
+        // açoes do modal
+        downloadCanvas.onclick = () => {
+            if (!originalImage) return;
+            const a = document.createElement('a');
+            a.download = 'lightshot_edit.png';
+            a.href = canvas.toDataURL();
+            a.click();
+            generateFakeLink();
+        };
+        copyCanvas.onclick = async () => {
+            if (!originalImage) return;
+            canvas.toBlob(async (blob) => {
+                await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+                showToast("Imagem copiada", "success");
+            });
+            generateFakeLink();
+        };
+        shareLink.onclick = () => { generateFakeLink(); };
+        
+        function generateFakeLink() {
+            const fakeId = Math.random().toString(36).substring(2, 10);
+            const fakeUrl = `https://prnt.sc/${fakeId}`;
+            navigator.clipboard.writeText(fakeUrl);
+            showToast(`Link partilha: ${fakeUrl} (copiado)`, "success");
+        }
+        
+        closeModal.onclick = () => {
+            editorModal.classList.remove('show');
+            floatingToolsDiv.classList.add('hidden');
+        };
+        
+        // inicial placeholder (sem imagem)
+        function setPlaceholder() {
+            canvas.width = 700;
+            canvas.height = 400;
+            ctx.fillStyle = "#232635";
+            ctx.fillRect(0,0,canvas.width,canvas.height);
+            ctx.fillStyle = "#aaa";
+            ctx.font = "18px Inter";
+            ctx.textAlign = "center";
+            ctx.fillText("⚡ Clique no raio → selecione uma área", canvas.width/2, canvas.height/2);
+            originalImage = null;
+        }
+        setPlaceholder();
+        
+        // ao abrir editor com imagem, garantir que ferramentas flutuantes estejam com estilo
+        window.addEventListener('load', () => {
+            setTool('rect');
+        });
+    </script>
+</body>
+</html>
