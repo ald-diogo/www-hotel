@@ -282,7 +282,6 @@
         .toast-container-custom { position: fixed; bottom: 20px; right: 20px; z-index: 1100; }
         .toast-custom { min-width: 280px; background: white; border-radius: 12px; padding: 14px 20px; margin-bottom: 12px; border-left: 5px solid; animation: slideInRight 0.3s ease; }
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @media (max-width: 768px) { .contact-hero { padding: 40px 20px; } .social-btn-simple { padding: 8px 18px; font-size: 0.9rem; } .floating-buttons-container { bottom: 20px; right: 20px; gap: 12px; } .floating-biorisk { width: 50px; height: 50px; } .floating-biorisk i { font-size: 1.6rem; } .fab-chat { width: 50px; height: 50px; font-size: 1.3rem; } }
         
         .logo-dots{
             border-radius: 50%;
@@ -443,7 +442,7 @@
             transform: scale(1.02);
         }
 
-        /* ===== MODAL PRINCIPAL (VANTAGENS) ===== */
+        /* ===== MODAL PRINCIPAL (VANTAGENS) - CORREÇÃO DE SCROLL ===== */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -457,14 +456,17 @@
             align-items: center;
             z-index: 2000;
             padding: 1.5rem;
+            overflow-y: auto;
         }
 
         .modal-card {
             max-width: 920px;
             width: 100%;
+            max-height: 90vh;
             background: #ffffff;
             border-radius: 40px;
-            overflow: hidden;
+            overflow-y: auto;
+            overflow-x: hidden;
             box-shadow: 0 32px 55px rgba(0, 0, 0, 0.4);
             animation: modalFadeUp 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
         }
@@ -644,7 +646,7 @@
             margin-top: 14px;
         }
 
-        /* ===== NOVO MODAL DE ACORDO / DIREITOS DO USUÁRIO E NEWSLETTER ===== */
+        /* ===== MODAL DE ACORDO / DIREITOS DO USUÁRIO E NEWSLETTER - CORREÇÃO DE SCROLL ===== */
         .modal-acordo-overlay {
             position: fixed;
             top: 0;
@@ -658,16 +660,19 @@
             align-items: center;
             z-index: 2100;
             padding: 1.5rem;
+            overflow-y: auto;
         }
 
         .modal-acordo-card {
             max-width: 500px;
             width: 100%;
+            max-height: 90vh;
             background: linear-gradient(145deg, #ffffff 0%, #fef9ef 100%);
             border-radius: 32px;
             box-shadow: 0 30px 45px rgba(0, 0, 0, 0.4);
             animation: modalFadeUp 0.3s ease;
-            overflow: hidden;
+            overflow-y: auto;
+            overflow-x: hidden;
             border: 1px solid #f0deaa;
         }
 
@@ -678,6 +683,9 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 5;
         }
 
         .modal-acordo-header i {
@@ -828,6 +836,7 @@
             margin-top: 10px;
         }
 
+        /* CORREÇÕES DE RESPONSIVIDADE E SCROLL EM TELAS MENORES */
         @media (max-width: 780px) {
             body { padding: 1rem; }
             .modal-flex { flex-direction: column; }
@@ -839,10 +848,43 @@
             .card-negocio { width: 220px; }
             .input-email-group { flex-wrap: wrap; }
             .btn-inscrever { width: 100%; }
+            .floating-buttons-container { bottom: 20px; right: 20px; gap: 12px; }
+            .floating-biorisk { width: 50px; height: 50px; }
+            .floating-biorisk i { font-size: 1.6rem; }
+            .fab-chat { width: 50px; height: 50px; font-size: 1.3rem; }
+            /* Garantir scroll nos modais em telas pequenas */
+            .modal-card { max-height: 85vh; }
+            .modal-acordo-card { max-height: 85vh; }
         }
+        
         @media (max-width: 560px) {
             .card-negocio { width: 100%; max-width: 280px; }
             .hero { padding: 1.5rem; }
+            .contact-hero { padding: 40px 20px; }
+            .social-btn-simple { padding: 8px 18px; font-size: 0.9rem; }
+        }
+        
+        /* Esconder scrollbar no Chrome/Safari mas manter funcionalidade (opcional) */
+        .modal-card::-webkit-scrollbar,
+        .modal-acordo-card::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .modal-card::-webkit-scrollbar-track,
+        .modal-acordo-card::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .modal-card::-webkit-scrollbar-thumb,
+        .modal-acordo-card::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+        
+        .modal-card::-webkit-scrollbar-thumb:hover,
+        .modal-acordo-card::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
         }
     </style>
 </head>
