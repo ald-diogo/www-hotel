@@ -405,8 +405,30 @@
         .store-badge:hover { transform: scale(1.02); }
         @media (max-width: 576px) { .store-badge { height: 40px; } }
         
-        /* Chatbot */
-        .chat-messages { max-height: 350px; overflow-y: auto; padding: 15px; background: var(--body-bg); border-radius: 16px; margin-bottom: 15px; }
+        /* Chatbot com scroll corrigido */
+        .chat-messages { 
+            max-height: 350px; 
+            overflow-y: auto; 
+            padding: 15px; 
+            background: var(--body-bg); 
+            border-radius: 16px; 
+            margin-bottom: 15px;
+        }
+        
+        /* Garantir scroll no modal do chatbot em telas menores */
+        @media (max-width: 768px) {
+            .chat-messages {
+                max-height: 250px;
+            }
+            .modal-dialog {
+                margin: 0.5rem;
+            }
+            .modal-body {
+                max-height: 70vh;
+                overflow-y: auto;
+            }
+        }
+        
         .message { margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px; }
         .message.user { justify-content: flex-end; }
         .message.bot .avatar, .message.user .avatar {
@@ -660,11 +682,14 @@
         .modal-card {
             max-width: 950px;
             width: 100%;
+            max-height: 90vh;
             background: #ffffff;
             border-radius: 40px;
             overflow: hidden;
             box-shadow: 0 32px 55px rgba(0, 0, 0, 0.4);
             animation: modalFadeUp 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            display: flex;
+            flex-direction: column;
         }
 
         @keyframes modalFadeUp {
@@ -681,6 +706,8 @@
         .modal-flex {
             display: flex;
             flex-wrap: wrap;
+            flex: 1;
+            min-height: 0;
         }
 
         .modal-imagem {
@@ -722,6 +749,27 @@
             padding: 2rem 2rem;
             background: #fffef9;
             position: relative;
+            overflow-y: auto;
+            max-height: 90vh;
+        }
+
+        /* Scrollbar personalizada para o conteúdo do modal */
+        .modal-conteudo::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-conteudo::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .modal-conteudo::-webkit-scrollbar-thumb {
+            background: #c28135;
+            border-radius: 10px;
+        }
+
+        .modal-conteudo::-webkit-scrollbar-thumb:hover {
+            background: #a06720;
         }
 
         .btn-fechar {
@@ -880,22 +928,37 @@
             margin-top: 14px;
         }
 
+        /* Ajustes responsivos para os modais */
         @media (max-width: 780px) {
             body {
-                padding: 1rem;
+                padding: 0;
+            }
+            .modal-overlay {
+                padding: 0.5rem;
+                align-items: flex-start;
+                overflow-y: auto;
+            }
+            .modal-card {
+                margin: 1rem auto;
+                max-height: 95vh;
             }
             .modal-flex {
                 flex-direction: column;
+                max-height: 95vh;
+                overflow-y: auto;
             }
             .modal-imagem {
-                min-height: 200px;
+                min-height: 180px;
                 flex: auto;
             }
             .modal-conteudo {
-                padding: 1.5rem;
+                padding: 1.2rem;
+                max-height: 60vh;
+                overflow-y: auto;
             }
             .titulo-chat {
-                font-size: 1.5rem;
+                font-size: 1.3rem;
+                padding-right: 30px;
             }
             .hero h1 {
                 font-size: 1.9rem;
@@ -905,6 +968,11 @@
             }
             .card-negocio {
                 width: 220px;
+            }
+            /* Garantir scroll no modal do Bootstrap */
+            .modal-body {
+                max-height: 60vh;
+                overflow-y: auto;
             }
         }
 
@@ -919,6 +987,36 @@
             .btn-outline {
                 font-size: 0.9rem;
                 padding: 0.7rem 1.4rem;
+            }
+            .modal-conteudo {
+                padding: 1rem;
+                max-height: 55vh;
+            }
+            .chat-messages {
+                max-height: 200px;
+            }
+        }
+
+        /* Garantir scroll em todos os modais do Bootstrap */
+        .modal {
+            overflow-y: auto;
+        }
+        
+        .modal-dialog {
+            margin: 1rem auto;
+        }
+        
+        @media (max-width: 576px) {
+            .modal-dialog {
+                margin: 0.5rem;
+            }
+            .modal-content {
+                max-height: 95vh;
+                overflow-y: auto;
+            }
+            .modal-body {
+                max-height: 60vh;
+                overflow-y: auto;
             }
         }
     </style>
@@ -1025,7 +1123,7 @@
         </div>
     </section>
 
-    <!-- SEÇÃO DESTINOS (resumida para brevidade) -->
+    <!-- SEÇÃO DESTINOS -->
     <section class="container mb-5" id="destinos">
         <div class="d-flex justify-content-between align-items-center flex-wrap">
             <h2 class="fw-bold" data-i18n="sectionDestinos">✨ Maravilhas da Província de Malanje ✨</h2>
@@ -1171,7 +1269,7 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-3">
-                    <div class="mb-2 small text-muted text-center fst-italic">“Aquela em que podemos confiar” – Contexto Africano de confiança</div>
+                    <div class="mb-2 small text-muted text-center fst-italic">"Aquela em que podemos confiar" – Contexto Africano de confiança</div>
                     <div id="chatMessagesContainer" class="chat-messages"></div>
                     <div id="quickReplies" class="quick-replies"></div>
                     <a href="front-ia.html">
@@ -1190,7 +1288,7 @@
 
     <!-- Modal para detalhes das atrações -->
     <div class="modal fade" id="destinoDetailModal" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header"><h5 class="modal-title" id="destinoModalTitle">Detalhes</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
                 <div class="modal-body" id="modalDestinoBody"></div>
@@ -1200,7 +1298,7 @@
 
     <!-- Modal para visualizar imagem completa -->
     <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
             <div class="modal-content bg-transparent border-0">
                 <div class="modal-body p-0 text-center">
                     <img id="fullscreenImage" src="" alt="Imagem ampliada" class="img-fluid rounded" style="max-height: 90vh; width: auto; margin: 0 auto;">
@@ -1264,48 +1362,82 @@
             }, 4000);
         }
 
-        // ===================== TRADUÇÕES (resumido) =====================
+        // ===================== TRADUÇÕES =====================
         const translations = {
-            pt: { heroTitle: "Plataforma que conecta viajantes às maravilhas de Malanje", btnRegisterHotel: "📢 Oferecer meu hotel", /*... demais traduções omitidas por brevidade ...*/ },
+            pt: { heroTitle: "Plataforma que conecta viajantes às maravilhas de Malanje", btnRegisterHotel: "📢 Oferecer meu hotel" },
             en: { heroTitle: "The platform connecting travelers to the wonders of Malanje", btnRegisterHotel: "📢 List my hotel" },
             fr: { heroTitle: "La plateforme qui connecte les voyageurs aux merveilles de Malanje", btnRegisterHotel: "📢 Inscrire mon hôtel" }
         };
-        function updateAllTexts(lang) { /* função de tradução simplificada */ }
+        
         let currentLanguage = localStorage.getItem('languagePreference') || 'pt';
-        function setLanguage(lang) { currentLanguage = lang; document.getElementById('currentLang').innerText = lang.toUpperCase(); localStorage.setItem('languagePreference', lang); }
-        document.getElementById('langBtn')?.addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('langDropdown').classList.toggle('show'); });
-        document.querySelectorAll('.lang-option').forEach(opt => { opt.addEventListener('click', () => setLanguage(opt.getAttribute('data-lang'))); });
+        
+        function setLanguage(lang) { 
+            currentLanguage = lang; 
+            document.getElementById('currentLang').innerText = lang.toUpperCase(); 
+            localStorage.setItem('languagePreference', lang);
+            document.getElementById('langDropdown').classList.remove('show');
+        }
+        
+        document.getElementById('langBtn')?.addEventListener('click', (e) => { 
+            e.stopPropagation(); 
+            document.getElementById('langDropdown').classList.toggle('show'); 
+        });
+        
+        document.querySelectorAll('.lang-option').forEach(opt => { 
+            opt.addEventListener('click', () => setLanguage(opt.getAttribute('data-lang'))); 
+        });
+        
         setLanguage(currentLanguage);
 
         // Tema escuro/claro
         const themeSwitch = document.getElementById('themeSwitch');
-        const applyTheme = (theme) => { document.body.setAttribute('data-bs-theme', theme); localStorage.setItem('themePreference', theme); themeSwitch.checked = (theme === 'dark'); };
+        const applyTheme = (theme) => { 
+            document.body.setAttribute('data-bs-theme', theme); 
+            localStorage.setItem('themePreference', theme); 
+            if(themeSwitch) themeSwitch.checked = (theme === 'dark'); 
+        };
         applyTheme(localStorage.getItem('themePreference') || 'light');
-        themeSwitch.addEventListener('change', () => applyTheme(themeSwitch.checked ? 'dark' : 'light'));
+        if(themeSwitch) {
+            themeSwitch.addEventListener('change', () => applyTheme(themeSwitch.checked ? 'dark' : 'light'));
+        }
 
         // Slides
         let currentSlide = 0, slides = document.getElementsByClassName("mySlides");
-        function showSlide(n) { for (let i = 0; i < slides.length; i++) slides[i].classList.remove('active'); if (n >= slides.length) currentSlide = 0; if (n < 0) currentSlide = slides.length - 1; slides[currentSlide].classList.add('active'); }
+        function showSlide(n) { 
+            for (let i = 0; i < slides.length; i++) slides[i].classList.remove('active'); 
+            if (n >= slides.length) currentSlide = 0; 
+            if (n < 0) currentSlide = slides.length - 1; 
+            if(slides[currentSlide]) slides[currentSlide].classList.add('active'); 
+        }
         function nextSlide() { currentSlide++; showSlide(currentSlide); }
-        setInterval(() => nextSlide(), 5000);
+        if(slides.length > 0) setInterval(() => nextSlide(), 5000);
 
         // Dados das atrações
         const destinosData = {
-            1: { nome: "Quedas de Kalandula", descricao: "As Quedas de Kalandula estão localizadas no município de Kalandula...", image: "images/kalandula.png" },
-            2: { nome: "Pedras Negras de Pungo Andongo", descricao: "As Pedras Negras de Pungo Andongo ficam no município de Cacuso...", image: "images/pungo-an-dongo.png" },
-            3: { nome: "Cascata de Musseleje", descricao: "A Cascata de Musseleje, localizada no município de Cacuso...", image: "images/musseje.png" }
+            1: { nome: "Quedas de Kalandula", descricao: "As Quedas de Kalandula estão localizadas no município de Kalandula, sendo uma das maiores quedas de água em volume de África. Com aproximadamente 105 metros de altura e 400 metros de largura, é um espetáculo natural impressionante.", image: "images/kalandula.png" },
+            2: { nome: "Pedras Negras de Pungo Andongo", descricao: "As Pedras Negras de Pungo Andongo ficam no município de Cacuso. São formações rochosas imponentes que guardam histórias da rainha Nzinga e oferecem uma vista panorâmica espetacular da região.", image: "images/pungo-an-dongo.png" },
+            3: { nome: "Cascata de Musseleje", descricao: "A Cascata de Musseleje, localizada no município de Cacuso, é uma queda d'água de águas cristalinas rodeada por vegetação exuberante, perfeita para banho e contato com a natureza.", image: "images/musseje.png" }
         };
+        
         document.querySelectorAll('.btn-detail-destino').forEach(btn => {
             btn.addEventListener('click', function() {
                 const d = destinosData[this.dataset.destino];
-                if(d) { document.getElementById('modalDestinoBody').innerHTML = `<img src="${d.image}" class="img-fluid rounded mb-3" style="max-height: 300px;"><h4>${d.nome}</h4><p>${d.descricao}</p>`; new bootstrap.Modal(document.getElementById('destinoDetailModal')).show(); }
+                if(d) { 
+                    document.getElementById('modalDestinoBody').innerHTML = `<img src="${d.image}" class="img-fluid rounded mb-3" style="max-height: 300px; width: 100%; object-fit: cover;"><h4>${d.nome}</h4><p>${d.descricao}</p>`; 
+                    new bootstrap.Modal(document.getElementById('destinoDetailModal')).show(); 
+                }
             });
         });
 
         // Zoom nas imagens
         const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
         document.querySelectorAll('.img-zoom-icon').forEach(icon => {
-            icon.addEventListener('click', function(e) { e.stopPropagation(); document.getElementById('fullscreenImage').src = this.getAttribute('data-img-src'); imageModal.show(); });
+            icon.addEventListener('click', function(e) { 
+                e.stopPropagation(); 
+                const imgSrc = this.getAttribute('data-img-src');
+                if(imgSrc) document.getElementById('fullscreenImage').src = imgSrc; 
+                imageModal.show(); 
+            });
         });
 
         // Newsletter
@@ -1328,25 +1460,81 @@
 
         // ===================== CHATBOT A.M.I.N.A =====================
         let chatHistory = [];
-        function getGreeting(lang) { const hour = new Date().getHours(); if (lang === 'pt') return hour < 12 ? "Bom dia! 🌅" : hour < 18 ? "Boa tarde! ☀️" : "Boa noite! 🌙"; return "Olá!"; }
-        const botResponses = { pt: { welcome: (g) => `${g} Sou a A.M.I.N.A, sua assistente. Como posso ajudar?`, default: "Obrigado pela mensagem!" } };
-        function getBotReply(msg, lang) { return botResponses[lang]?.default || botResponses.pt.default; }
-        function renderChat() { const container = document.getElementById('chatMessagesContainer'); if(!container) return; container.innerHTML = ''; chatHistory.forEach(msg => { const div = document.createElement('div'); div.className = `message ${msg.sender}`; const avatar = document.createElement('div'); avatar.className = 'avatar'; avatar.innerHTML = msg.sender === 'bot' ? '<img src="images/amina-chat.png" class="logo-user-ia"/>' : '<i class="bi bi-person"></i>'; const bubble = document.createElement('div'); bubble.className = 'bubble'; bubble.innerHTML = msg.text; div.appendChild(avatar); div.appendChild(bubble); container.appendChild(div); }); container.scrollTop = container.scrollHeight; }
-        function addMessage(sender, text) { chatHistory.push({ sender, text }); renderChat(); }
-        function sendUserMessage(messageText = null) { const input = document.getElementById('chatInput'); const text = messageText !== null ? messageText : input.value.trim(); if (!text) return; addMessage('user', text); if (messageText === null) input.value = ''; setTimeout(() => addMessage('bot', getBotReply(text, currentLanguage)), 400); }
-        function resetChat() { chatHistory = []; addMessage('bot', botResponses[currentLanguage]?.welcome(getGreeting(currentLanguage)) || "Olá! Como posso ajudar?"); }
+        
+        function getGreeting(lang) { 
+            const hour = new Date().getHours(); 
+            if (lang === 'pt') return hour < 12 ? "Bom dia! 🌅" : hour < 18 ? "Boa tarde! ☀️" : "Boa noite! 🌙"; 
+            return "Olá!"; 
+        }
+        
+        const botResponses = { 
+            pt: { 
+                welcome: (g) => `${g} Sou a A.M.I.N.A, sua assistente virtual da Reserve Já. Posso ajudar com informações sobre hotéis, atrações turísticas de Malanje ou reservas. Como posso ajudá-lo hoje?`, 
+                default: "Obrigado pela sua mensagem! Em breve retornaremos com mais informações." 
+            } 
+        };
+        
+        function getBotReply(msg, lang) { 
+            msg = msg.toLowerCase();
+            if(msg.includes('hotel') || msg.includes('hospedagem')) return "Trabalhamos com diversos hotéis parceiros em Malanje. Posso sugerir opções de acordo com seu orçamento e preferências!";
+            if(msg.includes('kalandula') || msg.includes('queda')) return "As Quedas de Kalandula são imperdíveis! Localizadas a cerca de 80km de Malanje cidade, são as maiores quedas de água em volume de África. Posso ajudar com transporte e hospedagem nas proximidades.";
+            if(msg.includes('pungo') || msg.includes('pedras')) return "As Pedras Negras de Pungo Andongo são um sítio histórico fascinante. Além da beleza natural, guardam lendas da rainha Nzinga. Vale a pena visitar ao entardecer para fotos incríveis!";
+            if(msg.includes('reserva') || msg.includes('reservar')) return "Para fazer uma reserva, preciso de mais informações: datas, número de pessoas e tipo de acomodação desejada. Posso te ajudar com isso!";
+            return botResponses[lang]?.default || botResponses.pt.default; 
+        }
+        
+        function renderChat() { 
+            const container = document.getElementById('chatMessagesContainer'); 
+            if(!container) return; 
+            container.innerHTML = ''; 
+            chatHistory.forEach(msg => { 
+                const div = document.createElement('div'); 
+                div.className = `message ${msg.sender}`; 
+                const avatar = document.createElement('div'); 
+                avatar.className = 'avatar'; 
+                avatar.innerHTML = msg.sender === 'bot' ? '<img src="images/amina-chat.png" class="logo-user-ia" style="width:36px;height:36px;border-radius:50%;"/>' : '<i class="bi bi-person" style="font-size:1.5rem;"></i>'; 
+                const bubble = document.createElement('div'); 
+                bubble.className = 'bubble'; 
+                bubble.innerHTML = msg.text; 
+                div.appendChild(avatar); 
+                div.appendChild(bubble); 
+                container.appendChild(div); 
+            }); 
+            container.scrollTop = container.scrollHeight; 
+        }
+        
+        function addMessage(sender, text) { 
+            chatHistory.push({ sender, text }); 
+            renderChat(); 
+        }
+        
+        function sendUserMessage(messageText = null) { 
+            const input = document.getElementById('chatInput'); 
+            const text = messageText !== null ? messageText : input.value.trim(); 
+            if (!text) return; 
+            addMessage('user', text); 
+            if (messageText === null && input) input.value = ''; 
+            setTimeout(() => addMessage('bot', getBotReply(text, currentLanguage)), 400); 
+        }
+        
+        function resetChat() { 
+            chatHistory = []; 
+            addMessage('bot', botResponses[currentLanguage]?.welcome(getGreeting(currentLanguage)) || "Olá! Como posso ajudar?"); 
+        }
+        
         document.getElementById('sendChatBtn')?.addEventListener('click', () => sendUserMessage());
         document.getElementById('chatInput')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendUserMessage(); });
         document.getElementById('chatModal')?.addEventListener('shown.bs.modal', () => { if (chatHistory.length === 0) resetChat(); });
         document.getElementById('btnSaberMaisAmina')?.addEventListener('click', () => new bootstrap.Modal(document.getElementById('chatModal')).show());
+        document.getElementById('btnCadastrarHotel')?.addEventListener('click', (e) => { e.preventDefault(); showToast('Entre em contato para cadastrar seu hotel: +244 921 151 685', 'success'); });
 
         // ===================== QUIZ MALANJE =====================
         (function() {
             const perguntas = [
-                { texto: "Qual é a cachoeira mais famosa localizada na província de Malanje?", opcoes: ["Quedas de Kalandula", "Quedas do Ruacana", "Cachoeira da Lagoa Azul", "Cataratas Epupa"], correta: 0, explicacao: "✅ As Quedas de Kalandula são as maiores de Angola!" },
-                { texto: "As imponentes formações rochosas que representam símbolo histórico em Malanje são conhecidas como:", opcoes: ["Montanhas da Leba", "Pedras Negras do Pungo Andongo", "Serra da Chela", "Tundavala"], correta: 1, explicacao: "📸 As Pedras Negras do Pungo Andongo guardam histórias da rainha Nginga." },
-                { texto: "Qual prato típico é amplamente consumido em Malanje?", opcoes: ["Moamba de ginguba", "Funge", "Cuscuz angolano", "Cabidela"], correta: 1, explicacao: "🍛 O funge é uma iguaria diária na região." },
-                { texto: "Malanje é conhecida por ser a 'Capital' de qual produto agrícola?", opcoes: ["Café", "Algodão", "Cana-de-açúcar", "Mandioca"], correta: 0, explicacao: "☕ Malanje foi grande produtora de café de qualidade." }
+                { texto: "Qual é a cachoeira mais famosa localizada na província de Malanje?", opcoes: ["Quedas de Kalandula", "Quedas do Ruacana", "Cachoeira da Lagoa Azul", "Cataratas Epupa"], correta: 0, explicacao: "✅ As Quedas de Kalandula são as maiores de Angola e uma das maiores em volume de água de África!" },
+                { texto: "As imponentes formações rochosas que representam símbolo histórico em Malanje são conhecidas como:", opcoes: ["Montanhas da Leba", "Pedras Negras do Pungo Andongo", "Serra da Chela", "Tundavala"], correta: 1, explicacao: "📸 As Pedras Negras do Pungo Andongo guardam histórias da rainha Nzinga e são um dos cartões-postais da província." },
+                { texto: "Qual prato típico é amplamente consumido em Malanje?", opcoes: ["Moamba de ginguba", "Funge", "Cuscuz angolano", "Cabidela"], correta: 1, explicacao: "🍛 O funge é a base da alimentação diária na região, geralmente acompanhado de peixe ou carne." },
+                { texto: "Malanje é conhecida por ser a 'Capital' de qual produto agrícola?", opcoes: ["Café", "Algodão", "Cana-de-açúcar", "Mandioca"], correta: 0, explicacao: "☕ Malanje foi grande produtora de café de qualidade, sendo conhecida como a 'Capital do Café' em Angola." }
             ];
             let perguntaAtual = 0, pontuacao = 0, respostaSelecionada = false;
             const modal = document.getElementById('quizMalanjeModal');
@@ -1365,8 +1553,7 @@
                 let html = `<div class="mensagem-chat"><i class="fas fa-comment-dots"></i> ${p.texto}</div><div class="opcoes-chat">`;
                 p.opcoes.forEach((opcao, idx) => { html += `<div class="opcao-chat" data-opcao="${idx}"><i class="fas fa-${idx === 0 ? 'a' : idx === 1 ? 'b' : idx === 2 ? 'c' : 'd'}-circle"></i> ${opcao}</div>`; });
                 html += `</div><div id="feedbackResposta" class="resposta-feedback"></div>
-                <a href="forum.html">
-                <button class="btn-proximo" id="btnProximoQuiz">${perguntaAtual < perguntas.length - 1 ? 'Entrar no Chat' : 'Finalizar Chat'}</button></a>`;
+                <button class="btn-proximo" id="btnProximoQuiz">${perguntaAtual < perguntas.length - 1 ? 'Próxima Pergunta' : 'Finalizar Chat'}</button>`;
                 quizArea.innerHTML = html;
                 respostaSelecionada = false;
                 document.querySelectorAll('.opcao-chat').forEach(el => {
@@ -1374,28 +1561,81 @@
                         if (respostaSelecionada) return;
                         const opcaoEscolhida = parseInt(el.dataset.opcao);
                         const feedbackDiv = document.getElementById('feedbackResposta');
-                        if (opcaoEscolhida === p.correta) { pontuacao++; contadorSpan.innerText = pontuacao; feedbackDiv.innerHTML = `<i class="fas fa-smile-wink"></i> ${p.explicacao} <br> 🎉 Correta! +1 ponto`; feedbackDiv.style.background = "#e1f7e6"; }
-                        else { feedbackDiv.innerHTML = `<i class="fas fa-lightbulb"></i> ${p.explicacao} <br> ❌ Resposta incorreta. A certa é: ${p.opcoes[p.correta]}.`; feedbackDiv.style.background = "#ffe5e0"; }
+                        if (opcaoEscolhida === p.correta) { 
+                            pontuacao++; 
+                            if(contadorSpan) contadorSpan.innerText = pontuacao; 
+                            feedbackDiv.innerHTML = `<i class="fas fa-smile-wink"></i> ${p.explicacao} <br> 🎉 Correta! +1 ponto`; 
+                            feedbackDiv.style.background = "#e1f7e6"; 
+                        }
+                        else { 
+                            feedbackDiv.innerHTML = `<i class="fas fa-lightbulb"></i> ${p.explicacao} <br> ❌ Resposta incorreta. A certa é: ${p.opcoes[p.correta]}.`; 
+                            feedbackDiv.style.background = "#ffe5e0"; 
+                        }
                         feedbackDiv.style.display = "block";
                         respostaSelecionada = true;
                         document.querySelectorAll('.opcao-chat').forEach(opt => { opt.style.opacity = "0.6"; opt.style.pointerEvents = "none"; });
                     });
                 });
                 document.getElementById('btnProximoQuiz')?.addEventListener('click', () => {
-                    if (!respostaSelecionada) { document.getElementById('feedbackResposta').innerHTML = `<i class="fas fa-exclamation-triangle"></i> Selecione uma resposta antes de continuar.`; document.getElementById('feedbackResposta').style.display = "block"; return; }
-                    perguntaAtual++; renderizarPergunta();
+                    if (!respostaSelecionada) { 
+                        const feedbackDiv = document.getElementById('feedbackResposta');
+                        if(feedbackDiv) {
+                            feedbackDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Selecione uma resposta antes de continuar.`; 
+                            feedbackDiv.style.display = "block"; 
+                        }
+                        return; 
+                    }
+                    perguntaAtual++; 
+                    renderizarPergunta();
                 });
             }
-            function finalizarChat() { quizArea.innerHTML = `<div style="background:#eef1e3; border-radius:32px; padding:20px; text-align:center;"><i class="fas fa-comments" style="font-size:2.5rem; color:#c28135;"></i><h3>Chat Finalizado!</h3><p><strong>Pontuação: ${pontuacao} de ${perguntas.length}</strong></p><button id="reiniciarQuizBtn" class="btn-proximo">Conversar novamente</button></div>`; certificadoMsgDiv.style.display = "block"; document.getElementById('reiniciarQuizBtn')?.addEventListener('click', () => { perguntaAtual = 0; pontuacao = 0; contadorSpan.innerText = "0"; certificadoMsgDiv.style.display = "none"; renderizarPergunta(); }); }
-            function resetQuizModal() { perguntaAtual = 0; pontuacao = 0; contadorSpan.innerText = "0"; certificadoMsgDiv.style.display = "none"; renderizarPergunta(); }
-            function abrirModal() { if (modal && modal.style.display !== 'flex') { resetQuizModal(); modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; } }
-            function fecharModal() { if (modal && modal.style.display === 'flex') { modal.style.display = 'none'; document.body.style.overflow = ''; localStorage.setItem(STORAGE_KEY, Date.now().toString()); setTimeout(() => abrirModal(), INTERVALO_MS); } }
-            btnFechar?.addEventListener('click', (e) => { e.preventDefault(); fecharModal(); });
-            modal?.addEventListener('click', (e) => { if (e.target === modal) fecharModal(); });
-            floatingBtn?.addEventListener('click', (e) => { e.preventDefault(); abrirModal(); });
+            
+            function finalizarChat() { 
+                if(quizArea) {
+                    quizArea.innerHTML = `<div style="background:#eef1e3; border-radius:32px; padding:20px; text-align:center;"><i class="fas fa-comments" style="font-size:2.5rem; color:#c28135;"></i><h3>Chat Finalizado!</h3><p><strong>Pontuação: ${pontuacao} de ${perguntas.length}</strong></p><button id="reiniciarQuizBtn" class="btn-proximo">Conversar novamente</button></div>`; 
+                }
+                if(certificadoMsgDiv) certificadoMsgDiv.style.display = "block"; 
+                document.getElementById('reiniciarQuizBtn')?.addEventListener('click', () => { 
+                    perguntaAtual = 0; 
+                    pontuacao = 0; 
+                    if(contadorSpan) contadorSpan.innerText = "0"; 
+                    if(certificadoMsgDiv) certificadoMsgDiv.style.display = "none"; 
+                    renderizarPergunta(); 
+                }); 
+            }
+            
+            function resetQuizModal() { 
+                perguntaAtual = 0; 
+                pontuacao = 0; 
+                if(contadorSpan) contadorSpan.innerText = "0"; 
+                if(certificadoMsgDiv) certificadoMsgDiv.style.display = "none"; 
+                renderizarPergunta(); 
+            }
+            
+            function abrirModal() { 
+                if (modal && modal.style.display !== 'flex') { 
+                    resetQuizModal(); 
+                    modal.style.display = 'flex'; 
+                    document.body.style.overflow = 'hidden'; 
+                } 
+            }
+            
+            function fecharModal() { 
+                if (modal && modal.style.display === 'flex') { 
+                    modal.style.display = 'none'; 
+                    document.body.style.overflow = ''; 
+                    localStorage.setItem(STORAGE_KEY, Date.now().toString()); 
+                } 
+            }
+            
+            if(btnFechar) btnFechar.addEventListener('click', (e) => { e.preventDefault(); fecharModal(); });
+            if(modal) modal.addEventListener('click', (e) => { if (e.target === modal) fecharModal(); });
+            if(floatingBtn) floatingBtn.addEventListener('click', (e) => { e.preventDefault(); abrirModal(); });
+            
             const ultimoFechamento = localStorage.getItem(STORAGE_KEY);
-            if (!ultimoFechamento || Date.now() - parseInt(ultimoFechamento) >= INTERVALO_MS) setTimeout(() => abrirModal(), 1000);
-            else setTimeout(() => { if (modal && modal.style.display !== 'flex') abrirModal(); }, INTERVALO_MS - (Date.now() - parseInt(ultimoFechamento)));
+            if (!ultimoFechamento || Date.now() - parseInt(ultimoFechamento) >= INTERVALO_MS) {
+                setTimeout(() => abrirModal(), 1000);
+            }
         })();
     </script>
 </body>
