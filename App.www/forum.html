@@ -114,6 +114,7 @@
             display: flex;
             flex-direction: column;
             position: relative;
+            min-height: 0; /* Importante para scroll correto */
         }
         body.light-theme .chat-area { background: rgba(245, 248, 250, 0.55); }
         .conv-item {
@@ -237,10 +238,11 @@
         }
         body.light-theme .msg-actions button:hover { background: rgba(0,0,0,0.1); }
         
-        /* CORREÇÃO DA BARRA DE ROLAGEM EM TELAS MENORES */
+        /* CORREÇÃO DA BARRA DE ROLAGEM EM TELAS MENORES - FIXADO */
         .chat-messages {
-            flex: 1;
+            flex: 1 1 auto;
             overflow-y: auto;
+            overflow-x: hidden;
             padding: 20px;
             display: flex;
             flex-direction: column;
@@ -248,15 +250,17 @@
             position: relative;
             z-index: 1;
             -webkit-overflow-scrolling: touch;
-            /* Garantir altura mínima e comportamento de scroll correto */
-            min-height: 0;
-            height: 100%;
+            min-height: 0; /* ESSENCIAL para flexbox scroll funcionar */
+            max-height: 100%;
+            height: auto;
         }
         
-        /* Garantir que o chat-area ocupe toda altura disponível */
+        /* Garantir que o chat-area ocupe toda altura disponível e o scroll funcione */
         .chat-area {
             min-height: 0;
             height: 100%;
+            display: flex;
+            flex-direction: column;
         }
         
         /* O row dentro do glass-panel também precisa de altura total */
@@ -865,13 +869,21 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     // ================== SISTEMAS INTELIGENTES ==================
+    // LISTA EXPANDIDA DE PALAVRAS OFENSIVAS - MAIS PALAVRÕES BLOQUEADOS
     const offensiveWords = [
-        "bobo", "feio", "idiota", "pateta", "estupido", "parvo",
-        "burro", "otario", "inutil", "lixo", "chato", "nojento", 
-        "desgraça", "merda", "caralho", "puta", "porcaria", "desgracado", "desgracada","estupida","nojenta", "burra","parva", "chata", "otaria","paneleira", "paneleiro", "viado"
+        "bobo", "feio", "idiota", "pateta", "estupido", "parvo","porra","boba","feia","estupida", "chorao", "chorona",
+        "burro", "otario", "inutil", "lixo", "chato", "nojento", "burra", "trouxa",
+        "desgraça", "merda", "caralho", "puta", "porcaria", "desgracado", "desgracada", "estupida", "nojenta", 
+        "burra", "parva", "chata", "otaria", "paneleira", "paneleiro", "viado", "vagabundo", "vagabunda","analfabeto", "analfabeta",
+        "filho da puta", "filhadaputa", "cuzão", "cuzona", "babaca", "escroto", "escrota", "imbecil",
+        "retardado", "retardada", "trouxa", "palhaço", "palhaça", "maldito", "maldita", "nojento",
+        "nojenta", "nojentos", "nojentinha", "nojentinha", "porcalhão", "porcalhona", "porco", "porca","porcaria","panina", "bicho",
+        "bicha", "bichinha", "sapatão", "boiola", "veado", "sapatona", "lésbica", "gay" 
     ];
+    
     function containsOffensive(text) { 
-        return offensiveWords.some(word => text.toLowerCase().includes(word)); 
+        const lowerText = text.toLowerCase();
+        return offensiveWords.some(word => lowerText.includes(word.toLowerCase())); 
     }
     
     const commonMistakes = { 
@@ -1198,7 +1210,11 @@
         });
         document.querySelectorAll('.edit-msg-btn').forEach(btn => btn.addEventListener('click', openEditModal));
         document.querySelectorAll('.delete-msg-btn').forEach(btn => btn.addEventListener('click', openDeleteModal));
-        container.scrollTop = container.scrollHeight;
+        
+        // Garantir que o scroll vá até o final (corrigido)
+        setTimeout(() => {
+            container.scrollTop = container.scrollHeight;
+        }, 100);
     }
     
     function openEditModal(e) {
