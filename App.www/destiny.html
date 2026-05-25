@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Reserve Já - Turismo em Malanje | Contacto Premium</title>
+    <title>Reserve Já - Destinos em Malanje</title>
     
-    <!-- Bootstrap + Icons + Font Awesome -->
+    <!-- Bootstrap + Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     
     <style>
         * {
@@ -34,8 +35,6 @@
             --border-color: #dee2e6;
             --chat-user-bg: #e9ecef;
             --chat-bot-bg: #d4e6f1;
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
         }
 
         [data-bs-theme="dark"] {
@@ -54,8 +53,6 @@
             --border-color: #444;
             --chat-user-bg: #2c2c2c;
             --chat-bot-bg: #1a3e50;
-            --glass-bg: rgba(0, 0, 0, 0.5);
-            --glass-border: rgba(255, 255, 255, 0.15);
         }
         
         body {
@@ -67,133 +64,207 @@
         }
 
         /* Language dropdown */
-        .language-selector { position: relative; display: inline-block; }
-        .lang-btn { background: rgba(128, 128, 128, 0.08); border: 1px solid var(--border-color); border-radius: 40px; padding: 6px 14px; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; font-weight: 500; transition: all 0.2s; color: var(--body-color); }
-        .lang-btn:hover { background: var(--primary-color); color: white; border-color: var(--primary-color); }
-        .lang-dropdown { position: absolute; top: 110%; right: 0; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; min-width: 170px; z-index: 1050; display: none; box-shadow: 0 12px 28px rgba(0,0,0,0.2); backdrop-filter: blur(2px); overflow: hidden; }
+        .language-selector {
+            position: relative;
+            display: inline-block;
+        }
+        .lang-btn {
+            background: rgba(128, 128, 128, 0.08);
+            border: 1px solid var(--border-color);
+            border-radius: 40px;
+            padding: 6px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            color: var(--body-color);
+        }
+        .lang-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        .lang-dropdown {
+            position: absolute;
+            top: 110%;
+            right: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            min-width: 170px;
+            z-index: 1050;
+            display: none;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.2);
+            backdrop-filter: blur(2px);
+            overflow: hidden;
+        }
         .lang-dropdown.show { display: block; animation: fadeIn 0.2s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px);} to { opacity: 1; transform: translateY(0);} }
-        .lang-option { display: flex; align-items: center; gap: 10px; padding: 10px 14px; text-decoration: none; color: var(--body-color); font-size: 0.9rem; transition: background 0.2s; cursor: pointer; }
+        .lang-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            text-decoration: none;
+            color: var(--body-color);
+            font-size: 0.9rem;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
         .lang-option:hover { background: rgba(52, 152, 219, 0.15); }
         .lang-flag { width: 22px; height: 15px; object-fit: cover; border-radius: 3px; }
 
         /* Hero slides */
-        .hero-section { position: relative; color: white; padding: 100px 0; margin-bottom: 40px; overflow: hidden; min-height: 600px; display: flex; align-items: center; }
-        .slideshow-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
-        .mySlides { display: none; position: absolute; width: 100%; height: 100%; opacity: 0; transition: opacity 2s ease-in-out; }
-        .mySlides.active { display: block; opacity: 1; }
-        .slide-background { width: 100%; height: 100%; background-size: cover; background-position: center; position: relative; }
-        .slide-background::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4)); }
-        .hero-content { position: relative; z-index: 2; width: 100%; }
-        
-        /* Glassmorphism */
-        .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            border-radius: 32px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s;
+        .hero-section {
+            position: relative;
+            color: white;
+            padding: 100px 0;
+            margin-bottom: 40px;
+            overflow: hidden;
+            min-height: 600px;
+            display: flex;
+            align-items: center;
         }
-        .glass-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
-        .contact-hero {
-            background: linear-gradient(135deg, rgba(0,0,0,0.7), rgba(0,0,0,0.5)), url('images/parque-cangandala.png');
+        .slideshow-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .mySlides {
+            display: none;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+        }
+        .mySlides.active { display: block; opacity: 1; }
+        .slide-background {
+            width: 100%;
+            height: 100%;
             background-size: cover;
             background-position: center;
-            border-radius: 48px;
-            padding: 70px 20px;
             position: relative;
-            overflow: hidden;
         }
-        .contact-hero::after {
+        .slide-background::after {
             content: '';
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 20% 40%, rgba(52,152,219,0.2), transparent);
-            pointer-events: none;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4));
         }
-        .btn-premium-glow {
-            background: linear-gradient(135deg, var(--primary-color), #2c3e50);
+        .hero-content { position: relative; z-index: 2; width: 100%; }
+        .search-box {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        [data-bs-theme="dark"] .search-box { background: rgba(30, 30, 30, 0.95); }
+        .card {
             border: none;
-            padding: 12px 32px;
-            border-radius: 60px;
-            font-weight: bold;
-            transition: all 0.3s;
-            box-shadow: 0 0 12px rgba(52,152,219,0.5);
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            background-color: var(--card-bg);
+            color: var(--card-color);
         }
-        .btn-premium-glow:hover { transform: scale(1.02); box-shadow: 0 0 20px var(--primary-color); }
-        .contact-icon-card {
-            background: var(--card-bg);
-            border-radius: 28px;
-            padding: 24px 16px;
-            text-align: center;
-            transition: all 0.3s;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        .card:hover { transform: translateY(-6px); box-shadow: 0 20px 25px -12px rgba(0,0,0,0.2); }
+        .hotel-img {
+            height: 220px;
+            object-fit: cover;
+            border-radius: 20px 20px 0 0;
+            width: 100%;
         }
-        .contact-icon-card:hover { transform: translateY(-8px); background: var(--primary-color); color: white; }
-        .contact-icon-card i { font-size: 2.8rem; margin-bottom: 1rem; }
-        
-        /* REDES SOCIAIS SIMPLIFICADAS - cada uma com sua cor e logotipo */
-        .social-simple {
-            display: flex;
-            justify-content: center;
-            gap: 1.2rem;
-            flex-wrap: wrap;
-            margin-top: 1rem;
-        }
-        .social-btn-simple {
-            display: inline-flex;
+        /* Modo lista: imagem menor à esquerda */
+        .destinos-lista .card {
+            flex-direction: row;
             align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 10px 24px;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: 500;
-            text-decoration: none;
-            transition: 0.2s;
-            background-color: #eee;
-            color: #333;
         }
-        .social-btn-simple i { font-size: 1.4rem; }
-        .social-btn-simple:hover { transform: scale(1.02); filter: brightness(0.95); }
-        /* Cores oficiais */
-        .social-whatsapp { background-color: #25D366; color: white; }
-        .social-facebook { background-color: #1877F2; color: white; }
-        .social-instagram { background: radial-gradient(circle at 30% 110%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); color: white; }
-        .social-tiktok { background-color: #010101; color: white; }
-        .social-telegram { background-color: #26A5E4; color: white; }
-        
-        .map-container-modern { border-radius: 28px; overflow: hidden; box-shadow: 0 15px 30px rgba(0,0,0,0.2); height: 380px; width: 100%; }
-        .form-control-glass { background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 60px; padding: 12px 20px; color: var(--input-color); }
-        textarea.form-control-glass { border-radius: 28px; }
-        .btn-ripple { position: relative; overflow: hidden; transition: all 0.2s; }
-        .btn-ripple:active { transform: scale(0.98); }
-        .card { border: none; border-radius: 20px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); background-color: var(--card-bg); color: var(--card-color); }
-        .hotel-img { height: 220px; object-fit: cover; border-radius: 20px 20px 0 0; width: 100%; }
-        .btn-premium { background: linear-gradient(135deg, #f39c12, #e67e22); border: none; font-weight: bold; padding: 12px 30px; border-radius: 50px; }
+        .destinos-lista .card-img-wrapper {
+            width: 280px;
+            border-radius: 20px 0 0 20px;
+            overflow: hidden;
+        }
+        .destinos-lista .hotel-img {
+            height: 180px;
+            border-radius: 0;
+        }
+        .destinos-lista .card-body {
+            flex: 1;
+        }
+        .destinos-lista .img-zoom-icon {
+            bottom: 8px;
+            right: 8px;
+        }
+        @media (max-width: 768px) {
+            .destinos-lista .card {
+                flex-direction: column;
+            }
+            .destinos-lista .card-img-wrapper {
+                width: 100%;
+                border-radius: 20px 20px 0 0;
+            }
+        }
+        .btn-premium {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            border: none;
+            font-weight: bold;
+            padding: 12px 30px;
+            border-radius: 50px;
+            box-shadow: 0 0 15px rgba(243, 156, 18, 0.5);
+            transition: all 0.3s;
+        }
+        .btn-giant {
+            padding: 15px 40px;
+            font-size: 1.8rem;
+            border-radius: 60px;
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(243,156,18,0.7); }
+            70% { transform: scale(1.03); box-shadow: 0 0 0 12px rgba(243,156,18,0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(243,156,18,0); }
+        }
         .stat-number { font-size: 2.5rem; font-weight: bold; color: var(--primary-color); }
         .theme-toggle { position: relative; display: inline-block; width: 55px; height: 28px; }
         .theme-toggle input { opacity: 0; width: 0; height: 0; }
-        .theme-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
-        .theme-slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        .theme-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .theme-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
         input:checked + .theme-slider { background-color: var(--primary-color); }
         input:checked + .theme-slider:before { transform: translateX(27px); }
-        
-        /* CORREÇÃO DE SOBREPOSIÇÃO - ÍCONES FLUTUANTES ORGANIZADOS */
-        .floating-buttons-container {
+        .fab {
             position: fixed;
             bottom: 30px;
             right: 30px;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            align-items: flex-end;
-        }
-        
-        /* Chat Button - Versão corrigida */
-        .fab-chat {
             width: 60px;
             height: 60px;
             border-radius: 50%;
@@ -204,85 +275,135 @@
             justify-content: center;
             font-size: 1.5rem;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 100; /* Mantido mais baixo que o ícone do quiz (1050) */
             cursor: pointer;
-            transition: all 0.2s ease;
+        }
+        @media (max-width: 768px) {
+            .hero-section { padding: 60px 0; min-height: 500px; }
+            .btn-giant { font-size: 1.2rem; padding: 10px 20px; }
+        }
+        .map-container iframe {
+            border-radius: 20px;
+            width: 100%;
+            height: 280px;
+            border: 0;
+        }
+        .address-highlight {
+            background: rgba(52,152,219,0.1);
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-weight: 500;
+        }
+        
+        /* Logo */
+        .navbar-brand-custom {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
             text-decoration: none;
         }
-        
-        .fab-chat:hover {
-            transform: scale(1.08);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        .logo-img {
+            height: 70px;
+            width: 150px;
+            object-fit: contain;
+            margin: 0;
+            padding: 0;
+            border: 0;
+            display: block;
         }
+        .brand-text {
+            line-height: 1.2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin: 0;
+            padding: 0;
+        }
+        .brand-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            letter-spacing: -0.3px;
+            color: var(--body-color);
+            margin-bottom: 0;
+            line-height: 1.2;
+        }
+        .brand-sub {
+            font-size: 0.68rem;
+            opacity: 0.8;
+            margin-top: 0px;
+            line-height: 1.3;
+            color: var(--body-color);
+        }
+        @media (max-width: 576px) {
+            .navbar-brand-custom { gap: 0.3rem; }
+            .logo-img { height: 40px; max-width: 44px; }
+            .brand-title { font-size: 1.1rem; }
+            .brand-sub { font-size: 0.55rem; }
+        }
+        .card-img-top {
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+        }
+        .store-badge { height: 50px; width: auto; transition: transform 0.2s; }
+        .store-badge:hover { transform: scale(1.02); }
+        @media (max-width: 576px) { .store-badge { height: 40px; } }
         
-        /* Ícone flutuante do Quiz/Plataforma */
-        .floating-biorisk {
-            background: linear-gradient(135deg, #1b4e3f, #0c352a);
-            width: 62px;
-            height: 62px;
+        /* Chatbot */
+        .chat-messages { max-height: 350px; overflow-y: auto; padding: 15px; background: var(--body-bg); border-radius: 16px; margin-bottom: 15px; }
+        .message { margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px; }
+        .message.user { justify-content: flex-end; }
+        .message.bot .avatar, .message.user .avatar {
+            width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: white;
+        }
+        .message.bot .avatar { background: var(--primary-color); }
+        .message.user .avatar { background: var(--success-color); }
+        .bubble { max-width: 75%; padding: 10px 14px; border-radius: 18px; word-wrap: break-word; }
+        .bot .bubble { background: var(--chat-bot-bg); color: var(--body-color); }
+        .user .bubble { background: var(--primary-color); color: white; }
+        .quick-replies { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; margin-bottom: 12px; }
+        .quick-reply-btn {
+            background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 30px;
+            padding: 5px 12px; font-size: 0.8rem; transition: all 0.2s;
+        }
+        .quick-reply-btn:hover { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .btn-saber-mais {
+            background: linear-gradient(135deg, #f39c12, #e67e22); border: none; font-weight: bold;
+            border-radius: 60px; padding: 14px 30px; font-size: 1.2rem; box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+            transition: all 0.3s; margin-top: 20px;
+        }
+        .btn-saber-mais-modal {
+            background: linear-gradient(135deg, #2ecc71, #27ae60); border: none; font-weight: bold;
+            border-radius: 60px; padding: 10px 20px; font-size: 1rem; width: 100%; margin-bottom: 15px;
+            transition: all 0.3s; color: white;
+        }
+        .btn-saber-mais-modal:hover { transform: scale(1.02); background: linear-gradient(135deg, #27ae60, #1e8449); color: white; }
+        
+        /* Ícone de zoom na imagem */
+        .img-zoom-icon {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: rgba(0,0,0,0.6);
+            color: white;
             border-radius: 50%;
+            width: 36px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 15px 28px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(245,176,66,0.7);
-            transition: all 0.2s ease;
-            animation: softPulse 2.2s infinite;
+            transition: all 0.2s;
+            z-index: 2;
         }
-        
-        .floating-biorisk i {
-            font-size: 2rem;
-            color: #FFDF8c;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        .img-zoom-icon:hover {
+            background: var(--primary-color);
+            transform: scale(1.05);
         }
-        
-        .floating-biorisk:hover {
-            transform: scale(1.08);
-            background: linear-gradient(135deg, #2a6b56, #15523f);
-            box-shadow: 0 18px 32px rgba(0, 0, 0, 0.35), 0 0 0 4px #ffda77;
+        .card-img-wrapper {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px 20px 0 0;
         }
-        
-        @keyframes softPulse {
-            0% { box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25), 0 0 0 3px rgba(245,176,66,0.6); }
-            50% { box-shadow: 0 16px 28px rgba(0, 0, 0, 0.35), 0 0 0 5px rgba(255, 200, 70, 0.9); }
-            100% { box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25), 0 0 0 3px rgba(245,176,66,0.6); }
-        }
-        
-        .floating-biorisk::after {
-            content: "Reserve Já · Hotéis e Turismo em Malanje";
-            position: absolute;
-            bottom: 72px;
-            right: 0;
-            background: #1a2f28;
-            color: #ffecb3;
-            font-size: 0.7rem;
-            font-weight: bold;
-            padding: 5px 12px;
-            border-radius: 40px;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: 0.2s;
-            font-family: 'Segoe UI', system-ui;
-        }
-        
-        .floating-biorisk:hover::after {
-            opacity: 1;
-            bottom: 70px;
-        }
-        
-        .logo-img { height: 70px; width: 150px; object-fit: contain; }
-        .brand-title { font-size: 1.4rem; font-weight: bold; }
-        .chat-messages { max-height: 350px; overflow-y: auto; padding: 15px; background: var(--body-bg); border-radius: 16px; margin-bottom: 15px; }
-        .message { margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px; }
-        .bubble { max-width: 75%; padding: 10px 14px; border-radius: 18px; }
-        .bot .bubble { background: var(--chat-bot-bg); }
-        .user .bubble { background: var(--primary-color); color: white; }
-        .quick-replies { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
-        .quick-reply-btn { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 30px; padding: 5px 12px; }
-        .toast-container-custom { position: fixed; bottom: 20px; right: 20px; z-index: 1100; }
-        .toast-custom { min-width: 280px; background: white; border-radius: 12px; padding: 14px 20px; margin-bottom: 12px; border-left: 5px solid; animation: slideInRight 0.3s ease; }
-        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        
         .logo-dots{
             border-radius: 50%;
             width: 60px;
@@ -298,20 +419,50 @@
             width: 40px;
             height: 40px;
         }
-        /* Estilos para cards de destinos */
-        .destino-card { transition: transform 0.2s; }
-        .destino-card:hover { transform: translateY(-5px); }
         
-        /* Outher CSS */
-        .map-container iframe {
-            border-radius: 20px;
-            width: 100%;
-            height: 280px;
-            border: 0;
+        /* Toast container */
+        .toast-container-custom {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1100;
+        }
+        .toast-custom {
+            min-width: 280px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            padding: 14px 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-left: 5px solid;
+            animation: slideInRight 0.3s ease;
+        }
+        .toast-custom.success { border-left-color: #2ecc71; background: #f0fff4; }
+        .toast-custom.error { border-left-color: #e74c3c; background: #fff5f5; }
+        [data-bs-theme="dark"] .toast-custom.success { background: #1e2a1e; color: #e0e0e0; }
+        [data-bs-theme="dark"] .toast-custom.error { background: #2a1e1e; color: #e0e0e0; }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
         
-        /* =================================Outher CSS ADD ===========================*/
-         /* Página principal – Reserve Já */
+        /* Botões de visualização */
+        .view-toggle .btn {
+            border-radius: 30px;
+            padding: 6px 18px;
+            font-size: 0.9rem;
+        }
+        .view-toggle .btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        /* ==========================================OUTHER CSS================================================= */
+       /* Página principal – Quiz Malanje */
         .page-content {
             max-width: 1300px;
             margin: 0 auto;
@@ -319,7 +470,7 @@
         }
 
         .hero {
-            background: linear-gradient(105deg, #0f3b2c 0%, #1b5e4a 100%);
+            background: linear-gradient(105deg, #8b5a2b 0%, #c28135 100%);
             border-radius: 48px;
             padding: 2rem 2rem;
             color: white;
@@ -335,7 +486,7 @@
 
         .hero h1 i {
             margin-right: 12px;
-            color: #f5b042;
+            color: #ffd966;
         }
 
         .hero p {
@@ -368,7 +519,7 @@
 
         .grade-servicos h2 {
             font-size: 1.9rem;
-            color: #1e3a2f;
+            color: #6b3f1c;
             margin-bottom: 1.5rem;
             font-weight: 700;
         }
@@ -389,31 +540,31 @@
             transition: all 0.25s ease;
             box-shadow: 0 12px 24px rgba(0,0,0,0.05);
             cursor: pointer;
-            border: 1px solid #dce5e0;
+            border: 1px solid #e6d5b3;
         }
 
         .card-negocio i {
             font-size: 2.6rem;
-            color: #c27e2e;
+            color: #c28135;
             margin-bottom: 0.8rem;
         }
 
         .card-negocio h3 {
             font-size: 1.3rem;
-            color: #1c473a;
+            color: #8b5a2b;
             margin-bottom: 0.5rem;
         }
 
         .card-negocio p {
             font-size: 0.85rem;
-            color: #4f5a55;
+            color: #6b4c2c;
         }
 
         .card-negocio:hover {
             transform: translateY(-7px);
-            background: #fffcf0;
+            background: #fffaf0;
             box-shadow: 0 22px 30px rgba(0,0,0,0.1);
-            border-color: #edd18e;
+            border-color: #d4a259;
         }
 
         .cta-principal {
@@ -422,11 +573,11 @@
 
         .btn-outline {
             background: transparent;
-            border: 2px solid #c27e2e;
+            border: 2px solid #c28135;
             padding: 0.9rem 2rem;
             border-radius: 60px;
             font-weight: bold;
-            color: #c27e2e;
+            color: #c28135;
             font-size: 1rem;
             transition: 0.2s;
             cursor: pointer;
@@ -436,13 +587,13 @@
         }
 
         .btn-outline:hover {
-            background: #c27e2e;
+            background: #c28135;
             color: white;
-            border-color: #c27e2e;
+            border-color: #c28135;
             transform: scale(1.02);
         }
 
-        /* ===== MODAL PRINCIPAL (VANTAGENS) - CORREÇÃO DE SCROLL ===== */
+        /* ===== MODAL QUIZ - MALANJE ANGOLA (CORRIGIDO: SCROLLBAR EM TELAS MENORES) ===== */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -455,20 +606,20 @@
             justify-content: center;
             align-items: center;
             z-index: 2000;
-            padding: 1.5rem;
-            overflow-y: auto;
+            padding: 1rem;
         }
 
         .modal-card {
-            max-width: 920px;
+            max-width: 950px;
             width: 100%;
-            max-height: 90vh;
+            max-height: 95vh;
             background: #ffffff;
             border-radius: 40px;
-            overflow-y: auto;
-            overflow-x: hidden;
+            overflow: hidden;
             box-shadow: 0 32px 55px rgba(0, 0, 0, 0.4);
             animation: modalFadeUp 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            display: flex;
+            flex-direction: column;
         }
 
         @keyframes modalFadeUp {
@@ -485,11 +636,13 @@
         .modal-flex {
             display: flex;
             flex-wrap: wrap;
+            flex: 1;
+            overflow-y: auto; /* SCROLLBAR PRINCIPAL PARA TELAS MENORES */
         }
 
         .modal-imagem {
             flex: 0.9;
-            background: #1f3d31;
+            background: #2c5538;
             position: relative;
             overflow: hidden;
             min-height: 200px;
@@ -503,7 +656,7 @@
             flex-direction: column;
         }
 
-        .img-biorisk {
+        .img-malanje {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -517,21 +670,22 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(45deg, rgba(0,0,0,0.2) 0%, rgba(27, 94, 74, 0.3) 100%);
+            background: linear-gradient(45deg, rgba(0,0,0,0.2) 0%, rgba(139,90,43,0.3) 100%);
             pointer-events: none;
         }
 
         .modal-conteudo {
             flex: 1.2;
-            padding: 2rem 2rem;
+            padding: 1.5rem;
             background: #fffef9;
             position: relative;
+            overflow-y: auto; /* GARANTE SCROLL INTERNO SE NECESSÁRIO */
         }
 
         .btn-fechar {
             position: absolute;
-            top: 18px;
-            right: 20px;
+            top: 12px;
+            right: 16px;
             background: #f0ede5;
             width: 34px;
             height: 34px;
@@ -541,10 +695,10 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.2s;
-            color: #2d3e2c;
+            color: #6b3f1c;
             font-size: 1.2rem;
-            z-index: 10;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            z-index: 20;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
         }
 
         .btn-fechar:hover {
@@ -553,65 +707,91 @@
             color: #b34e2e;
         }
 
-        .titulo-software {
-            font-size: 1.9rem;
+        .titulo-quiz {
+            font-size: 1.5rem;
             font-weight: 800;
-            color: #2c5a42;
-            margin-bottom: 0.5rem;
+            color: #8b5a2b;
+            margin-bottom: 0.3rem;
             line-height: 1.25;
             border-left: 5px solid #f5b042;
             padding-left: 18px;
         }
 
-        .titulo-software i {
+        .titulo-quiz i {
             color: #f5b042;
             margin-right: 8px;
-            font-size: 1.7rem;
+            font-size: 1.5rem;
         }
 
-        .descricao-principal {
-            font-size: 0.95rem;
-            color: #2a3b2e;
+        .descricao-quiz {
+            font-size: 0.9rem;
+            color: #5a3e22;
             margin: 0.5rem 0 1rem 0;
             line-height: 1.45;
         }
 
-        .lista-vantagens-biorisk {
-            list-style: none;
-            margin: 1rem 0 1.2rem 0;
+        .quiz-container {
+            margin: 0.8rem 0;
         }
 
-        .lista-vantagens-biorisk li {
-            margin-bottom: 12px;
+        .pergunta-quiz {
+            font-weight: bold;
+            color: #2c5538;
+            background: #fef4e6;
+            padding: 10px 15px;
+            border-radius: 28px;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+
+        .opcoes-quiz {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .opcao-quiz {
+            background: #f9f5ea;
+            border: 1.5px solid #e2cfaa;
+            border-radius: 40px;
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: all 0.2s;
             font-size: 0.9rem;
+            color: #4a341c;
             display: flex;
             align-items: center;
             gap: 12px;
-            color: #1f3b1a;
         }
 
-        .lista-vantagens-biorisk i {
-            color: #f5b042;
-            font-size: 1.2rem;
-            width: 26px;
+        .opcao-quiz i {
+            width: 24px;
+            color: #c28135;
         }
 
-        .nota-importante {
-            background: #fef4e8;
-            border-radius: 20px;
-            padding: 0.8rem 1rem;
-            margin: 0.8rem 0 1.2rem 0;
-            font-size: 0.8rem;
-            border-left: 3px solid #e4a022;
+        .opcao-quiz:hover {
+            background: #fff2df;
+            border-color: #c28135;
+            transform: translateX(5px);
         }
 
-        .nota-importante i {
-            color: #d48f2b;
+        .resposta-feedback {
+            background: #eef4ea;
+            border-radius: 28px;
+            padding: 12px 15px;
+            margin: 15px 0;
+            font-size: 0.85rem;
+            border-left: 4px solid #8b5a2b;
+            display: none;
+        }
+
+        .resposta-feedback i {
             margin-right: 8px;
+            color: #8b5a2b;
         }
 
-        .btn-acao {
-            display: block;
+        .btn-proximo {
             background: linear-gradient(95deg, #ca9622, #b47c10);
             border: none;
             width: 100%;
@@ -620,18 +800,30 @@
             transition: all 0.2s;
             box-shadow: 0 8px 18px rgba(180, 124, 16, 0.3);
             cursor: pointer;
-            text-decoration: none;
-            padding: 13px 12px;
+            padding: 12px;
             font-weight: bold;
             font-size: 1rem;
             color: white;
             letter-spacing: 0.5px;
+            margin-top: 8px;
         }
 
-        .btn-acao:hover {
+        .btn-proximo:hover {
             transform: scale(1.01);
             background: linear-gradient(95deg, #e0a82e, #cc8c1a);
-            box-shadow: 0 10px 22px rgba(180, 124, 16, 0.45);
+        }
+
+        .pontuacao-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f5e9d9;
+            border-radius: 60px;
+            padding: 8px 18px;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #6b3f1c;
+            font-size: 0.9rem;
         }
 
         .texto-info {
@@ -646,286 +838,213 @@
             margin-top: 14px;
         }
 
-        /* ===== MODAL DE ACORDO / DIREITOS DO USUÁRIO E NEWSLETTER - CORREÇÃO DE SCROLL ===== */
-        .modal-acordo-overlay {
+        /* Ícone flutuante do Quiz - Z-INDEX ALTO PARA FICAR ACIMA DO CHATBOT */
+        .floating-quiz {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.92);
-            backdrop-filter: blur(5px);
-            display: none;
+            bottom: 110px; /* Ajustado para não sobrepor o botão do chat, mas ainda visível */
+            right: 26px;
+            background: linear-gradient(135deg, #c28135, #9b6027);
+            width: 62px;
+            height: 62px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
             justify-content: center;
-            align-items: center;
-            z-index: 2100;
-            padding: 1.5rem;
-            overflow-y: auto;
-        }
-
-        .modal-acordo-card {
-            max-width: 500px;
-            width: 100%;
-            max-height: 90vh;
-            background: linear-gradient(145deg, #ffffff 0%, #fef9ef 100%);
-            border-radius: 32px;
-            box-shadow: 0 30px 45px rgba(0, 0, 0, 0.4);
-            animation: modalFadeUp 0.3s ease;
-            overflow-y: auto;
-            overflow-x: hidden;
-            border: 1px solid #f0deaa;
-        }
-
-        .modal-acordo-header {
-            background: #1b5e4a;
-            padding: 1.2rem 1.5rem;
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            position: sticky;
-            top: 0;
-            z-index: 5;
-        }
-
-        .modal-acordo-header i {
-            font-size: 1.6rem;
-            color: #f5b042;
-        }
-
-        .modal-acordo-header h3 {
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin: 0;
-        }
-
-        .modal-acordo-body {
-            padding: 1.6rem 1.5rem;
-        }
-
-        .direitos-lista {
-            background: #f2f6f0;
-            padding: 1rem;
-            border-radius: 20px;
-            margin-bottom: 1.5rem;
-        }
-
-        .direitos-lista p {
-            font-weight: bold;
-            color: #1e3a2f;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-        }
-
-        .direitos-lista ul {
-            margin-left: 1.2rem;
-            color: #2c4b3a;
-            font-size: 0.8rem;
-            line-height: 1.5;
-        }
-
-        .direitos-lista li {
-            margin: 6px 0;
-        }
-
-        .newsletter-area {
-            background: white;
-            border-radius: 20px;
-            padding: 1rem;
-            border: 1px solid #e2dbbc;
-            margin-bottom: 1.2rem;
-        }
-
-        .newsletter-area label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: bold;
-            color: #2c5a42;
-            margin-bottom: 10px;
-            font-size: 0.9rem;
-        }
-
-        .input-email-group {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-        }
-
-        .input-email-group input {
-            flex: 1;
-            padding: 12px 14px;
-            border-radius: 60px;
-            border: 1.5px solid #ddd6bf;
-            font-size: 0.9rem;
-            outline: none;
-            transition: 0.2s;
-        }
-
-        .input-email-group input:focus {
-            border-color: #ca9622;
-            box-shadow: 0 0 0 2px rgba(202, 150, 34, 0.2);
-        }
-
-        .btn-inscrever {
-            background: #1b5e4a;
-            border: none;
-            padding: 12px 18px;
-            border-radius: 60px;
-            color: white;
-            font-weight: bold;
             cursor: pointer;
-            transition: 0.2s;
+            box-shadow: 0 15px 28px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(245,176,66,0.7);
+            z-index: 1050; /* Maior que o .fab (100) e o modal do chatbot (1055?) */
+            transition: all 0.2s ease;
+            animation: softPulse 2.2s infinite;
+        }
+
+        .floating-quiz i {
+            font-size: 2rem;
+            color: #ffffff;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+
+        .floating-quiz:hover {
+            transform: scale(1.08);
+            background: linear-gradient(135deg, #e09d48, #b87128);
+            box-shadow: 0 18px 32px rgba(0, 0, 0, 0.35), 0 0 0 4px #ffda77;
+        }
+
+        @keyframes softPulse {
+            0% { box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25), 0 0 0 3px rgba(245,176,66,0.6); }
+            50% { box-shadow: 0 16px 28px rgba(0, 0, 0, 0.35), 0 0 0 5px rgba(255, 200, 70, 0.9); }
+            100% { box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25), 0 0 0 3px rgba(245,176,66,0.6); }
+        }
+
+        .floating-quiz::after {
+            content: "✨ Quiz: Malanje ✨";
+            position: absolute;
+            bottom: 72px;
+            right: 0;
+            background: #5a3e22;
+            color: #ffecb3;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 5px 12px;
+            border-radius: 40px;
             white-space: nowrap;
-        }
-
-        .btn-inscrever:hover {
-            background: #0f4637;
-            transform: scale(1.02);
-        }
-
-        .msg-sucesso {
-            background: #d4edda;
-            color: #155724;
-            padding: 8px 12px;
-            border-radius: 40px;
-            font-size: 0.75rem;
-            margin-top: 10px;
-            text-align: center;
-            display: none;
-        }
-
-        .btn-fechar-acordo {
-            background: #e9e0ce;
-            border: none;
-            padding: 10px;
-            border-radius: 40px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 12px;
-            color: #4a3b1c;
+            opacity: 0;
+            pointer-events: none;
             transition: 0.2s;
+            font-family: 'Segoe UI', system-ui;
         }
 
-        .btn-fechar-acordo:hover {
-            background: #ddd0b6;
+        .floating-quiz:hover::after {
+            opacity: 1;
+            bottom: 70px;
         }
 
-        .btn-aceitar {
-            background: linear-gradient(95deg, #ca9622, #b47c10);
-            border: none;
-            padding: 12px;
-            border-radius: 40px;
-            color: white;
-            font-weight: bold;
-            width: 100%;
-            margin-bottom: 8px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .btn-aceitar:hover {
-            background: linear-gradient(95deg, #e0a82e, #cc8c1a);
-        }
-
-        .small-note {
-            font-size: 0.65rem;
-            text-align: center;
-            color: #8b7a55;
-            margin-top: 10px;
-        }
-
-        /* CORREÇÕES DE RESPONSIVIDADE E SCROLL EM TELAS MENORES */
+        /* Responsivo para o modal - GARANTIA DE SCROLL EM TELAS MENORES */
         @media (max-width: 780px) {
-            body { padding: 1rem; }
-            .modal-flex { flex-direction: column; }
-            .modal-imagem { min-height: 200px; flex: auto; }
-            .modal-conteudo { padding: 1.5rem; }
-            .titulo-software { font-size: 1.5rem; }
-            .hero h1 { font-size: 1.9rem; }
-            .cards-negocios { gap: 1rem; }
-            .card-negocio { width: 220px; }
-            .input-email-group { flex-wrap: wrap; }
-            .btn-inscrever { width: 100%; }
-            .floating-buttons-container { bottom: 20px; right: 20px; gap: 12px; }
-            .floating-biorisk { width: 50px; height: 50px; }
-            .floating-biorisk i { font-size: 1.6rem; }
-            .fab-chat { width: 50px; height: 50px; font-size: 1.3rem; }
-            /* Garantir scroll nos modais em telas pequenas */
-            .modal-card { max-height: 85vh; }
-            .modal-acordo-card { max-height: 85vh; }
+            body {
+                padding: 1rem;
+            }
+            .modal-flex {
+                flex-direction: column;
+                overflow-y: auto;
+                max-height: 90vh;
+            }
+            .modal-imagem {
+                min-height: 180px;
+                flex: auto;
+            }
+            .modal-conteudo {
+                padding: 1.2rem;
+                overflow-y: visible;
+            }
+            .titulo-quiz {
+                font-size: 1.3rem;
+                padding-left: 12px;
+            }
+            .hero h1 {
+                font-size: 1.9rem;
+            }
+            .cards-negocios {
+                gap: 1rem;
+            }
+            .card-negocio {
+                width: 220px;
+            }
+            .floating-quiz {
+                bottom: 100px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+            }
+            .floating-quiz i {
+                font-size: 1.6rem;
+            }
         }
-        
+
         @media (max-width: 560px) {
-            .card-negocio { width: 100%; max-width: 280px; }
-            .hero { padding: 1.5rem; }
-            .contact-hero { padding: 40px 20px; }
-            .social-btn-simple { padding: 8px 18px; font-size: 0.9rem; }
+            .card-negocio {
+                width: 100%;
+                max-width: 280px;
+            }
+            .hero {
+                padding: 1.5rem;
+            }
+            .btn-outline {
+                font-size: 0.9rem;
+                padding: 0.7rem 1.4rem;
+            }
+            .floating-quiz {
+                bottom: 90px;
+                right: 20px;
+            }
+            .modal-card {
+                max-height: 98vh;
+            }
+            .modal-conteudo {
+                padding: 1rem;
+            }
+            .opcao-quiz {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+            }
+            .btn-proximo {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
         }
-        
-        /* Esconder scrollbar no Chrome/Safari mas manter funcionalidade (opcional) */
-        .modal-card::-webkit-scrollbar,
-        .modal-acordo-card::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .modal-card::-webkit-scrollbar-track,
-        .modal-acordo-card::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-        
-        .modal-card::-webkit-scrollbar-thumb,
-        .modal-acordo-card::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 10px;
-        }
-        
-        .modal-card::-webkit-scrollbar-thumb:hover,
-        .modal-acordo-card::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
-        }
+    
     </style>
 </head>
 <body data-bs-theme="light">
     <div class="toast-container-custom" id="toastContainer"></div>
 
-    <!-- NAVBAR -->
     <nav class="navbar navbar-expand-lg sticky-top" style="background: var(--card-bg); box-shadow: 0 2px 12px rgba(0,0,0,0.05);">
         <div class="container">
-            <a class="navbar-brand-custom" href="index.html" style="display: flex; align-items: center; gap:0.4rem; text-decoration: none;">
-                <img src="images/palanca-real-rbg.png" class="logo-img" alt="Reserve Já" onerror="this.src='https://via.placeholder.com/150x70?text=Reserve+Já'">
+            <a class="navbar-brand-custom" href="index.html">
+                <img src="images/palanca-real-rbg.png" class="logo-img" alt="Reserve Já">
+                <!--
+                <div class="brand-text">
+                    <span class="brand-title d-block">Reserve Já</span>
+                    <small class="brand-sub text-muted">Plataforma Digital de Turismo</small>
+                </div>
+                -->
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-1">
                     <li class="nav-item"><a class="nav-link px-3" href="home.html" data-i18n="navBenefits">Para Hotéis</a></li>
-                    <li class="nav-item"><a class="nav-link px-3" href="destiny.html" data-i18n="navDestinos">Maravilhas</a></li>
+                    <li class="nav-item"><a class="nav-link px-3" href="#destinos" data-i18n="navDestinos">Maravilhas</a></li>
                     <li class="nav-item"><a class="nav-link px-3" href="offer.html" data-i18n="navOffers">Ofertas</a></li>
                     <li class="nav-item"><a class="nav-link px-3" href="testimonials.html" data-i18n="navTestimonials">Avaliações</a></li>
-                    <li class="nav-item"><a class="nav-link px-3" href="#contact" data-i18n="navContact">Contacto</a></li>
+                    <li class="nav-item"><a class="nav-link px-3" href="contact.html" data-i18n="navContact">Contacto</a></li>
                 </ul>
+
                 <div class="d-flex align-items-center ms-lg-4 mt-3 mt-lg-0 gap-2">
-                    <div class="language-selector me-2"><button class="lang-btn" id="langBtn"><i class="bi bi-translate"></i><span id="currentLang">PT</span><i class="bi bi-chevron-down"></i></button>
-                        <div class="lang-dropdown" id="langDropdown"><div class="lang-option" data-lang="pt"><span class="lang-flag">🇵🇹</span> Português</div><div class="lang-option" data-lang="en"><span class="lang-flag">🇬🇧</span> English</div><div class="lang-option" data-lang="fr"><span class="lang-flag">🇫🇷</span> Français</div></div>
+                    <div class="language-selector me-2">
+                        <button class="lang-btn" id="langBtn">
+                            <i class="bi bi-translate"></i>
+                            <span id="currentLang">PT</span>
+                            <i class="bi bi-chevron-down"></i>
+                        </button>
+                        <div class="lang-dropdown" id="langDropdown">
+                            <div class="lang-option" data-lang="pt"><span class="lang-flag">🇵🇹</span> Português</div>
+                            <div class="lang-option" data-lang="en"><span class="lang-flag">🇬🇧</span> English</div>
+                            <div class="lang-option" data-lang="fr"><span class="lang-flag">🇫🇷</span> Français</div>
+                        </div>
                     </div>
-                    <div class="d-flex align-items-center me-3"><i class="bi bi-sun me-1"></i><label class="theme-toggle"><input type="checkbox" id="themeSwitch"><span class="theme-slider"></span></label><i class="bi bi-moon ms-1"></i></div>
+
+                    <div class="d-flex align-items-center me-3">
+                        <i class="bi bi-sun me-1"></i>
+                        <label class="theme-toggle">
+                            <input type="checkbox" id="themeSwitch">
+                            <span class="theme-slider"></span>
+                        </label>
+                        <i class="bi bi-moon ms-1"></i>
+                    </div>
+
                     <div class="d-flex gap-2">
-                        <a href="login.html" class="btn btn-outline-primary btn-sm" data-i18n="btnLogin">Entrar <i class="fas fa-door-open"></i></a>
-                        <a href="401.html" class="btn btn-primary btn-sm" data-i18n="btnRegister">Cadastrar</a>
+                        <a href="login.html"
+                           class="btn btn-outline-primary btn-sm" 
+                           data-i18n="btnLogin">
+                            <span data-i18n="btnLogin">Entrar</span> 
+                            <i class="fas fa-door-open"></i>
+                        </a>
+                        <a href="401.html" class="btn btn-primary btn-sm" data-i18n="btnRegister"><span data-i18n="btnRegister">Cadastrar</span></a>
                     </div>
                 </div>
             </div>
         </div>
     </nav>
     
-    <!-- Hero slides -->
+    <!-- Hero com slides -->
     <section class="hero-section">
         <div class="slideshow-container">
-            <div class="mySlides active"><div class="slide-background" style="background-image: url('images/parque-cangandala.png')"></div></div>
-            <div class="mySlides"><div class="slide-background" style="background-image: url('images/rock-1.png')"></div></div>
-            <div class="mySlides"><div class="slide-background" style="background-image: url('images/reserva-luando.png')"></div></div>
+            <div class="mySlides active"><div class="slide-background" style="background-image: url('images/rock-1.png')"></div></div>
+            <div class="mySlides"><div class="slide-background" style="background-image: url('images/rock-2.png')"></div></div>
+            <div class="mySlides"><div class="slide-background" style="background-image: url('images/rock-3.png')"></div></div>
         </div>
         <div class="container hero-content text-center">
             <h1 class="display-4 fw-bold mb-3" data-i18n="heroTitle">Plataforma que conecta viajantes às maravilhas de Malanje</h1>
@@ -933,594 +1052,853 @@
             <a href="#" class="btn btn-premium btn-lg me-3" id="btnCadastrarHotel" data-i18n="btnRegisterHotel">📢 Oferecer meu hotel</a>
             <a href="#destinos" class="btn btn-outline-light btn-lg"><span data-i18n="btnExploreHotels">Explorar Maravilhas</span> <i class="fas fa-compass"></i></a>
             <div class="text-center mt-4">
-                <button class="btn btn-saber-mais btn-outline-light" id="btnSaberMaisAmina"><i class="bi bi-robot"></i> Deseja saber mais?</button>
+                <button class="btn btn-saber-mais" id="btnSaberMaisAmina"><i class="bi bi-robot"></i>  Deseja saber mais?</button>
             </div>
         </div>
     </section>
 
-    <!-- Benefícios completos -->
-    <section class="container mb-5" id="benefits">
-        <h2 class="fw-bold text-center mb-4" data-i18n="benefitsTitle">Por que escolher o Reserve Já?</h2>
-        <div class="row g-4">
-            <div class="col-md-4"><div class="card h-100 text-center p-4"><i class="fas fa-chart-line fa-3x text-primary mb-3"></i><h5 data-i18n="benefit1Title">Aumento de Reservas</h5><p data-i18n="benefit1Desc">Hotéis parceiros tiveram até +40% de ocupação em 3 meses.</p></div></div>
-            <div class="col-md-4"><div class="card h-100 text-center p-4"><i class="fas fa-robot fa-3x text-primary mb-3"></i><h5 data-i18n="benefit2Title">IA Personalizada</h5><p data-i18n="benefit2Desc">Assistente A.M.I.N.A. recomenda seu hotel para viajantes ideais.</p></div></div>
-            <div class="col-md-4"><div class="card h-100 text-center p-4"><i class="fas fa-globe fa-3x text-primary mb-3"></i><h5 data-i18n="benefit3Title">Visibilidade Global</h5><p data-i18n="benefit3Desc">Sua vitrine digital para turistas nacionais e internacionais.</p></div></div>
+    <!-- SEÇÃO DESTINOS COM ALTERNÂNCIA GRADE/LISTA -->
+    <section class="container mb-5" id="destinos">
+        <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+            <h2 class="fw-bold" data-i18n="sectionDestinos">✨ Maravilhas da Província de Malanje ✨</h2>
+            <div class="view-toggle btn-group" role="group">
+                <button class="btn btn-outline-secondary active" id="viewGridBtn"><i class="bi bi-grid-3x3-gap-fill"></i> Grade</button>
+                <button class="btn btn-outline-secondary" id="viewListBtn"><i class="bi bi-list-ul"></i> Lista</button>
+            </div>
+        </div>
+        
+        <div id="destinosContainer" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            <!-- Os cards serão gerados via JavaScript para facilitar a alternância -->
         </div>
     </section>
     
-    <!-- Estatísticas -->
-    <section class="container mb-5"><div class="row bg-primary bg-opacity-10 rounded-4 p-4 text-center"><div class="col-md-3"><div class="stat-number">+120</div><p data-i18n="statHotels">hotéis parceiros</p></div><div class="col-md-3"><div class="stat-number">+50k</div><p data-i18n="statTourists">turistas impactados</p></div><div class="col-md-3"><div class="stat-number">98%</div><p data-i18n="statSatisfaction">satisfação</p></div><div class="col-md-3"><div class="stat-number">24/7</div><p data-i18n="statSupport">suporte ativo</p></div></div></section>
-
-    <!-- Destinos completos -->
-    <section class="container mb-5" id="destinos">
+    <!-- SEÇÃO DE VÍDEOS -->
+    <section class="container mb-5" id="videos">
         <div class="d-flex justify-content-between align-items-center flex-wrap">
-            <h2 class="fw-bold" data-i18n="sectionDestinos">✨ Maravilhas da Província de Malanje ✨</h2>
-            <a href="#" data-i18n="btnSeeAll">Ver todos →</a>
+            <h2 class="fw-bold" data-i18n="sectionVideos">🎥 Explore Malanje em Vídeo</h2>
+            <a href="video.html" data-i18n="btnMoreVideos">Mais vídeos</a>
         </div>
-        <div class="row mt-4 g-4">
-            <div class="col-md-4"><div class="card destino-card h-100">
-                <img src="images/kalandula.png" class="hotel-img" alt="Quedas Kalandula"><div class="card-body"><h5 class="card-title">Quedas de Kalandula</h5><p class="card-text">Uma das maiores quedas de água em volume de África, beleza impressionante.</p><a href="#" class="btn btn-outline-primary">Saber mais</a></div></div></div>
-            <div class="col-md-4"><div class="card destino-card h-100">
-                <img src="images/pungo-an-dongo.png" class="hotel-img" alt="Pedras Negras"><div class="card-body"><h5 class="card-title">Pedras Negras de Pungo Andongo</h5><p class="card-text">Monumentos naturais com história e paisagens únicas.</p><a href="#" class="btn btn-outline-primary">Saber mais</a></div></div></div>
-            <div class="col-md-4"><div class="card destino-card h-100">
-                <img src="images/musseje.png" class="hotel-img" alt="Cascata Musseleje"><div class="card-body"><h5 class="card-title">Cascata de Musseleje</h5><p class="card-text">Cachoeira exuberante cercada de vegetação nativa.</p><a href="#" class="btn btn-outline-primary">Saber mais</a></div></div></div>
+        <div class="row mt-4">
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="ratio ratio-16x9">
+                        <iframe src="video/quedas-rei.mp4" title="YouTube video - Quedas de Kalandula" allowfullscreen></iframe>
+                    </div>
+                    <div class="card-body">
+                        <h5 data-i18n="video1Title">Quedas de Kalandula - Império das Águas</h5>
+                        <p data-i18n="video1Desc">Veja a majestade das maiores quedas de água em volume de África, um espetáculo da natureza.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="ratio ratio-16x9">
+                        <iframe src="video/pungo-dongo.mp4" title="YouTube video - Pedras Negras de Pungo Andongo" allowfullscreen></iframe>
+                    </div>
+                    <div class="card-body">
+                        <h5 data-i18n="video2Title">Pedras Negras de Pungo Andongo - Mística e História</h5>
+                        <p data-i18n="video2Desc">Conheça as formações rochosas lendárias e a vista panorâmica sobre a savana angolana.</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
-    <!-- =========== PÁGINA DE CONTACTOS PREMIUM (com Google Maps) =========== -->
-    <section id="contact" class="container mb-5">
-        <!-- Hero contacto -->
-        <div class="contact-hero glass-card text-center text-white mb-5" style="background-blend-mode: overlay;">
-            <div class="position-relative z-2">
-                <h1 class="display-4 fw-bold mb-3" data-i18n="contactHeroTitle">Estamos prontos para ajudar você.</h1>
-                <p class="lead mb-4" data-i18n="contactHeroSub">Entre em contacto com a plataforma turística de Malanje. Fale com nossa equipa, tire dúvidas, faça parcerias ou receba suporte especializado.</p>
-                <div class="d-flex justify-content-center gap-3 flex-wrap">
-                    <a href="#" class="btn btn-premium-glow btn-lg" id="supportChatBtn"><i class="bi bi-headset"></i> <span data-i18n="contactSupportBtn"> Falar com Suporte</span></a>
-                    <a href="401.html" class="btn btn-outline-light btn-lg" id="registerHotelBtnContact"><i class="bi bi-building"></i> <span data-i18n="contactRegisterHotelBtn"> Cadastrar Meu Hotel</span></a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Cards de contacto rápido -->
-        <div class="row g-4 mb-5">
-            <div class="col-md-3"><div class="contact-icon-card text-center"><i class="bi bi-telephone-fill text-primary"></i><h5 data-i18n="contactPhoneTitle">Telefone</h5><p class="mb-1">+244 921 151 685</p><small data-i18n="contactHours">Seg-Sex, 8h - 18h</small></div></div>
-            <div class="col-md-3"><div class="contact-icon-card text-center"><i class="bi bi-envelope-fill text-danger"></i><h5 data-i18n="contactEmailTitle">E-mail</h5><p class="mb-1">suporte@reserveja.ao</p><p class="mb-0 small">comercial@reserveja.ao</p></div></div>
-            <div class="col-md-3"><div class="contact-icon-card text-center"><i class="bi bi-whatsapp text-success"></i><h5 data-i18n="contactWhatsTitle">WhatsApp</h5><button class="btn btn-sm btn-success mt-2" id="whatsappBtn" data-i18n="contactWhatsBtn">Conversar Agora</button></div></div>
-            <div class="col-md-3"><div class="contact-icon-card text-center"><i class="bi bi-geo-alt-fill text-info"></i><h5 data-i18n="contactLocationTitle">Localização</h5><p>Bairro Ritondo, Malanje, Angola</p></div></div>
-        </div>
-
-        <!-- Formulário + Mapa Google Maps -->
-        <div class="row g-5 mb-5">
+    <!-- Contacto / Mapa -->
+    <section class="container mb-5" id="contact">
+        <h2 class="fw-bold text-center mb-4" data-i18n="sectionContact">Onde Estamos & Contacto</h2>
+        <div class="row g-4">
             <div class="col-lg-6">
-                <div class="glass-card p-4 h-100">
-                    <h3 class="mb-4" data-i18n="contactFormTitlePremium"><i class="bi bi-chat-right-text-fill"></i> Envie-nos uma mensagem</h3>
-                    <form id="premiumContactForm">
-                        <div class="mb-3"><input type="text" class="form-control form-control-glass" id="premiumName" placeholder="Nome completo" data-i18n-placeholder="formName"></div>
-                        <div class="mb-3"><input type="email" class="form-control form-control-glass" id="premiumEmail" placeholder="E-mail" data-i18n-placeholder="formEmail"></div>
-                        <div class="mb-3"><input type="tel" class="form-control form-control-glass" id="premiumPhone" placeholder="Telefone"></div>
-                        <div class="mb-3"><select class="form-select form-control-glass" id="contactType"><option value="suporte" data-i18n="contactTypeSupport">Suporte</option><option value="hotel" data-i18n="contactTypeHotel">Cadastro de Hotel</option><option value="reclamacao" data-i18n="contactTypeComplaint">Reclamação</option><option value="parceria" data-i18n="contactTypePartnership">Parceria</option><option value="turismo" data-i18n="contactTypeTourism">Turismo</option></select></div>
-                        <div class="mb-3"><textarea class="form-control form-control-glass" rows="4" id="premiumMessage" placeholder="Escreva sua mensagem..." data-i18n-placeholder="formMessage"></textarea></div>
-                        <button type="submit" class="btn btn-primary w-100 btn-ripple py-2" id="sendPremiumMsg"><span data-i18n="btnSendMessage">Enviar Mensagem</span> <i class="fas fa-paper-plane"></i></button>
-                    </form>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="glass-card p-3 h-100">
-                    <h3 class="mb-3" data-i18n="interactiveMapTitle"><i class="bi bi-map"></i> Mapa Interativo - Google Maps</h3>
+                <div class="card h-100 p-3">
+                    <h4 class="mb-3"><i class="bi bi-pin-map-fill text-danger"></i> <span data-i18n="mapTitle">Nossa Localização</span></h4>
                     <div class="map-container">
-                        <iframe src="https://maps.google.com/maps?q=Bairro%20Ritondo%2C%20Malanje%2C%20Angola&t=&z=15&ie=UTF8&iwloc=&output=embed" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                        <iframe src="https://maps.google.com/maps?q=Bairro%20Ritondo%2C%20Malanje%2C%20Angola&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+                                allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                     </div>
                     <div class="mt-3">
                         <p class="mb-1"><i class="bi bi-geo-alt-fill text-primary"></i> <strong data-i18n="addressLabel">Sede principal:</strong> <span class="address-highlight">Bairro Ritondo, Malanje, Angola</span></p>
                         <p><i class="bi bi-telephone"></i> +244 921 151 685 &nbsp;|&nbsp; <i class="bi bi-envelope"></i> antoniodiogo958@gmail.com</p>
                     </div>
-                    <p class="small text-muted mt-2 text-center" data-i18n="mapLegend">📍 Marcadores: Hotéis parceiros e maravilhas de Malanje</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="card h-100 p-3">
+                    <h4 class="mb-3"><i class="bi bi-chat-dots"></i> <span data-i18n="contactFormTitle">Fale connosco</span></h4>
+                    <form id="contactForm">
+                        <div class="mb-3"><label class="form-label" data-i18n="formName">Nome completo</label><input type="text" class="form-control" id="contactName"></div>
+                        <div class="mb-3"><label class="form-label" data-i18n="formEmail">E-mail</label><input type="email" class="form-control" id="contactEmail"></div>
+                        <div class="mb-3"><label class="form-label" data-i18n="formMessage">Mensagem</label><textarea class="form-control" rows="4" id="contactMessage"></textarea></div>
+                        <button type="submit" class="btn btn-primary w-100"><span data-i18n="btnSendMessage">Enviar mensagem</span> <i class="fas fa-paper-plane"></i></button>
+                    </form>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- Redes Sociais SIMPLIFICADAS com cores e logotipos -->
-        <div class="row g-5 mb-5">
-            <div class="col-md-6">
-                <div class="glass-card p-4 text-center">
-                    <h3 data-i18n="socialTitle">Siga-nos nas redes sociais</h3>
-                    <div class="social-simple">
-                        <a href="https://wa.me/244921151685" target="_blank" class="social-btn-simple social-whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                        <a href="#" target="_blank" class="social-btn-simple social-facebook"><i class="fab fa-facebook-f"></i> Facebook</a>
-                        <a href="#" target="_blank" class="social-btn-simple social-instagram"><i class="fab fa-instagram"></i> Instagram</a>
-                        <a href="#" target="_blank" class="social-btn-simple social-tiktok"><i class="fab fa-tiktok"></i> TikTok</a>
-                        <a href="#" target="_blank" class="social-btn-simple social-telegram"><i class="fab fa-telegram"></i> Telegram</a>
+    <!-- Testemunhos -->
+    <section class="container mb-5" id="testimonials">
+        <h2 class="fw-bold" data-i18n="sectionTestimonials">Depoimentos</h2>
+        <div class="row">
+            <div class="col-md-4"><div class="card p-3"><div class="rating-stars">★★★★★</div><p data-i18n="testimonial1">"As Quedas de Kalandula são indescritíveis. Experiência incrível!"</p><h6>— Ana K.</h6></div></div>
+            <div class="col-md-4"><div class="card p-3"><div class="rating-stars">★★★★★</div><p data-i18n="testimonial2">"Amei o passeio às Pedras Negras de Pungo Andongo. Recomendo a todos."</p><h6>— João M.</h6></div></div>
+        </div>
+    </section>
+
+    <!-- NEWSLETTER -->
+    <section class="newsletter-section bg-primary text-white p-5 text-center rounded-4 container mb-5">
+        <h2 data-i18n="newsletterTitle">Receba ofertas exclusivas</h2>
+        <div class="d-flex flex-wrap justify-content-center gap-2 mt-3">
+            <input type="email" id="newsletterEmail" class="form-control w-auto" style="min-width: 250px;" placeholder="seu@email.com" data-i18n-placeholder="newsletterPlaceholder">
+            <button id="btnSubscribeNewsletter" class="btn btn-light"><span data-i18n="btnSubscribe">Assinar</span> <i class="fas fa-envelope-open-text"></i></button>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer bg-dark text-white pt-5 pb-3">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-5 mb-4">
+                    <h5>Reserve Já</h5>
+                    <p data-i18n="footerDescription">Plataforma digital de turismo de Malanje – Conectando viajantes às maravilhas da província.</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 data-i18n="footerUsefulLinks">Links úteis</h5>
+                    <ul class="list-unstyled"><li><a href="about-us.html" class="text-white-50">Sobre nós</a></li>
+                        <li><a href="term.html" class="text-white-50">Termos e Condições</a></li>
+                        <li><a href="privacy.html" class="text-white-50">Política de Privacidade</a></li></ul>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h5>Baixe o App</h5>
+                    <div class="d-flex flex-row gap-3 align-items-center">
+                        <a href="https://play.google.com/store" target="_blank" rel="noopener noreferrer"><img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play" class="store-badge" style="height: 50px;"></a>
+                        <a href="https://www.apple.com/app-store/" target="_blank" rel="noopener noreferrer"><img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="App Store" class="store-badge" style="height: 50px;"></a>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="glass-card p-4 text-center" style="background: linear-gradient(135deg, var(--primary-color), #1e2a3a); color: white;">
-                    <h3 data-i18n="partnershipTitle">Deseja tornar-se parceiro da plataforma?</h3>
-                    <p data-i18n="partnershipDesc">Mais visibilidade, mais reservas, marketing digital e IA promovendo o seu hotel.</p>
-                    <button class="btn btn-light btn-lg mt-2" id="partnershipBtn"><span data-i18n="partnershipBtnText">Tornar-se Parceiro</span> <i class="bi bi-arrow-right-circle"></i></button>
+            <hr class="bg-secondary">
+            <div class="text-center small">&copy; 2025 Reserve Já - Turismo em Malanje | Bairro Ritondo, Malanje, Angola</div>
+        </div>
+    </footer>
+
+    <!-- Floating Chat Button -->
+    <a href="#" class="fab" data-bs-toggle="modal" data-bs-target="#chatModal">
+        <img src="images/amina-chat.png" class="logo-dots"/></a>
+
+    <!-- MODAL A.M.I.N.A (CHATBOT) -->
+    <div class="modal fade" id="chatModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <img src="images/amina-chat.png" class="logo-modal"/> A.M.I.N.A 
+                        <span class="amina-brand small">(Adaptativa, Multitarefa, Inteligente, Neural, Analítica)</span></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-3">
+                    <div class="mb-2 small text-muted text-center fst-italic">“Aquela em que podemos confiar” – Contexto Africano de confiança</div>
+                    <div id="chatMessagesContainer" class="chat-messages"></div>
+                    <div id="quickReplies" class="quick-replies"></div>
+                    <a href="front-ia.html">
+           <button class="btn btn-saber-mais-modal" id="btnSaberMaisModal">   
+            <i class="bi bi-question-circle-fill"></i>
+            Saber mais sobre a plataforma
+        </button>
+        </a>
+                    <div class="chat-input-group mt-2 d-flex gap-2">
+                        <input type="text" id="chatInput" class="form-control" placeholder="Escreva sua pergunta...">
+                        <button id="sendChatBtn" class="btn btn-primary"><i class="bi bi-send"></i></button>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <!-- FAQ Moderno -->
-        <div class="glass-card p-4 mb-5">
-            <h3 class="text-center mb-4" data-i18n="faqTitle">Perguntas Frequentes</h3>
-            <div class="accordion faq-accordion" id="faqAccordion">
-                <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1"><span data-i18n="faqQ1">Como cadastrar meu hotel?</span></button></h2><div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion"><div class="accordion-body" data-i18n="faqA1">O processo é simplificado pela nossa IA. Basta clicar em "Cadastrar Meu Hotel", preencher os dados e seu negócio estará visível para milhares de turistas em menos de 10 minutos.</div></div></div>
-                <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2"><span data-i18n="faqQ2">Como receber reservas?</span></button></h2><div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body" data-i18n="faqA2">Os turistas reservam diretamente pela plataforma, e você recebe notificações em tempo real. Gerencie tudo pelo painel inteligente.</div></div></div>
-                <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3"><span data-i18n="faqQ3">Como funciona o pagamento?</span></button></h2><div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body" data-i18n="faqA3">Oferecemos múltiplos métodos de pagamento seguro, transferências e gestão financeira transparente para hoteleiros.</div></div></div>
-                <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4"><span data-i18n="faqQ4">A plataforma realmente aumenta a visibilidade?</span></button></h2><div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body" data-i18n="faqA4">Sim, mais de 120 hotéis parceiros tiveram aumento médio de 40% nas reservas nos primeiros meses, graças ao nosso marketing digital integrado.</div></div></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Depoimentos completos -->
-    <section class="container mb-5" id="testimonials">
-        <h2 class="fw-bold text-center mb-4" data-i18n="sectionTestimonials">O que dizem os viajantes</h2>
-        <div class="row g-4">
-            <div class="col-md-4"><div class="card p-4 text-center"><i class="fas fa-star text-warning mb-2"></i><p>"Experiência incrível! As quedas de Kalandula são deslumbrantes e o Reserve Já facilitou tudo."</p><h6 class="mt-2">- Ana Silva</h6></div></div>
-            <div class="col-md-4"><div class="card p-4 text-center"><i class="fas fa-star text-warning mb-2"></i><p>"Plataforma fácil de usar, suporte rápido. Recomendo para quem quer conhecer Malanje."</p><h6 class="mt-2">- João Mendes</h6></div></div>
-            <div class="col-md-4"><div class="card p-4 text-center"><i class="fas fa-star text-warning mb-2"></i><p>"A A.M.I.N.A. me ajudou a escolher o melhor hotel. Voltarei com certeza!"</p><h6 class="mt-2">- Lurdes Costa</h6></div></div>
-        </div>
-    </section>
-    
-    <!-- Newsletter e Footer -->
-    <section class="newsletter-section bg-primary text-white p-5 text-center rounded-4 container mb-5"><h2 data-i18n="newsletterTitle">Receba ofertas exclusivas</h2><div class="d-flex flex-wrap justify-content-center gap-2 mt-3"><input type="email" id="newsletterEmail" class="form-control w-auto" style="min-width: 250px;" placeholder="seu@email.com" data-i18n-placeholder="newsletterPlaceholder"><button id="btnSubscribeNewsletter" class="btn btn-light"><span data-i18n="btnSubscribe">Assinar</span> <i class="fas fa-envelope-open-text"></i></button></div></section>
-    <footer class="footer bg-dark text-white pt-5 pb-3"><div class="container"><div class="row"><div class="col-md-5 mb-4"><h5>Reserve Já</h5><p data-i18n="footerDescription">Plataforma digital de turismo de Malanje – Conectando viajantes às maravilhas da província.</p></div><div class="col-md-4 mb-4"><h5 data-i18n="footerUsefulLinks">Links úteis</h5><ul class="list-unstyled"><li><a href="about-us.html" class="text-white-50">Sobre nós</a></li><li><a href="term.html" class="text-white-50">Termos e Condições</a></li><li><a href="privacy.html" class="text-white-50">Política de Privacidade</a></li></ul></div><div class="col-md-3 mb-4"><h5>Baixe o App</h5><div class="d-flex flex-row gap-3 align-items-center"><a href="https://play.google.com/store" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play" class="store-badge" style="height: 50px;"></a><a href="https://www.apple.com/app-store/" target="_blank"><img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="App Store" style="height: 50px;"></a></div></div></div><hr class="bg-secondary"><div class="text-center small">&copy; 2025 Reserve Já - Turismo em Malanje | Bairro Ritondo, Malanje, Angola</div></div></footer>
-
-    <!-- CONTAINER UNIFICADO PARA ÍCONES FLUTUANTES (CORREÇÃO DE SOBREPOSIÇÃO) -->
-    <div class="floating-buttons-container">
-        <!-- Ícone do Quiz/Plataforma -->
-        <div class="floating-biorisk" id="floatingBioRiskBtn" aria-label="Abrir Reserve Já" title="Reserve Já - Hotéis e Turismo em Malanje">
-            <i class="fas fa-hotel"></i>
-        </div>
-        
-        <!-- Ícone do Chatbot A.M.I.N.A. -->
-        <a href="#" class="fab-chat" data-bs-toggle="modal" data-bs-target="#chatModal">
-            <img src="images/amina-chat.png" class="logo-dots" onerror="this.src='https://via.placeholder.com/60?text=IA'" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;"/>
-        </a>
     </div>
 
-    <!-- Modal Chatbot A.M.I.N.A -->
-    <div class="modal fade" id="chatModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content"><div class="modal-header bg-primary text-white">
-        <h5 class="modal-title">
-            <img src="images/amina-chat.png" class="logo-modal" onerror="this.src='https://via.placeholder.com/30?text=IA'"/> A.M.I.N.A 
-            <span class="amina-brand small">(Adaptativa, Multitarefa, Inteligente, Neural, Analítica)</span>
-        </h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body p-3"><div id="chatMessagesContainer" class="chat-messages"></div><div id="quickReplies" class="quick-replies"></div>
-       
-        <a href="front-ia.html">
-            <button class="btn btn-saber-mais-modal btn-sm btn-outline-primary mb-2" id="btnSaberMaisModal">
-                <i class="bi bi-question-circle-fill"></i> Deseja saber mais?
-            </button>
-        </a>
-        
-        <div class="chat-input-group mt-2 d-flex gap-2">
-            <input type="text" id="chatInput" class="form-control" placeholder="Escreva sua pergunta..."><button id="sendChatBtn" class="btn btn-primary"><i class="bi bi-send"></i></button></div></div></div></div></div>
+    <!-- Modal para detalhes das atrações com carrossel de imagens -->
+    <div class="modal fade" id="destinoDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="destinoModalTitle">Detalhes</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="modalDestinoBody"></div>
+            </div>
+        </div>
+    </div>
 
-    <!-- MODAL PRINCIPAL – VANTAGENS (original) -->
-    <div id="modalBioRisk" class="modal-overlay">
+    <!-- Modal para visualizar imagem completa (zoom) -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content bg-transparent border-0">
+                <div class="modal-body p-0 text-center">
+                    <img id="fullscreenImage" src="" alt="Imagem ampliada" class="img-fluid rounded" style="max-height: 90vh; width: auto; margin: 0 auto;">
+                </div>
+                <div class="modal-footer border-0 justify-content-center">
+                    <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modais Login -->
+    <div class="modal fade" id="loginModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header">
+        <h5 class="modal-title">Login</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form><input type="email" class="form-control mb-2" placeholder="Email"><input type="password" class="form-control mb-2" placeholder="Senha"><button class="btn btn-primary w-100">Entrar</button></form></div></div></div></div>
+
+    
+    <!-- HTML ADD -->
+    <!-- MODAL QUIZ - MALANJE (COM SCROLLBAR CORRIGIDO) -->
+    <div id="quizMalanjeModal" class="modal-overlay">
         <div class="modal-card">
             <div class="modal-flex">
                 <div class="modal-imagem">
                     <div class="img-wrapper">
-                        <img class="img-biorisk" src="images/fraude-html.png" alt="Reserve Já - Hotéis e Turismo em Malanje, Angola" onerror="this.src='https://placehold.co/700x480/1b5e4a/f5e5b0?text=🏨+Reserve+Já:+Hotéis+e+Turismo+em+Malanje&font=roboto'">
+                        <img class="img-malanje" 
+                             src="images/quiz-modal.jpg"
+                             alt="Malanje - Província de Angola"
+                             onerror="this.src='https://placehold.co/700x480/8b5a2b/f5e5b0?text=🇦🇴+Malanje:+Terra+das+Quedas+e+Cultura&font=roboto'">
                         <div class="overlay-social"></div>
                     </div>
                 </div>
                 <div class="modal-conteudo">
-                    <div class="btn-fechar" id="fecharModalBioRisk">
+                    <div class="btn-fechar" id="fecharModalQuiz">
                         <i class="fas fa-times"></i>
                     </div>
-                    <div class="titulo-software">
-                        <i class="fas fa-hotel"></i> Reserve Já – Visibilidade para Hotéis<br>
-                        <span style="font-size: 0.9rem; color: #e4a022;">Promovendo o turismo e a hotelaria na província de Malanje, Angola</span>
+                    
+                    <div class="titulo-quiz">
+                        <i class="fas fa-brain"></i> Quiz · Venha descobrir Malanje - Angola<br>
+                        <span style="font-size: 0.8rem; color: #b87c2e;">Teste seus conhecimentos e divirta-se!</span>
                     </div>
-                    <p class="descricao-principal">
-                        Conectamos viajantes, agências e hóspedes aos melhores hotéis, pousadas e experiências de Malanje. Valorizamos a cultura, a natureza e a hospitalidade local com ferramentas digitais e redes sociais.
+                    
+                    <p class="descricao-quiz">
+                        Responda as perguntas abaixo e mostre o quanto você conhece sobre a deslumbrante província de Malanje. São 4 desafios rápidos!
                     </p>
-                    <ul class="lista-vantagens-biorisk">
-                        <li><i class="fab fa-whatsapp"></i> <strong>Divulgação por WhatsApp</strong> – compartilhe ofertas, disponibilidade e diferenciais dos hotéis diretamente com viajantes e agências.</li>
-                        <li><i class="fab fa-instagram"></i> <strong>Conteúdo nos stories</strong> – mostre quartos, café da manhã, paisagens e pontos turísticos próximos para engajar novos hóspedes.</li>
-                        <li><i class="fab fa-facebook"></i> <strong>Comunidade de hotelaria e turismo</strong> – troca de experiências entre gestores de hotéis, guias e viajantes que amam Malanje.</li>
-                        <li><i class="fas fa-chart-simple"></i> <strong>Dashboard de desempenho</strong> – visualize a eficácia das campanhas, origem dos hóspedes e sazonalidade para planejar melhorias.</li>
-                        <li><i class="fas fa-hand-holding-heart"></i> <strong>Apoio à gestão hoteleira</strong> – dicas de boas práticas, captação de reservas e fidelização de clientes.</li>
-                    </ul>
-                    <div class="nota-importante">
-                        <i class="fas fa-exclamation-triangle"></i> <strong>Direitos e responsabilidades:</strong> O Reserve Já actua como plataforma de divulgação e conexão. <u>Não realiza vendas directas</u> e <u>não substitui os canais oficiais de reserva</u> dos hotéis. Nosso compromisso é com a transparência, a promoção ética do turismo local e o respeito às leis angolanas.
+                    
+                    <div class="quiz-container" id="quizArea">
+                        <!-- as perguntas serão inseridas via js -->
                     </div>
-                    <a href="contract.html">
-                        <button class="btn-acao">
-                            <i class="fab fa-whatsapp"></i> Quero Saber Mais Sobre a Plataforma
-                        </button>
-                    </a>
-                    <div class="texto-info">
-                        <i class="fas fa-clock"></i> Cadastro rápido · Primeiros 3 meses com recursos especiais
+                    
+                    <div class="pontuacao-area" id="pontuacaoArea">
+                        <span><i class="fas fa-star-of-life"></i> Pontuação:</span>
+                        <span id="contadorPontos">0</span>
+                    </div>
+                    
+                    <div class="texto-info" id="certificadoMsg" style="display: none;">
+                        <i class="fas fa-award"></i> Parabéns! Você concluiu o quiz. Copie e compartilhe: "Eu conheço Malanje - Angola! 🌍"
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- NOVO MODAL: ACORDO + DIREITOS + NEWSLETTER (inscrição por email) -->
-    <div id="modalAcordo" class="modal-acordo-overlay">
-        <div class="modal-acordo-card">
-            <div class="modal-acordo-header">
-                <i class="fas fa-handshake"></i>
-                <h3>Termo de Consentimento e Direitos</h3>
-            </div>
-            <div class="modal-acordo-body">
-                <div class="direitos-lista">
-                    <p><i class="fas fa-shield-alt"></i> Seus direitos como usuário:</p>
-                    <ul>
-                        <li><i class="fas fa-check-circle"></i> Acesso transparente às informações da plataforma Reserve Já.</li>
-                        <li><i class="fas fa-check-circle"></i> Proteção de dados pessoais conforme a legislação angolana.</li>
-                        <li><i class="fas fa-check-circle"></i> Liberdade de cancelar notificações ou solicitar remoção de dados a qualquer momento.</li>
-                        <li><i class="fas fa-check-circle"></i> A plataforma não partilha seu email com terceiros sem autorização explícita.</li>
-                        <li><i class="fas fa-check-circle"></i> Conteúdo é meramente informativo; reservas são feitas diretamente com hotéis.</li>
-                    </ul>
-                </div>
-                
-                <div class="newsletter-area">
-                    <label><i class="fas fa-envelope"></i> Receba novidades e ofertas por e-mail:</label>
-                    <div class="input-email-group">
-                        <input type="email" id="emailNotificacao" placeholder="seuemail@exemplo.com" autocomplete="email">
-                        <button id="btnInscreverEmail" class="btn-inscrever"><i class="fas fa-bell"></i> Inscrever</button>
-                    </div>
-                    <div id="msgSucessoEmail" class="msg-sucesso">
-                        <i class="fas fa-check-circle"></i> Obrigado! Você receberá notificações sobre hotéis e turismo em Malanje.
-                    </div>
-                    <div class="small-note">
-                        <i class="fas fa-lock"></i> Seu email será usado apenas para enviar conteúdos e novidades do Reserve Já. Você pode cancelar a qualquer momento.
-                    </div>
-                </div>
-                
-                <button id="btnAceitarAcordo" class="btn-aceitar"><i class="fas fa-check"></i> Li e concordo com os termos</button>
-                <button id="btnFecharAcordo" class="btn-fechar-acordo"><i class="fas fa-times-circle"></i> Fechar</button>
-            </div>
-        </div>
+    <!-- Ícone flutuante para abrir o quiz -->
+    <div class="floating-quiz" id="floatingQuizBtn" aria-label="Abrir Quiz Malanje" title="Quiz: Venha descobrir Malanje!">
+        <i class="fas fa-question-circle"></i>
     </div>
     
+    
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Google Maps API - substitua SUA_CHAVE_API_GOOGLE_MAPS pela sua chave válida -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=SUA_CHAVE_API_GOOGLE_MAPS&callback=initGoogleMap&libraries=places" async defer></script>
-    
     <script>
-        // ---------- TRADUÇÕES ----------
+        // ===================== FUNÇÃO DE TOAST =====================
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast-custom ${type}`;
+            const icon = type === 'success' ? '✅' : '❌';
+            toast.innerHTML = `<span style="font-size: 1.3rem;">${icon}</span><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // ===================== DADOS VERDADEIROS DAS ATRAÇÕES (COM IMAGENS REAIS) =====================
+        const destinosData = {
+            1: { 
+                nome: "Quedas de Kalandula", 
+                descricao: "As Quedas de Kalandula estão localizadas no município de Kalandula, Província de Malanje. São um dos maiores tesouros naturais de Angola, no rio Lucala, com mais de 100 metros de altura e 400 metros de largura. Um espetáculo impressionante de força e beleza. Melhor época para visitar: estação seca (Maio a Agosto).",
+                imagens: [
+                    "images/Kalandula.png",
+                    "images/Kalandula.png",
+                    "images/Kalandula.png"
+                ],
+                local: "Município de Kalandula, Malanje"
+            },
+            2: { 
+                nome: "Pedras Negras de Pungo Andongo", 
+                descricao: "As Pedras Negras de Pungo Andongo ficam no município de Cacuso, a poucos quilómetros da vila de Pungo Andongo. São formações rochosas de origem vulcânica que se erguem na savana, com grande significado histórico e cultural, pegadas lendárias e vista deslumbrante do rio Luando. Perfeito para caminhadas e fotografia.",
+                imagens: [
+                    "images/pungo-an-dongo.png",
+                    "images/pungo-an-dongo.png",
+                    "images/pungo-an-dongo.png"
+                ],
+                local: "Município de Cacuso (Pungo Andongo), Malanje"
+            },
+            3: { 
+                nome: "Cascata de Musseleje", 
+                descricao: "A Cascata de Musseleje, localizada no município de Cacuso, é um paraíso escondido com águas cristalinas caindo entre rochas e vegetação densa. Local ideal para relaxar, fazer piquenique e se conectar com a natureza.",
+                imagens: [
+                    "images/musseje.png",
+                    "images/musseje.png",
+                    "images/musseje.png"
+                ],
+                local: "Município de Cacuso, Malanje"
+            },
+            4: { 
+                nome: "Parque Nacional da Cangandala", 
+                descricao: "O Parque Nacional da Cangandala é a mais pequena área de conservação de Angola, mas de enorme importância: abriga a Palanca Negra Gigante (Hippotragus niger variani), espécie endémica e símbolo nacional. Criado em 1970, oferece paisagens de miombo, savana e a oportunidade única de observar a palanca em seu habitat natural. Ideal para ecoturismo e safaris fotográficos.",
+                imagens: [
+                    "images/parque-cangandala.png",
+                    "images/parque-cangandala.png",
+                    "images/parque-cangandala.png"
+                ],
+                local: "Município de Cangandala, Malanje"
+            },
+            5: { 
+                nome: "Sé Catedral de Malanje", 
+                descricao: "A Sé Catedral de Nossa Senhora da Assunção é a principal igreja católica da cidade de Malanje. Construída em estilo neogótico, foi inaugurada em 1954. O seu interior acolhe vitrais impressionantes e uma atmosfera de paz. É um marco histórico e arquitetónico da cidade, representando a fé e a cultura local.",
+                imagens: [
+                    "images/se-catedral.png",
+                    "images/se-catedral.png",
+                    "images/se-catedral.png"
+                ],
+                local: "Centro da Cidade, Malanje"
+            }
+        };
+
+        // Construir os cards dinamicamente (para facilitar a alternância grade/lista)
+        const destinosContainer = document.getElementById('destinosContainer');
+        let currentView = 'grid'; // 'grid' ou 'list'
+
+        function renderDestinos(view) {
+            const container = destinosContainer;
+            container.innerHTML = '';
+            container.className = view === 'grid' ? 'row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4' : 'row g-4 destinos-lista';
+            
+            for (const [id, data] of Object.entries(destinosData)) {
+                const col = document.createElement('div');
+                col.className = 'col';
+                
+                const card = document.createElement('div');
+                card.className = 'card h-100';
+                
+                const imgWrapper = document.createElement('div');
+                imgWrapper.className = 'card-img-wrapper';
+                const img = document.createElement('img');
+                img.src = data.imagens[0];
+                img.alt = data.nome;
+                img.className = 'hotel-img';
+                img.loading = 'lazy';
+                const zoomIcon = document.createElement('div');
+                zoomIcon.className = 'img-zoom-icon';
+                zoomIcon.setAttribute('data-img-src', data.imagens[0]);
+                zoomIcon.setAttribute('data-img-alt', data.nome);
+                zoomIcon.innerHTML = '<i class="bi bi-zoom-in"></i>';
+                imgWrapper.appendChild(img);
+                imgWrapper.appendChild(zoomIcon);
+                
+                const cardBody = document.createElement('div');
+                cardBody.className = 'card-body';
+                const title = document.createElement('h5');
+                title.innerText = data.nome;
+                const location = document.createElement('p');
+                location.className = 'text-muted';
+                location.innerHTML = `<i class="bi bi-geo-alt"></i> ${data.local}`;
+                const desc = document.createElement('p');
+                desc.innerText = data.descricao.substring(0, 120) + (data.descricao.length > 120 ? '…' : '');
+                const badgeDiv = document.createElement('div');
+                badgeDiv.className = 'd-flex justify-content-between align-items-center';
+                const badge = document.createElement('span');
+                badge.className = 'badge bg-primary';
+                badge.innerHTML = `<i class="bi bi-stars"></i> ${data.natureza || 'Natureza'}`;
+                const detailBtn = document.createElement('button');
+                detailBtn.className = 'btn btn-outline-primary btn-sm';
+                detailBtn.setAttribute('data-i18n', 'btnViewDetails');
+                detailBtn.innerText = 'Saiba mais';
+                detailBtn.addEventListener('click', () => showDestinoDetail(id));
+                badgeDiv.appendChild(badge);
+                badgeDiv.appendChild(detailBtn);
+                cardBody.appendChild(title);
+                cardBody.appendChild(location);
+                cardBody.appendChild(desc);
+                cardBody.appendChild(badgeDiv);
+                
+                card.appendChild(imgWrapper);
+                card.appendChild(cardBody);
+                col.appendChild(card);
+                container.appendChild(col);
+                
+                // Evento zoom
+                zoomIcon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    document.getElementById('fullscreenImage').src = zoomIcon.getAttribute('data-img-src');
+                    new bootstrap.Modal(document.getElementById('imageModal')).show();
+                });
+            }
+        }
+        
+        function showDestinoDetail(id) {
+            const data = destinosData[id];
+            if (!data) return;
+            // Monta carrossel com as imagens do destino
+            let carouselHtml = '';
+            if (data.imagens && data.imagens.length) {
+                carouselHtml = `<div id="carouselDestino" class="carousel slide mb-3" data-bs-ride="carousel">
+                    <div class="carousel-inner">`;
+                data.imagens.forEach((imgUrl, idx) => {
+                    carouselHtml += `<div class="carousel-item ${idx === 0 ? 'active' : ''}">
+                        <img src="${imgUrl}" class="d-block w-100 rounded" style="max-height: 400px; object-fit: cover;" alt="${data.nome}">
+                    </div>`;
+                });
+                carouselHtml += `</div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselDestino" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Anterior</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselDestino" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Próximo</span>
+                    </button>
+                </div>`;
+            }
+            const html = `${carouselHtml}<h4>${data.nome}</h4><p>${data.descricao}</p><small class="text-muted"><i class="bi bi-geo-alt"></i> ${data.local}</small>`;
+            document.getElementById('modalDestinoBody').innerHTML = html;
+            new bootstrap.Modal(document.getElementById('destinoDetailModal')).show();
+        }
+        
+        // Alternância entre grade e lista
+        document.getElementById('viewGridBtn').addEventListener('click', () => {
+            currentView = 'grid';
+            renderDestinos('grid');
+            document.getElementById('viewGridBtn').classList.add('active');
+            document.getElementById('viewListBtn').classList.remove('active');
+        });
+        document.getElementById('viewListBtn').addEventListener('click', () => {
+            currentView = 'list';
+            renderDestinos('list');
+            document.getElementById('viewListBtn').classList.add('active');
+            document.getElementById('viewGridBtn').classList.remove('active');
+        });
+        
+        // Inicializar destinos em grade
+        renderDestinos('grid');
+        
+        // ===================== TRADUÇÕES COMPLETAS (com chaves adicionais) =====================
         const translations = {
-            pt: { 
-                navBenefits: "Para Hotéis", 
-                navDestinos: "Maravilhas",
-                navOffers: "Ofertas",
-                navTestimonials: "Avaliações", 
-                navContact: "Contacto",
+            pt: {
                 heroTitle: "Plataforma que conecta viajantes às maravilhas de Malanje",
                 heroSubtitle: "Descubra as Quedas de Kalandula, as Pedras Negras de Pungo Andongo, a Cascata de Musseleje e muito mais. Reserve experiências autênticas.",
                 btnRegisterHotel: "📢 Oferecer meu hotel",
                 btnExploreHotels: "Explorar Maravilhas",
                 benefitsTitle: "Por que escolher o Reserve Já?",
-                benefit1Title: "Aumento de Reservas", 
-                benefit1Desc: "Hotéis parceiros tiveram até +40% de ocupação em 3 meses.",
-                benefit2Title: "IA Personalizada", 
-                benefit2Desc: "Assistente A.M.I.N.A. recomenda seu hotel para viajantes ideais.", 
-                benefit3Title: "Visibilidade Global", 
-                benefit3Desc: "Sua vitrine digital para turistas nacionais e internacionais.",
+                benefit1Title: "Maior Visibilidade",
+                benefit1Text: "Divulgue seu hotel para turistas do mundo inteiro.",
+                benefit2Title: "Mais Reservas",
+                benefit2Text: "Receba pedidos de forma automática e segura.",
+                benefit3Title: "Marketing Digital", 
+                benefit3Text: "Promova seu negócio nas redes sociais.",
+                benefit4Title: "IA Inteligente", 
+                benefit4Text: "Recomendação personalizada para cada viajante.",
                 statHotels: "hotéis parceiros", 
-                statTourists: "turistas impactados",
-                statSatisfaction: "satisfação", 
-                statSupport: "suporte ativo",
-                sectionDestinos: "✨ Maravilhas da Província de Malanje ✨", 
-                btnSeeAll: "Ver todos →",
-                contactHeroTitle: "Estamos prontos para ajudar você.", 
-                contactHeroSub: "Entre em contacto com a plataforma turística de Malanje. Fale com nossa equipa, tire dúvidas, faça parcerias ou receba suporte especializado.",
-                contactSupportBtn: " Falar com Suporte",
-                contactRegisterHotelBtn: " Cadastrar Meu Hotel",
-                contactPhoneTitle: "Telefone",
-                contactEmailTitle: "E-mail", 
-                contactWhatsTitle: "WhatsApp",
-                contactWhatsBtn: "Conversar Agora",
-                contactLocationTitle: "Localização",
-                contactHours: "Seg-Sex, 8h - 18h",
-                contactFormTitlePremium: "Envie-nos uma mensagem",
-                interactiveMapTitle: "Mapa Interativo - Google Maps",
-                socialTitle: "Siga-nos nas redes sociais", 
-                partnershipTitle: "Deseja tornar-se parceiro da plataforma?",
-                partnershipDesc: "Mais visibilidade, mais reservas, marketing digital e IA promovendo o seu hotel.",
-                partnershipBtnText: "Tornar-se Parceiro",
-                faqTitle: "Perguntas Frequentes", 
-                faqQ1: "Como cadastrar meu hotel?", 
-                faqA1: "O processo é simplificado pela nossa IA. Basta clicar em 'Cadastrar Meu Hotel', preencher os dados e seu negócio estará visível para milhares de turistas em menos de 10 minutos.", 
-                faqQ2: "Como receber reservas?", 
-                faqA2: "Os turistas reservam diretamente pela plataforma, e você recebe notificações em tempo real. Gerencie tudo pelo painel inteligente.", 
-                faqQ3: "Como funciona o pagamento?", 
-                faqA3: "Oferecemos múltiplos métodos de pagamento seguro, transferências e gestão financeira transparente para hoteleiros.", 
-                faqQ4: "A plataforma realmente aumenta a visibilidade?", 
-                faqA4: "Sim, mais de 120 hotéis parceiros tiveram aumento médio de 40% nas reservas nos primeiros meses.",
-                contactTypeSupport: "Suporte", 
-                contactTypeHotel: "Cadastro de Hotel",
-                contactTypeComplaint: "Reclamação", 
-                contactTypePartnership: "Parceria", 
-                contactTypeTourism: "Turismo",
-                mapLegend: "📍 Marcadores: Hotéis parceiros e maravilhas de Malanje",
-                sectionTestimonials: "O que dizem os viajantes",
-                newsletterTitle: "Receba ofertas exclusivas", 
-                btnSubscribe: "Assinar", 
-                footerDescription: "Plataforma digital de turismo de Malanje – Conectando viajantes às maravilhas da província.", 
-                footerUsefulLinks: "Links úteis",
+                statTourists: "turistas impactados", 
+                statSatisfaction: "satisfação",
+                sectionDestinos: "✨ Maravilhas da Província de Malanje ✨",
+                btnViewDetails: "Saiba mais",
+                navDestinos: "Maravilhas", 
+                navBenefits: "Para Hotéis",
+                navHotels: "Hotéis", 
+                navOffers: "Ofertas",
+                navTestimonials: "Avaliações", 
+                navContact: "Contacto",
                 btnLogin: "Entrar", 
-                btnRegister: "Cadastrar", 
-                btnSendMessage: "Enviar Mensagem", 
+                btnRegister: "Cadastrar",
+                sectionContact: "Onde Estamos & Contacto", 
+                mapTitle: "Nossa Localização", 
+                addressLabel: "Sede principal:", 
+                contactFormTitle: "Fale connosco",
                 formName: "Nome completo", 
-                formEmail: "E-mail", 
-                formMessage: "Escreva sua mensagem..."
+                formEmail: "E-mail",
+                formMessage: "Mensagem",
+                btnSendMessage: "Enviar mensagem",
+                newsletterTitle: "Receba ofertas exclusivas",
+                newsletterPlaceholder: "seu@email.com",
+                btnSubscribe: "Assinar",
+                footerDescription: "Plataforma digital de turismo de Malanje – Conectando viajantes às maravilhas da província.",
+                footerUsefulLinks: "Links úteis",
+                testimonial1: "As Quedas de Kalandula são indescritíveis. Experiência incrível!",
+                testimonial2: "Amei o passeio às Pedras Negras de Pungo Andongo. Recomendo a todos.",
+                sectionVideos: "🎥 Explore Malanje em Vídeo",
+                btnMoreVideos: "Mais vídeos",
+                video1Title: "Quedas de Kalandula - Império das Águas",
+                video1Desc: "Veja a majestade das maiores quedas de água em volume de África, um espetáculo da natureza.",
+                video2Title: "Pedras Negras de Pungo Andongo - Mística e História",
+                video2Desc: "Conheça as formações rochosas lendárias e a vista panorâmica sobre a savana angolana."
             },
             en: {
-                navBenefits: "For Hotels",
-                navDestinos: "Wonders",
-                navOffers: "Offers", 
-                navTestimonials: "Testimonials", 
-                navContact: "Contact",
-                heroTitle: "Platform connecting travelers to the wonders of Malanje",
-                heroSubtitle: "Discover Kalandula Falls, Pungo Andongo Black Stones, Musseleje Cascade and more. Book authentic experiences.",
-                btnRegisterHotel: "📢 Offer my hotel", 
-                btnExploreHotels: "Explore Wonders",
-                benefitsTitle: "Why choose Reserve Já?",
-                benefit1Title: "Booking Increase", 
-                benefit1Desc: "Partner hotels saw up to +40% occupancy in 3 months.",
-                benefit2Title: "Personalized AI",
-                benefit2Desc: "A.M.I.N.A. assistant recommends your hotel to ideal travelers.",
-                benefit3Title: "Global Visibility", 
-                benefit3Desc: "Your digital showcase for national and international tourists.",
-                statHotels: "partner hotels", 
-                statTourists: "impacted tourists", 
-                statSatisfaction: "satisfaction", 
-                statSupport: "active support",
-                sectionDestinos: "✨ Wonders of Malanje Province ✨", 
-                btnSeeAll: "See all →",
-                contactHeroTitle: "We are ready to help you.",
-                contactHeroSub: "Get in touch with Malanje's tourism platform. Talk to our team, ask questions, partner up or get expert support.", 
-                contactSupportBtn: " Talk to Support", 
-                contactRegisterHotelBtn: " Register My Hotel",
-                contactPhoneTitle: "Phone", 
-                contactEmailTitle: "Email",
-                contactWhatsTitle: "WhatsApp", 
-                contactWhatsBtn: "Chat Now", 
-                contactLocationTitle: "Location", 
-                contactHours: "Mon-Fri, 8am - 6pm",
-                contactFormTitlePremium: "Send us a message", 
-                interactiveMapTitle: "Interactive Map - Google Maps",
-                socialTitle: "Follow us on social media",
-                partnershipTitle: "Want to become a partner?", 
-                partnershipDesc: "More visibility, more bookings, digital marketing and AI promoting your hotel.", 
-                partnershipBtnText: "Become a Partner",
-                faqTitle: "Frequently Asked Questions",
-                faqQ1: "How to register my hotel?", 
-                faqA1: "Our AI simplifies the process. Click 'Register My Hotel', fill in the data, and your business will be visible to thousands of tourists in less than 10 minutes.", 
-                faqQ2: "How to receive bookings?", 
-                faqA2: "Tourists book directly on the platform, you receive real-time notifications. Manage everything via smart dashboard.", 
-                faqQ3: "How does payment work?", 
-                faqA3: "We offer multiple secure payment methods, transfers and transparent financial management for hoteliers.",
-                faqQ4: "Does the platform really increase visibility?", 
-                faqA4: "Yes, over 120 partner hotels saw an average 40% increase in bookings in the first months.",
-                contactTypeSupport: "Support", 
-                contactTypeHotel: "Hotel Registration", 
-                contactTypeComplaint: "Complaint", 
-                contactTypePartnership: "Partnership", 
-                contactTypeTourism: "Tourism", 
-                mapLegend: "📍 Markers: Partner hotels and Malanje wonders",
-                sectionTestimonials: "What travelers say",
-                newsletterTitle: "Receive exclusive offers",
-                btnSubscribe: "Subscribe", 
-                footerDescription: "Digital tourism platform for Malanje – Connecting travelers to the province's wonders.", 
+                heroTitle: "The platform connecting travelers to the wonders of Malanje",
+                heroSubtitle: "Discover Kalandula Falls, Pungo Andongo Black Rocks, Musseleje Waterfall and more. Book authentic experiences.",
+                btnRegisterHotel: "📢 List my hotel", btnExploreHotels: "Explore Wonders",
+                benefitsTitle: "Why choose Reserve Já?", benefit1Title: "Greater Visibility", benefit1Text: "Showcase your hotel to tourists worldwide.",
+                benefit2Title: "More Bookings", benefit2Text: "Receive reservation requests automatically.",
+                benefit3Title: "Digital Marketing", benefit3Text: "Promote your business on social media.",
+                benefit4Title: "Smart AI", benefit4Text: "Personalized recommendations for each traveler.",
+                statHotels: "partner hotels", statTourists: "tourists reached", statSatisfaction: "satisfaction",
+                sectionDestinos: "✨ Wonders of Malanje Province ✨",
+                btnViewDetails: "Learn more",
+                navDestinos: "Wonders", navBenefits: "For Hotels", navHotels: "Hotels", navOffers: "Offers", navTestimonials: "Reviews", navContact: "Contact",
+                btnLogin: "Login", btnRegister: "Sign up",
+                sectionContact: "Location & Contact", mapTitle: "Our Location", addressLabel: "Head office:", contactFormTitle: "Contact us",
+                formName: "Full name", formEmail: "Email", formMessage: "Message", btnSendMessage: "Send message",
+                newsletterTitle: "Get exclusive offers", newsletterPlaceholder: "your@email.com", btnSubscribe: "Subscribe",
+                footerDescription: "Digital tourism platform from Malanje – Connecting travelers to the province's wonders.",
                 footerUsefulLinks: "Useful links",
-                btnLogin: "Login", 
-                btnRegister: "Sign up",
-                btnSendMessage: "Send Message", 
-                formName: "Full name", 
-                formEmail: "E-mail", 
-                formMessage: "Write your message..."
+                testimonial1: "Kalandula Falls are breathtaking. Amazing experience!", testimonial2: "Loved the trip to Pungo Andongo Black Rocks. Highly recommend.",
+                sectionVideos: "🎥 Explore Malanje in Video",
+                btnMoreVideos: "More videos",
+                video1Title: "Kalandula Falls - Empire of Waters",
+                video1Desc: "Witness the majesty of Africa's largest waterfall by volume, a natural spectacle.",
+                video2Title: "Pungo Andongo Black Rocks - Mystique and History",
+                video2Desc: "Discover the legendary rock formations and panoramic views over the Angolan savanna."
             },
             fr: {
-                navBenefits: "Pour Hôtels", 
-                navDestinos: "Merveilles", 
-                navOffers: "Offres", 
-                navTestimonials: "Avis", 
-                navContact: "Contact",
-                heroTitle: "Plateforme connectant les voyageurs aux merveilles de Malanje", 
-                heroSubtitle: "Découvrez les chutes de Kalandula, les pierres noires de Pungo Andongo, la cascade de Musseleje et plus. Réservez des expériences authentiques.",
-                btnRegisterHotel: "📢 Proposer mon hôtel", 
-                btnExploreHotels: "Explorer les merveilles",
-                benefitsTitle: "Pourquoi choisir Reserve Já?",
-                benefit1Title: "Augmentation des réservations",
-                benefit1Desc: "Les hôtels partenaires ont vu jusqu'à +40% d'occupation en 3 mois.", 
-                benefit2Title: "IA personnalisée",
-                benefit2Desc: "L'assistant A.M.I.N.A. recommande votre hôtel aux voyageurs idéaux.",
-                benefit3Title: "Visibilité mondiale",
-                benefit3Desc: "Votre vitrine numérique pour les touristes nationaux et internationaux.",
-                statHotels: "hôtels partenaires", 
-                statTourists: "touristes impactés", 
-                statSatisfaction: "satisfaction", 
-                statSupport: "support actif",
-                sectionDestinos: "✨ Merveilles de la province de Malanje ✨", btnSeeAll: "Voir tout →",
-                contactHeroTitle: "Nous sommes prêts à vous aider.", 
-                contactHeroSub: "Contactez la plateforme touristique de Malanje. Parlez à notre équipe, posez des questions, créez des partenariats ou obtenez un support expert.", 
-                contactSupportBtn: " Parler au Support", 
-                contactRegisterHotelBtn: "Inscrire Mon Hôtel",
-                contactPhoneTitle: "Téléphone", 
-                contactEmailTitle: "E-mail", 
-                contactWhatsTitle: "WhatsApp", 
-                contactWhatsBtn: "Discuter maintenant", 
-                contactLocationTitle: "Emplacement", 
-                contactHours: "Lun-Ven, 8h-18h",
-                contactFormTitlePremium: "Envoyez-nous un message", 
-                interactiveMapTitle: "Carte interactive - Google Maps", 
-                socialTitle: "Suivez-nous", 
-                partnershipTitle: "Devenir partenaire ?", 
-                partnershipDesc: "Plus de visibilité, plus de réservations, marketing digital et IA promouvant votre hôtel.",
-                partnershipBtnText: "Devenir Partenaire",
-                faqTitle: "FAQ", 
-                faqQ1: "Comment inscrire mon hôtel ?", 
-                faqA1: "Notre IA simplifie le processus. Cliquez sur 'Inscrire Mon Hôtel', remplissez les données, votre établissement sera visible par des milliers de touristes en moins de 10 minutes.", 
-                faqQ2: "Comment recevoir des réservations ?", 
-                faqA2: "Les touristes réservent directement sur la plateforme, vous recevez des notifications en temps réel. Gérez tout via le tableau de bord intelligent.", 
-                faqQ3: "Comment fonctionne le paiement ?", 
-                faqA3: "Nous proposons plusieurs modes de paiement sécurisés, virements et gestion financière transparente.", 
-                faqQ4: "La plateforme augmente-t-elle vraiment la visibilité ?", 
-                faqA4: "Oui, plus de 120 hôtels partenaires ont vu une augmentation moyenne de 40% des réservations.",
-                contactTypeSupport: "Support", 
-                contactTypeHotel: "Inscription Hôtel", 
-                contactTypeComplaint: "Réclamation", 
-                contactTypePartnership: "Partenariat", 
-                contactTypeTourism: "Tourisme", 
-                mapLegend: "📍 Marqueurs : Hôtels partenaires et merveilles de Malanje",
-                sectionTestimonials: "Ce que disent les voyageurs",
-                newsletterTitle: "Recevez des offres exclusives", 
-                btnSubscribe: "S'abonner", 
-                footerDescription: "Plateforme de tourisme numérique pour Malanje – Connecter les voyageurs aux merveilles de la province.", 
+                heroTitle: "La plateforme qui connecte les voyageurs aux merveilles de Malanje",
+                heroSubtitle: "Découvrez les chutes de Kalandula, les roches noires de Pungo Andongo, la cascade de Musseleje et plus encore. Réservez des expériences authentiques.",
+                btnRegisterHotel: "📢 Inscrire mon hôtel", btnExploreHotels: "Explorer les merveilles",
+                benefitsTitle: "Pourquoi choisir Reserve Já ?", benefit1Title: "Visibilité accrue", benefit1Text: "Faites connaître votre hôtel aux touristes du monde entier.",
+                benefit2Title: "Plus de réservations", benefit2Text: "Recevez des demandes automatiquement.",
+                benefit3Title: "Marketing digital", benefit3Text: "Promouvez votre activité sur les réseaux sociaux.",
+                benefit4Title: "IA intelligente", benefit4Text: "Recommandations personnalisées pour chaque voyageur.",
+                statHotels: "hôtels partenaires", statTourists: "touristes touchés", statSatisfaction: "satisfaction",
+                sectionDestinos: "✨ Merveilles de la province de Malanje ✨",
+                btnViewDetails: "En savoir plus",
+                navDestinos: "Merveilles", navBenefits: "Pour hôtels", navHotels: "Hôtels", navOffers: "Offres", navTestimonials: "Avis", navContact: "Contact",
+                btnLogin: "Connexion", btnRegister: "Inscription",
+                sectionContact: "Localisation & Contact", mapTitle: "Notre emplacement", addressLabel: "Siège social:", contactFormTitle: "Contactez-nous",
+                formName: "Nom complet", formEmail: "E-mail", formMessage: "Message", btnSendMessage: "Envoyer",
+                newsletterTitle: "Offres exclusives", newsletterPlaceholder: "votre@email.com", btnSubscribe: "S'abonner",
+                footerDescription: "Plateforme numérique de tourisme de Malanje – Connecter les voyageurs aux merveilles de la province.",
                 footerUsefulLinks: "Liens utiles",
-                btnLogin: "Connexion",
-                btnRegister: "S'inscrire",
-                btnSendMessage: "Envoyer le message", 
-                formName: "Nom complet", 
-                formEmail: "E-mail", 
-                formMessage: "Écrivez votre message..."
+                testimonial1: "Les chutes de Kalandula sont à couper le souffle. Expérience incroyable!", testimonial2: "J'ai adoré la visite aux rochers noirs de Pungo Andongo. Je recommande vivement.",
+                sectionVideos: "🎥 Explorez Malanje en Vidéo",
+                btnMoreVideos: "Plus de vidéos",
+                video1Title: "Chutes de Kalandula - Empire des Eaux",
+                video1Desc: "Admirez la majesté des plus grandes cascades d'Afrique en volume, un spectacle naturel.",
+                video2Title: "Rochers Noirs de Pungo Andongo - Mystique et Histoire",
+                video2Desc: "Découvrez les formations rocheuses légendaires et la vue panoramique sur la savane angolaise."
             }
         };
-        
-        let currentLanguage = localStorage.getItem('languagePreference') || 'pt';
-        function updateAllTexts(lang){ const d=translations[lang]; if(!d) return; document.querySelectorAll('[data-i18n]').forEach(el=>{ if(el.children.length===0){ const key=el.getAttribute('data-i18n'); if(d[key] && el.tagName!=='INPUT' && el.tagName!=='TEXTAREA' && el.tagName!=='SELECT') el.innerText=d[key]; } }); document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const key=el.getAttribute('data-i18n-placeholder'); if(d[key]) el.placeholder=d[key];}); }
-        function setLanguage(lang){ currentLanguage=lang; document.getElementById('currentLang').innerText=lang.toUpperCase(); localStorage.setItem('languagePreference',lang); updateAllTexts(lang); }
-        document.getElementById('langBtn').addEventListener('click',(e)=>{ e.stopPropagation(); document.getElementById('langDropdown').classList.toggle('show'); });
-        document.querySelectorAll('.lang-option').forEach(opt=>{ opt.addEventListener('click',()=>{ setLanguage(opt.getAttribute('data-lang')); document.getElementById('langDropdown').classList.remove('show'); }); });
-        setLanguage(currentLanguage);
-        
-        // Tema escuro/claro
-        const themeSwitch=document.getElementById('themeSwitch'); const applyTheme=(theme)=>{ document.body.setAttribute('data-bs-theme',theme); localStorage.setItem('themePreference',theme); themeSwitch.checked=(theme==='dark'); };
-        applyTheme(localStorage.getItem('themePreference')||'light'); themeSwitch.addEventListener('change',()=>applyTheme(themeSwitch.checked?'dark':'light'));
-        
-        // Slides
-        let currentSlide=0, slides=document.getElementsByClassName("mySlides"); 
-        function showSlide(n){ for(let i=0;i<slides.length;i++)slides[i].classList.remove('active'); currentSlide=(n+slides.length)%slides.length; slides[currentSlide].classList.add('active'); } 
-        function nextSlide(){ showSlide(currentSlide+1); } setInterval(nextSlide,5000);
-        
-        // ---------- GOOGLE MAPS ----------
-        let map;
-        function initGoogleMap() {
-            const center = { lat: -9.5392, lng: 16.3449 };
-            map = new google.maps.Map(document.getElementById('googleMap'), {
-                zoom: 10,
-                center: center,
-                mapTypeId: 'roadmap',
-                styles: []
+
+        function updateAllTexts(lang) {
+            const dict = translations[lang] || translations.pt;
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                if (el.children.length === 0 || el.tagName === 'BUTTON' || el.tagName === 'SPAN') {
+                    const key = el.getAttribute('data-i18n');
+                    if (dict[key]) el.innerText = dict[key];
+                }
             });
-            
-            const hotels = [
-                { name: "Hotel Ritondo Plaza", lat: -9.5392, lng: 16.3449, type: "hotel" },
-                { name: "Resort Kalandula View", lat: -9.5333, lng: 16.35, type: "hotel" },
-                { name: "Paradise Hotel", lat: -9.545, lng: 16.34, type: "hotel" }
-            ];
-            const attractions = [
-                { name: "Quedas Kalandula", lat: -9.076, lng: 16.003, type: "attraction" },
-                { name: "Pedras Negras Pungo Andongo", lat: -9.708, lng: 15.988, type: "attraction" },
-                { name: "Cascata Musseleje", lat: -9.4, lng: 16.0, type: "attraction" }
-            ];
-            
-            const hotelIcon = { url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png", scaledSize: new google.maps.Size(32,32) };
-            const attrIcon = { url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png", scaledSize: new google.maps.Size(32,32) };
-            
-            hotels.forEach(h => {
-                new google.maps.Marker({
-                    position: { lat: h.lat, lng: h.lng },
-                    map: map,
-                    title: h.name,
-                    icon: hotelIcon,
-                    animation: google.maps.Animation.DROP
-                }).addListener('click', function() {
-                    const info = new google.maps.InfoWindow({ content: `<b>${h.name}</b><br>🏨 Hotel parceiro` });
-                    info.open(map, this);
-                });
-            });
-            
-            attractions.forEach(a => {
-                new google.maps.Marker({
-                    position: { lat: a.lat, lng: a.lng },
-                    map: map,
-                    title: a.name,
-                    icon: attrIcon,
-                    animation: google.maps.Animation.DROP
-                }).addListener('click', function() {
-                    const info = new google.maps.InfoWindow({ content: `<b>${a.name}</b><br>📍 Atração turística` });
-                    info.open(map, this);
-                });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (dict[key]) el.placeholder = dict[key];
             });
         }
-        window.initGoogleMap = initGoogleMap;
+
+        const langBtn = document.getElementById('langBtn'), langDropdown = document.getElementById('langDropdown'), currentLangSpan = document.getElementById('currentLang');
+        let currentLanguage = localStorage.getItem('languagePreference') || 'pt';
+        function setLanguage(lang) { currentLanguage = lang; currentLangSpan.innerText = lang.toUpperCase(); localStorage.setItem('languagePreference', lang); updateAllTexts(lang); }
+        langBtn.addEventListener('click', (e) => { e.stopPropagation(); langDropdown.classList.toggle('show'); });
+        document.querySelectorAll('.lang-option').forEach(opt => { opt.addEventListener('click', (e) => { e.preventDefault(); setLanguage(opt.getAttribute('data-lang')); langDropdown.classList.remove('show'); }); });
+        document.addEventListener('click', (e) => { if (!langBtn.contains(e.target) && !langDropdown.contains(e.target)) langDropdown.classList.remove('show'); });
+        setLanguage(currentLanguage);
+
+        // Tema escuro/claro
+        const themeSwitch = document.getElementById('themeSwitch');
+        const applyTheme = (theme) => { document.body.setAttribute('data-bs-theme', theme); localStorage.setItem('themePreference', theme); themeSwitch.checked = (theme === 'dark'); };
+        const savedTheme = localStorage.getItem('themePreference') || 'light'; applyTheme(savedTheme);
+        themeSwitch.addEventListener('change', () => applyTheme(themeSwitch.checked ? 'dark' : 'light'));
+
+        // Slides
+        let currentSlide = 0, slides = document.getElementsByClassName("mySlides"), slideInterval;
+        function showSlide(n) { for (let i = 0; i < slides.length; i++) slides[i].classList.remove('active'); if (n >= slides.length) currentSlide = 0; if (n < 0) currentSlide = slides.length - 1; slides[currentSlide].classList.add('active'); }
+        function nextSlide() { currentSlide++; showSlide(currentSlide); resetAutoSlide(); }
+        function startAutoSlide() { slideInterval = setInterval(() => nextSlide(), 5000); }
+        function resetAutoSlide() { clearInterval(slideInterval); startAutoSlide(); }
+        startAutoSlide();
+
+        // Zoom nas imagens (já tratado no evento dos ícones)
         
-        // ---------- FORMULÁRIO E TOASTS ----------
-        function showToast(m,t){ const c=document.getElementById('toastContainer'); const toast=document.createElement('div'); toast.className=`toast-custom ${t}`; toast.innerHTML=`<span>${t==='success'?'✅':'❌'}</span><span>${m}</span>`; c.appendChild(toast); setTimeout(()=>{ toast.style.opacity='0'; setTimeout(()=>toast.remove(),300); },4000); }
-        document.getElementById('premiumContactForm')?.addEventListener('submit',(e)=>{ e.preventDefault(); const name=document.getElementById('premiumName').value.trim(), email=document.getElementById('premiumEmail').value.trim(), msg=document.getElementById('premiumMessage').value.trim(); if(!name||!email||!msg) showToast('Preencha todos os campos','error'); else{ showToast('Mensagem enviada com sucesso! Responderemos em breve.','success'); e.target.reset(); } });
-        document.getElementById('btnSubscribeNewsletter')?.addEventListener('click',()=>{ const email=document.getElementById('newsletterEmail').value.trim(); if(email&&email.includes('@')) showToast('Inscrição confirmada!','success'); else showToast('Email inválido','error'); });
-        document.getElementById('supportChatBtn')?.addEventListener('click',()=>{ const modal=new bootstrap.Modal(document.getElementById('chatModal')); modal.show(); setTimeout(()=>{ document.getElementById('chatInput').value='Gostaria de suporte'; sendUserMessage(); },500); });
-        document.getElementById('registerHotelBtnContact')?.addEventListener('click',()=>showToast('Acesse o painel de parceiros para cadastrar seu hotel. Contacte-nos para ativação!','success'));
-        document.getElementById('whatsappBtn')?.addEventListener('click',()=>window.open('https://wa.me/244921151685','_blank'));
-        document.getElementById('partnershipBtn')?.addEventListener('click',()=>showToast('Entraremos em contacto para viabilizar sua parceria. Obrigado!','success'));
-        document.getElementById('btnCadastrarHotel')?.addEventListener('click',()=>showToast('Acesse o painel de parceiros para cadastrar seu hotel.','success'));
+        // Newsletter
+        document.getElementById('btnSubscribeNewsletter').addEventListener('click', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('newsletterEmail').value.trim();
+            if (!email || !email.includes('@')) showToast('Email inválido', 'error');
+            else { showToast('✅ Inscrição confirmada!', 'success'); document.getElementById('newsletterEmail').value = ''; }
+        });
+
+        // Formulário de contacto
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const nome = document.getElementById('contactName').value.trim();
+            const email = document.getElementById('contactEmail').value.trim();
+            const msg = document.getElementById('contactMessage').value.trim();
+            if (!nome || !email || !msg) showToast('Preencha todos os campos', 'error');
+            else if (!email.includes('@')) showToast('Email inválido', 'error');
+            else { showToast('Mensagem enviada com sucesso!', 'success'); this.reset(); }
+        });
+
+        // ===================== CHATBOT A.M.I.N.A (mantido igual, mas com dados completos) =====================
+        function getGreeting(lang) {
+            const hour = new Date().getHours();
+            if (lang === 'pt') return hour < 12 ? "Bom dia! 🌅" : hour < 18 ? "Boa tarde! ☀️" : "Boa noite! 🌙";
+            if (lang === 'en') return hour < 12 ? "Good morning! 🌅" : hour < 18 ? "Good afternoon! ☀️" : "Good evening! 🌙";
+            return hour < 12 ? "Bonjour! 🌅" : hour < 18 ? "Bon après-midi! ☀️" : "Bonsoir! 🌙";
+        }
+
+        const botResponses = {
+            pt: { welcome: (g) => `${g} Sou a A.M.I.N.A, sua assistente de confiança para as maravilhas de Malanje. Estou aqui para ajudar turistas e hoteleiros. Como posso tornar sua visita ou parceria inesquecível?`,
+                hotels: "✨ Para donos de hotéis: nossa plataforma aumenta a visibilidade do seu negócio em +200% e já ajudamos mais de 120 hotéis a crescer. Quer saber como começar?",
+                touristBenefits: "🌍 Viajante, com o Reserve Já você acede a descontos exclusivos, roteiros personalizados e recomendações de IA. Que tipo de experiência procura?",
+                price: "💰 Preços médios: Hotel Paradise (6.800 AOA/diária), Resort Kalandula (9.200 AOA), Hotel Ritondo Plaza (4.500 AOA). Todos oferecem Wi-Fi.",
+                attraction: "🏞️ As maravilhas incluem Quedas de Kalandula, Pedras Negras, Cascata de Musseleje, Parque da Cangandala e Sé Catedral. Qual delas gostaria de conhecer melhor?",
+                moreInfo: "📢 Fico feliz que queira saber mais! Nossa missão é conectar turistas e hoteleiros. Para hoteleiros: aumente suas reservas. Para turistas: ganhe um guia gratuito de Malanje ao se cadastrar.",
+                default: "Obrigado pela sua mensagem! Pode perguntar sobre atrações, hotéis, preços, vantagens para hoteleiros ou dicas de viagem."
+            },
+            en: { welcome: (g) => `${g} I'm A.M.I.N.A, your trusted assistant for the wonders of Malanje. How can I help?`,
+                hotels: "✨ For hotel owners: our platform increases your visibility by +200% and has helped 120+ hotels. Want to know how to start?",
+                touristBenefits: "🌍 Traveler, with Reserve Já you get exclusive discounts and AI recommendations. What experience are you looking for?",
+                price: "💰 Average prices: Hotel Paradise (6,800 AOA/night), Resort Kalandula (9,200 AOA), Hotel Ritondo Plaza (4,500 AOA).",
+                attraction: "🏞️ Malanje's wonders: Kalandula Falls, Black Rocks, Musseleje, Cangandala Park, and the Cathedral. Which one interests you?",
+                moreInfo: "📢 Glad you want to know more! Our mission is to connect travelers and hoteliers intelligently.",
+                default: "Ask me about attractions, hotels, prices, or travel tips."
+            },
+            fr: { welcome: (g) => `${g} Je suis A.M.I.N.A, votre assistante pour les merveilles de Malanje. Comment puis-je vous aider ?`,
+                hotels: "✨ Pour les hôteliers : notre plateforme augmente votre visibilité de +200% et a aidé 120+ hôtels. Voulez-vous commencer ?",
+                touristBenefits: "🌍 Voyageur, avec Reserve Já bénéficiez de réductions exclusives et de recommandations IA. Quelle expérience recherchez-vous ?",
+                price: "💰 Prix moyens : Hotel Paradise (6 800 AOA/nuit), Resort Kalandula (9 200 AOA), Hotel Ritondo Plaza (4 500 AOA).",
+                attraction: "🏞️ Les merveilles de Malanje : Chutes de Kalandula, Rochers Noirs, Cascade Musseleje, Parc Cangandala, Cathédrale. Laquelle souhaitez-vous découvrir ?",
+                moreInfo: "📢 Heureux que vous vouliez en savoir plus ! Notre mission est de connecter voyageurs et hôteliers intelligemment.",
+                default: "Demandez-moi tout sur les attractions, hôtels, prix ou conseils voyage."
+            }
+        };
+
+        function getIntent(userMsg, lang) { 
+            const msg = userMsg.toLowerCase();
+            if (msg.includes('hotel')||msg.includes('hotéis')) return 'hotels';
+            if (msg.includes('preço')||msg.includes('custo')) return 'price';
+            if (msg.includes('atração')||msg.includes('quedas')||msg.includes('pungo')) return 'attraction';
+            if (msg.includes('saber mais')) return 'moreInfo';
+            return 'default';
+        }
+        let chatHistory = [];
+        function getBotReply(userMsg, lang) { const intent = getIntent(userMsg, lang); const dict = botResponses[lang]||botResponses.pt; return dict[intent] || dict.default; }
+        function renderChat() { const container = document.getElementById('chatMessagesContainer'); if(!container) return; container.innerHTML = ''; chatHistory.forEach(msg => { const div = document.createElement('div'); div.className = `message ${msg.sender}`; const avatar = document.createElement('div'); avatar.className = 'avatar'; avatar.innerHTML = msg.sender === 'bot' ? '<img src="images/amina-chat.png" class="logo-user-ia"/>' : '<i class="bi bi-person"></i>'; const bubble = document.createElement('div'); bubble.className = 'bubble'; bubble.innerHTML = msg.text; div.appendChild(avatar); div.appendChild(bubble); container.appendChild(div); }); container.scrollTop = container.scrollHeight; }
+        function addMessage(sender, text) { chatHistory.push({ sender, text }); renderChat(); }
+        function sendUserMessage(messageText = null) { const input = document.getElementById('chatInput'); const text = messageText !== null ? messageText : input.value.trim(); if(!text) return; addMessage('user', text); if(messageText===null) input.value=''; const lang = currentLanguage || 'pt'; const reply = getBotReply(text, lang); setTimeout(() => addMessage('bot', reply), 300); }
+        function resetChat() { chatHistory = []; const lang = currentLanguage; const greeting = getGreeting(lang); addMessage('bot', botResponses[lang]?.welcome(greeting) || botResponses.pt.welcome(greeting)); }
+        document.getElementById('sendChatBtn')?.addEventListener('click', () => sendUserMessage());
+        document.getElementById('chatInput')?.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendUserMessage(); });
+        document.getElementById('chatModal')?.addEventListener('shown.bs.modal', () => { if(chatHistory.length === 0) resetChat(); });
+        document.getElementById('btnSaberMaisAmina')?.addEventListener('click', () => { new bootstrap.Modal(document.getElementById('chatModal')).show(); });
+        document.getElementById('btnSaberMaisModal')?.addEventListener('click', () => sendUserMessage("Desejo saber mais sobre como a plataforma pode beneficiar meu hotel ou melhorar minha experiência como turista."));
+        document.querySelector('.fab')?.setAttribute('data-bs-target', '#chatModal');
+        document.getElementById('btnCadastrarHotel')?.addEventListener('click', () => showToast('🔐 Acesse o painel de parceiros para cadastrar seu hotel em Malanje. Contacte-nos para ativação imediata!', 'success'));
+    
         
-        // ---------- CHATBOT A.M.I.N.A. ----------
-        function getGreeting(lang){ const h=new Date().getHours(); if(lang==='pt') return h<12?"Bom dia! 🌅":h<18?"Boa tarde! ☀️":"Boa noite! 🌙"; if(lang==='en') return h<12?"Good morning! 🌅":h<18?"Good afternoon! ☀️":"Good evening! 🌙"; return h<12?"Bonjour! 🌅":h<18?"Bon après-midi! ☀️":"Bonsoir! 🌙"; }
-        const botResponses={pt:{welcome:g=>`${g} Sou a A.M.I.N.A, sua assistente de confiança para as maravilhas de Malanje. Como posso tornar sua visita ou parceria inesquecível?`,default:"Obrigado! Pergunte sobre atrações, hotéis ou parcerias."},en:{welcome:g=>`${g} I'm A.M.I.N.A, your trusted assistant for the wonders of Malanje. How can I make your visit or partnership unforgettable?`,default:"Thanks! Ask about attractions, hotels or partnerships."},fr:{welcome:g=>`${g} Je suis A.M.I.N.A, votre assistante de confiance pour les merveilles de Malanje. Comment puis-je rendre votre visite ou partenariat inoubliable ?`,default:"Merci! Demandez-moi tout sur les attractions, hôtels ou partenariats."}};
-        function getBotReply(msg,lang){ const d=botResponses[lang]||botResponses.pt; return d.default; }
-        let chatHistory=[]; 
-        function renderChat(){ const c=document.getElementById('chatMessagesContainer'); if(!c)return; c.innerHTML=''; chatHistory.forEach(msg=>{ const div=document.createElement('div'); div.className=`message ${msg.sender}`; const avatar=document.createElement('div'); avatar.className='avatar'; avatar.innerHTML=msg.sender==='bot'?'<img src="images/amina-chat.png" class="logo-user-ia" onerror="this.src=\'https://via.placeholder.com/40?text=IA\'"/>':'<i class="bi bi-person"></i>'; const bubble=document.createElement('div'); bubble.className='bubble'; bubble.innerHTML=msg.text; div.appendChild(avatar); div.appendChild(bubble); c.appendChild(div); }); c.scrollTop=c.scrollHeight; }
-        function addMessage(s,t){ chatHistory.push({sender:s,text:t}); renderChat(); }
-        async function sendUserMessage(messageText=null){ const input=document.getElementById('chatInput'); const text=messageText!==null?messageText:input.value.trim(); if(!text)return; addMessage('user',text); if(messageText===null)input.value=''; const lang=currentLanguage; const reply=getBotReply(text,lang); setTimeout(()=>{ addMessage('bot',reply); generateQuickReplies(lang); },400); }
-        function generateQuickReplies(lang){ const qd=document.getElementById('quickReplies'); if(!qd)return; const opts=lang==='pt'?['🌟 Apresentação IA','🗺️ Sugestões','🏨 Reservas']:lang==='en'?['🌟 AI Presentation','🗺️ Suggestions','🏨 Smart Bookings']:['🌟 Présentation IA','🗺️ Suggestions','🏨 Réservations']; qd.innerHTML=opts.map(o=>`<button class="quick-reply-btn btn btn-sm btn-outline-secondary">${o}</button>`).join(''); document.querySelectorAll('.quick-reply-btn').forEach(btn=>btn.addEventListener('click',()=>sendUserMessage(btn.innerText))); }
-        function resetChat(){ chatHistory=[]; const lang=currentLanguage; addMessage('bot',botResponses[lang]?.welcome(getGreeting(lang))||botResponses.pt.welcome(getGreeting('pt'))); generateQuickReplies(lang); }
-        document.getElementById('sendChatBtn')?.addEventListener('click',()=>sendUserMessage()); document.getElementById('chatInput')?.addEventListener('keypress',(e)=>{if(e.key==='Enter')sendUserMessage();});
-        document.getElementById('chatModal')?.addEventListener('shown.bs.modal',()=>{if(chatHistory.length===0)resetChat();});
-        document.getElementById('btnSaberMaisAmina')?.addEventListener('click',()=>new bootstrap.Modal(document.getElementById('chatModal')).show());
-        document.getElementById('btnSaberMaisModal')?.addEventListener('click',()=>sendUserMessage("Desejo saber mais sobre a plataforma."));
-   
-        //==========================================================================JS ADD================================================================================//
-        (function() {
-            const modalVantagens = document.getElementById('modalBioRisk');
-            const btnFecharVantagens = document.getElementById('fecharModalBioRisk');
-            const floatingBtn = document.getElementById('floatingBioRiskBtn');
+        //=================================================================JS ADD============================================================//
+    (function() {
+            // Dados do Quiz
+            const perguntas = [
+                {
+                    texto: "Qual é a cachoeira mais famosa localizada na província de Malanje?",
+                    opcoes: ["Quedas de Kalandula", "Quedas do Ruacana", "Cachoeira da Lagoa Azul", "Cataratas Epupa"],
+                    correta: 0,
+                    explicacao: "✅ As Quedas de Kalandula são as maiores de Angola, com 105m de altura, um ícone do turismo em Malanje!"
+                },
+                {
+                    texto: "As imponentes formações rochosas que representam símbolo histórico e lendário em Malanje são conhecidas como:",
+                    opcoes: ["Montanhas da Leba", "Pedras Negras do Pungo Andongo", "Serra da Chela", "Tundavala"],
+                    correta: 1,
+                    explicacao: "📸 As Pedras Negras do Pungo Andongo guardam histórias da rainha Nginga e da resistência angolana."
+                },
+                {
+                    texto: "Qual prato típico é amplamente consumido em Malanje, à base de farinha de mandioca ou milho acompanhado de peixe, carne ou legumes?",
+                    opcoes: ["Moamba de ginguba", "Funge", "Cuscuz angolano", "Cabidela"],
+                    correta: 1,
+                    explicacao: "🍛 O funge é uma iguaria diária na região, servido com molhos e acompanhamentos deliciosos."
+                },
+                {
+                    texto: "Malanje é conhecida por ser a 'Capital' de qual importante produto agrícola?",
+                    opcoes: ["Café", "Algodão", "Cana-de-açúcar", "Mandioca"],
+                    correta: 0,
+                    explicacao: "☕ Malanje foi grande produtora de café de qualidade, sendo um dos centros históricos da cafeicultura angolana."
+                }
+            ];
+
+            let perguntaAtual = 0;
+            let pontuacao = 0;
+            let quizIniciado = false;
+            let respostaSelecionada = false;
+            let pontuacaoFinalExibida = false;
+            
+            const modal = document.getElementById('quizMalanjeModal');
+            const btnFechar = document.getElementById('fecharModalQuiz');
+            const floatingBtn = document.getElementById('floatingQuizBtn');
             const btnCtaPrincipal = document.getElementById('btnAbrirModalPrincipal');
-            const btnAcaoModal = document.getElementById('btnQueroBioRisk');
-            const cardsAbrir = document.querySelectorAll('.card-negocio[data-modal="abrir"]');
+            const quizArea = document.getElementById('quizArea');
+            const contadorSpan = document.getElementById('contadorPontos');
+            const certificadoMsgDiv = document.getElementById('certificadoMsg');
             
-            const modalAcordo = document.getElementById('modalAcordo');
-            const btnAceitarAcordo = document.getElementById('btnAceitarAcordo');
-            const btnFecharAcordo = document.getElementById('btnFecharAcordo');
-            const btnInscreverEmail = document.getElementById('btnInscreverEmail');
-            const emailInput = document.getElementById('emailNotificacao');
-            const msgSucesso = document.getElementById('msgSucessoEmail');
-            
+            // Configuração de reaparecimento a cada 10 minutos
             let timeoutModal = null;
             const INTERVALO_MS = 10 * 60 * 1000;
-            const STORAGE_KEY = 'reserveja_ultimo_fechamento';
+            const STORAGE_KEY = 'quiz_malanje_ultimo_fechamento';
             
-            let acordoAceito = localStorage.getItem('reserveja_acordo_aceito') === 'true';
+            function renderizarPergunta() {
+                if (!quizArea) return;
+                if (perguntaAtual >= perguntas.length) {
+                    finalizarQuiz();
+                    return;
+                }
+                
+                const p = perguntas[perguntaAtual];
+                let html = `
+                    <div class="pergunta-quiz">
+                        <i class="fas fa-question-circle"></i> ${p.texto}
+                    </div>
+                    <div class="opcoes-quiz">
+                `;
+                p.opcoes.forEach((opcao, idx) => {
+                    html += `
+                        <div class="opcao-quiz" data-opcao="${idx}">
+                            <i class="fas fa-${idx === 0 ? 'a' : idx === 1 ? 'b' : idx === 2 ? 'c' : 'd'}-circle"></i>
+                            ${opcao}
+                        </div>
+                    `;
+                });
+                html += `</div><div id="feedbackResposta" class="resposta-feedback"></div>`;
+                if (perguntaAtual < perguntas.length - 1) {
+                    html += `<a href="quiz.html"> <button class="btn-proximo" id="btnProximoQuiz"> Próxima pergunta <i class="fas fa-arrow-right"></i></button></a>`;
+                } else {
+                    html += `<button class="btn-proximo" id="btnProximoQuiz"><i class="fas fa-check-circle"></i> Finalizar Quiz</button>`;
+                }
+                
+                quizArea.innerHTML = html;
+                respostaSelecionada = false;
+                
+                // Eventos das opções
+                document.querySelectorAll('.opcao-quiz').forEach(el => {
+                    el.addEventListener('click', (e) => {
+                        if (respostaSelecionada) return;
+                        const opcaoEscolhida = parseInt(el.dataset.opcao);
+                        const perguntaObj = perguntas[perguntaAtual];
+                        const feedbackDiv = document.getElementById('feedbackResposta');
+                        const isCorreto = (opcaoEscolhida === perguntaObj.correta);
+                        
+                        if (isCorreto) {
+                            pontuacao++;
+                            contadorSpan.innerText = pontuacao;
+                            feedbackDiv.innerHTML = `<i class="fas fa-smile-wink"></i> ${perguntaObj.explicacao} <br> 🎉 Resposta correta! +1 ponto`;
+                            feedbackDiv.style.background = "#e1f7e6";
+                            feedbackDiv.style.borderLeftColor = "#2c7a47";
+                        } else {
+                            const respostaCerta = perguntaObj.opcoes[perguntaObj.correta];
+                            feedbackDiv.innerHTML = `<i class="fas fa-lightbulb"></i> ${perguntaObj.explicacao} <br> ❌ Resposta incorreta. A resposta certa é: ${respostaCerta}. Continue aprendendo!`;
+                            feedbackDiv.style.background = "#ffe5e0";
+                            feedbackDiv.style.borderLeftColor = "#b34e2e";
+                        }
+                        feedbackDiv.style.display = "block";
+                        respostaSelecionada = true;
+                        
+                        // Desabilitar visualmente as opções
+                        document.querySelectorAll('.opcao-quiz').forEach(opt => {
+                            opt.style.opacity = "0.6";
+                            opt.style.pointerEvents = "none";
+                        });
+                    });
+                });
+                
+                const btnProx = document.getElementById('btnProximoQuiz');
+                if (btnProx) {
+                    btnProx.addEventListener('click', () => {
+                        if (!respostaSelecionada) {
+                            const feedbackDiv = document.getElementById('feedbackResposta');
+                            feedbackDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Por favor, selecione uma resposta antes de continuar.`;
+                            feedbackDiv.style.display = "block";
+                            feedbackDiv.style.background = "#fff0db";
+                            return;
+                        }
+                        perguntaAtual++;
+                        renderizarPergunta();
+                    });
+                }
+            }
             
-            function abrirModalVantagens() {
-                if (!modalVantagens) return;
-                if (modalVantagens.style.display === 'flex') return;
-                modalVantagens.style.display = 'flex';
+            function finalizarQuiz() {
+                if (!quizArea) return;
+                const totalMax = perguntas.length;
+                let mensagemFinal = "";
+                if (pontuacao === totalMax) {
+                    mensagemFinal = `<i class="fas fa-crown"></i> Perfeito! Você é um verdadeiro conhecedor de Malanje, Angola! 🌟`;
+                } else if (pontuacao >= totalMax / 2) {
+                    mensagemFinal = `<i class="fas fa-thumbs-up"></i> Muito bem! Você tem um bom conhecimento sobre Malanje. Explore mais e volte a jogar!`;
+                } else {
+                    mensagemFinal = `<i class="fas fa-compass"></i> Que tal visitar Malanje um dia? Continue aprendendo sobre essa província maravilhosa!`;
+                }
+                
+                quizArea.innerHTML = `
+                    <div style="background: #eef1e3; border-radius: 32px; padding: 20px; text-align:center;">
+                        <i class="fas fa-map-marked-alt" style="font-size: 2.5rem; color:#c28135;"></i>
+                        <h3 style="color:#6b3f1c; margin: 15px 0;">Quiz Finalizado!</h3>
+                        <p style="font-size:1.1rem;"><strong>Sua pontuação: ${pontuacao} de ${totalMax}</strong></p>
+                        <p>${mensagemFinal}</p>
+                        <button id="reiniciarQuizBtn" class="btn-proximo" style="margin-top: 20px;"><i class="fas fa-redo-alt"></i> Jogar novamente</button>
+                    </div>
+                `;
+                certificadoMsgDiv.style.display = "block";
+                const reiniciarBtn = document.getElementById('reiniciarQuizBtn');
+                if (reiniciarBtn) {
+                    reiniciarBtn.addEventListener('click', () => {
+                        perguntaAtual = 0;
+                        pontuacao = 0;
+                        contadorSpan.innerText = "0";
+                        certificadoMsgDiv.style.display = "none";
+                        renderizarPergunta();
+                    });
+                }
+            }
+            
+            function resetQuizModal() {
+                perguntaAtual = 0;
+                pontuacao = 0;
+                if (contadorSpan) contadorSpan.innerText = "0";
+                if (certificadoMsgDiv) certificadoMsgDiv.style.display = "none";
+                if (quizArea) renderizarPergunta();
+            }
+            
+            function abrirModal() {
+                if (!modal) return;
+                if (modal.style.display === 'flex') return;
+                resetQuizModal();
+                modal.style.display = 'flex';
                 document.body.style.overflow = 'hidden';
             }
             
-            function fecharModalVantagens() {
-                if (!modalVantagens) return;
-                if (modalVantagens.style.display !== 'flex') return;
-                modalVantagens.style.display = 'none';
+            function fecharModal() {
+                if (!modal) return;
+                if (modal.style.display !== 'flex') return;
+                modal.style.display = 'none';
                 document.body.style.overflow = '';
                 const agora = Date.now();
                 localStorage.setItem(STORAGE_KEY, agora.toString());
-                if (timeoutModal) clearTimeout(timeoutModal);
+                if (timeoutModal) {
+                    clearTimeout(timeoutModal);
+                    timeoutModal = null;
+                }
                 timeoutModal = setTimeout(() => {
-                    abrirModalVantagens();
+                    abrirModal();
                     timeoutModal = null;
                 }, INTERVALO_MS);
             }
@@ -1528,112 +1906,52 @@
             function inicializarModalComIntervalo() {
                 const ultimoFechamento = localStorage.getItem(STORAGE_KEY);
                 if (!ultimoFechamento) {
-                    abrirModalVantagens();
+                    abrirModal();
                     return;
                 }
                 const tempoDecorrido = Date.now() - parseInt(ultimoFechamento, 10);
                 if (tempoDecorrido >= INTERVALO_MS) {
-                    abrirModalVantagens();
+                    abrirModal();
                 } else {
                     const tempoRestante = INTERVALO_MS - tempoDecorrido;
                     timeoutModal = setTimeout(() => {
-                        abrirModalVantagens();
+                        abrirModal();
                         timeoutModal = null;
                     }, tempoRestante);
                 }
             }
             
-            function abrirModalAcordo() {
-                if (!acordoAceito && modalAcordo) {
-                    modalAcordo.style.display = 'flex';
-                    document.body.style.overflow = 'hidden';
-                }
-            }
-            
-            function fecharModalAcordo() {
-                if (modalAcordo) {
-                    modalAcordo.style.display = 'none';
-                    document.body.style.overflow = '';
-                }
-            }
-            
-            function aceitarAcordo() {
-                acordoAceito = true;
-                localStorage.setItem('reserveja_acordo_aceito', 'true');
-                fecharModalAcordo();
-                console.log('Acordo aceito pelo usuário');
-            }
-            
-            function inscreverEmail() {
-                const email = emailInput.value.trim();
-                if (!email) {
-                    alert('Por favor, insira um endereço de email válido.');
-                    return;
-                }
-                if (!email.includes('@') || !email.includes('.')) {
-                    alert('Email inválido. Exemplo: nome@dominio.com');
-                    return;
-                }
-                let inscricoes = JSON.parse(localStorage.getItem('reserveja_newsletters') || '[]');
-                if (!inscricoes.includes(email)) {
-                    inscricoes.push(email);
-                    localStorage.setItem('reserveja_newsletters', JSON.stringify(inscricoes));
-                }
-                msgSucesso.style.display = 'block';
-                emailInput.value = '';
-                setTimeout(() => {
-                    msgSucesso.style.display = 'none';
-                }, 4000);
-            }
-            
-            if (btnFecharVantagens) {
-                btnFecharVantagens.addEventListener('click', (e) => {
+            // Eventos
+            if (btnFechar) {
+                btnFechar.addEventListener('click', (e) => {
                     e.preventDefault();
-                    fecharModalVantagens();
+                    fecharModal();
                 });
             }
-            if (modalVantagens) {
-                modalVantagens.addEventListener('click', (e) => {
-                    if (e.target === modalVantagens) fecharModalVantagens();
+            if (modal) {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) fecharModal();
                 });
-                const modalCard = document.querySelector('#modalBioRisk .modal-card');
-                if (modalCard) modalCard.addEventListener('click', (e) => e.stopPropagation());
             }
+            const modalCard = document.querySelector('.modal-card');
+            if (modalCard) modalCard.addEventListener('click', (e) => e.stopPropagation());
+            
             document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && modalVantagens && modalVantagens.style.display === 'flex') fecharModalVantagens();
-                if (e.key === 'Escape' && modalAcordo && modalAcordo.style.display === 'flex') fecharModalAcordo();
+                if (e.key === 'Escape' && modal && modal.style.display === 'flex') fecharModal();
             });
+            
             if (floatingBtn) {
                 floatingBtn.addEventListener('click', (e) => {
                     e.preventDefault();
-                    e.stopPropagation();
-                    if (modalVantagens && modalVantagens.style.display !== 'flex') abrirModalVantagens();
+                    if (modal && modal.style.display !== 'flex') abrirModal();
                 });
             }
-            if (btnCtaPrincipal) btnCtaPrincipal.addEventListener('click', () => abrirModalVantagens());
-            cardsAbrir.forEach(card => card.addEventListener('click', () => abrirModalVantagens()));
-            if (btnAcaoModal) {
-                btnAcaoModal.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    alert("🏨 Obrigado pelo interesse! Em breve nossa equipe entrará em contato para cadastrar seu hotel ou negócio de turismo em Malanje no Reserve Já — visibilidade e conexão com viajantes.");
-                    fecharModalVantagens();
-                });
+            if (btnCtaPrincipal) {
+                btnCtaPrincipal.addEventListener('click', () => abrirModal());
             }
-            
-            if (btnAceitarAcordo) btnAceitarAcordo.addEventListener('click', aceitarAcordo);
-            if (btnFecharAcordo) btnFecharAcordo.addEventListener('click', fecharModalAcordo);
-            if (btnInscreverEmail) btnInscreverEmail.addEventListener('click', inscreverEmail);
-            if (modalAcordo) {
-                modalAcordo.addEventListener('click', (e) => {
-                    if (e.target === modalAcordo) fecharModalAcordo();
-                });
-                const acordoCard = document.querySelector('.modal-acordo-card');
-                if (acordoCard) acordoCard.addEventListener('click', (e) => e.stopPropagation());
-            }
-            
-            setTimeout(() => {
-                abrirModalAcordo();
-            }, 500);
+            document.querySelectorAll('.card-negocio[data-modal="abrir"]').forEach(card => {
+                card.addEventListener('click', () => abrirModal());
+            });
             
             inicializarModalComIntervalo();
         })();
