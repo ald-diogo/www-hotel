@@ -593,7 +593,7 @@
             transform: scale(1.02);
         }
 
-        /* ===== MODAL QUIZ - MALANJE ANGOLA ===== */
+        /* ===== MODAL QUIZ - MALANJE ANGOLA (CORRIGIDO: SCROLLBAR EM TELAS MENORES) ===== */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -606,17 +606,20 @@
             justify-content: center;
             align-items: center;
             z-index: 2000;
-            padding: 1.5rem;
+            padding: 1rem;
         }
 
         .modal-card {
             max-width: 950px;
             width: 100%;
+            max-height: 95vh;
             background: #ffffff;
             border-radius: 40px;
             overflow: hidden;
             box-shadow: 0 32px 55px rgba(0, 0, 0, 0.4);
             animation: modalFadeUp 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            display: flex;
+            flex-direction: column;
         }
 
         @keyframes modalFadeUp {
@@ -633,6 +636,8 @@
         .modal-flex {
             display: flex;
             flex-wrap: wrap;
+            flex: 1;
+            overflow-y: auto; /* SCROLLBAR PRINCIPAL PARA TELAS MENORES */
         }
 
         .modal-imagem {
@@ -640,7 +645,7 @@
             background: #2c5538;
             position: relative;
             overflow: hidden;
-            min-height: 240px;
+            min-height: 200px;
             display: flex;
             align-items: stretch;
         }
@@ -671,15 +676,16 @@
 
         .modal-conteudo {
             flex: 1.2;
-            padding: 2rem 2rem;
+            padding: 1.5rem;
             background: #fffef9;
             position: relative;
+            overflow-y: auto; /* GARANTE SCROLL INTERNO SE NECESSÁRIO */
         }
 
         .btn-fechar {
             position: absolute;
-            top: 18px;
-            right: 20px;
+            top: 12px;
+            right: 16px;
             background: #f0ede5;
             width: 34px;
             height: 34px;
@@ -691,8 +697,8 @@
             transition: all 0.2s;
             color: #6b3f1c;
             font-size: 1.2rem;
-            z-index: 10;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            z-index: 20;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
         }
 
         .btn-fechar:hover {
@@ -702,7 +708,7 @@
         }
 
         .titulo-quiz {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: 800;
             color: #8b5a2b;
             margin-bottom: 0.3rem;
@@ -714,11 +720,11 @@
         .titulo-quiz i {
             color: #f5b042;
             margin-right: 8px;
-            font-size: 1.7rem;
+            font-size: 1.5rem;
         }
 
         .descricao-quiz {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: #5a3e22;
             margin: 0.5rem 0 1rem 0;
             line-height: 1.45;
@@ -735,7 +741,7 @@
             padding: 10px 15px;
             border-radius: 28px;
             margin-bottom: 15px;
-            font-size: 1rem;
+            font-size: 0.95rem;
         }
 
         .opcoes-quiz {
@@ -892,23 +898,27 @@
             bottom: 70px;
         }
 
-        /* Responsivo */
+        /* Responsivo para o modal - GARANTIA DE SCROLL EM TELAS MENORES */
         @media (max-width: 780px) {
             body {
                 padding: 1rem;
             }
             .modal-flex {
                 flex-direction: column;
+                overflow-y: auto;
+                max-height: 90vh;
             }
             .modal-imagem {
-                min-height: 200px;
+                min-height: 180px;
                 flex: auto;
             }
             .modal-conteudo {
-                padding: 1.5rem;
+                padding: 1.2rem;
+                overflow-y: visible;
             }
             .titulo-quiz {
-                font-size: 1.5rem;
+                font-size: 1.3rem;
+                padding-left: 12px;
             }
             .hero h1 {
                 font-size: 1.9rem;
@@ -920,7 +930,7 @@
                 width: 220px;
             }
             .floating-quiz {
-                bottom: 100px; /* Ajuste para telas pequenas */
+                bottom: 100px;
                 right: 20px;
                 width: 50px;
                 height: 50px;
@@ -945,6 +955,20 @@
             .floating-quiz {
                 bottom: 90px;
                 right: 20px;
+            }
+            .modal-card {
+                max-height: 98vh;
+            }
+            .modal-conteudo {
+                padding: 1rem;
+            }
+            .opcao-quiz {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+            }
+            .btn-proximo {
+                padding: 10px;
+                font-size: 0.9rem;
             }
         }
     
@@ -1224,7 +1248,7 @@
 
     
     <!-- HTML ADD -->
-    <!-- MODAL QUIZ - MALANJE -->
+    <!-- MODAL QUIZ - MALANJE (COM SCROLLBAR CORRIGIDO) -->
     <div id="quizMalanjeModal" class="modal-overlay">
         <div class="modal-card">
             <div class="modal-flex">
@@ -1580,9 +1604,6 @@
                 const key = el.getAttribute('data-i18n-placeholder');
                 if (dict[key]) el.placeholder = dict[key];
             });
-            // Atualizar também títulos dos cards (já foram gerados em português, precisamos regerar os cards com os textos traduzidos? 
-            // Os cards são dinâmicos, mas os textos fixos estão em português. Para simplificar, os cards mostram nome e descrição em português mesmo.
-            // Melhor deixar como está, pois são nomes próprios.
         }
 
         const langBtn = document.getElementById('langBtn'), langDropdown = document.getElementById('langDropdown'), currentLangSpan = document.getElementById('currentLang');
