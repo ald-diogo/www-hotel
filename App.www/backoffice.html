@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backoffice | HotelSphere - Gestão Hoteleira Malanje</title>
+    <!-- Bootstrap 5 + Font Awesome + CSS Principal -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background: linear-gradient(135deg, #0a1a2a 0%, #1a3a5a 100%);
+            min-height: 100vh;
+            color: #f0f4fa;
+        }
+        /* Glassmorphism */
+        .glass-card {
+            background: rgba(25, 40, 55, 0.65);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 24px;
+            transition: all 0.25s ease;
+        }
+        .glass-card:hover { border-color: rgba(70, 150, 250, 0.6); transform: translateY(-2px); }
+        .btn-glow:hover { box-shadow: 0 0 12px rgba(70,130,200,0.6); transform: scale(1.02); }
+        .section { display: none; animation: fadeIn 0.3s ease; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .preview-img { width: 80px; height: 80px; object-fit: cover; border-radius: 12px; margin: 5px; }
+        .message-item { border-bottom: 1px solid rgba(255,255,255,0.1); padding: 10px; }
+        .sidebar-nav { position: sticky; top: 20px; }
+        @media (max-width: 768px) { .sidebar-nav { position: static; margin-bottom: 20px; } }
+    </style>
+</head>
+<body>
+<div class="container-fluid px-3 px-md-4 py-3">
+    <!-- Header -->
+    <div class="glass-card p-3 mb-4 d-flex justify-content-between align-items-center flex-wrap">
+        <div><i class="fas fa-hotel fa-2x me-2"></i><span class="fs-2 fw-bold">Hotel<span style="color:#7bc5ff;">Sphere</span></span><span class="badge bg-info ms-2">BACKOFFICE · Malanje</span></div>
+        <div id="authHeader"><button class="btn btn-outline-light" id="showLoginBtn"><i class="fas fa-lock"></i> Login</button></div>
+        <div id="userHeader" style="display:none;"><span class="me-3"><i class="fas fa-user-shield"></i> <span id="currentUserName">Admin</span> (<span id="currentUserRole">Admin</span>)</span><button class="btn btn-sm btn-danger" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Sair</button></div>
+    </div>
+
+    <!-- Login Modal (simples, sem Bootstrap modal extra) -->
+    <div id="loginArea" class="glass-card p-4 mb-4" style="max-width:500px; margin:0 auto;">
+        <h3><i class="fas fa-key"></i> Acesso Restrito</h3>
+        <input type="text" id="loginUser" class="form-control my-2" placeholder="Utilizador">
+        <input type="password" id="loginPass" class="form-control my-2" placeholder="Palavra-passe">
+        <button class="btn btn-primary w-100" id="doLoginBtn">Entrar</button>
+        <hr><small>Admin: admin / admin123 | Manager: manager / manager</small>
+    </div>
+
+    <!-- Conteúdo principal (aparece só após login) -->
+    <div id="mainContent" style="display:none;">
+        <div class="row">
+            <div class="col-md-3 col-lg-2 mb-4">
+                <div class="glass-card p-3 sidebar-nav">
+                    <div class="d-flex flex-column gap-2">
+                        <button class="btn btn-outline-light nav-section" data-section="dashboard"><i class="fas fa-chart-line"></i> Dashboard</button>
+                        <button class="btn btn-outline-light nav-section" data-section="rooms"><i class="fas fa-bed"></i> Quartos</button>
+                        <button class="btn btn-outline-light nav-section" data-section="gastronomy"><i class="fas fa-utensils"></i> Gastronomia</button>
+                        <button class="btn btn-outline-light nav-section" data-section="services"><i class="fas fa-concierge-bell"></i> Serviços</button>
+                        <button class="btn btn-outline-light nav-section" data-section="experiences"><i class="fas fa-hiking"></i> Experiências</button>
+                        <button class="btn btn-outline-light nav-section" data-section="gallery"><i class="fas fa-images"></i> Galeria</button>
+                        <button class="btn btn-outline-light nav-section" data-section="messages"><i class="fas fa-envelope"></i> Mensagens</button>
+                        <button class="btn btn-outline-light nav-section" data-section="team"><i class="fas fa-users"></i> Equipa</button>
+                        <button class="btn btn-outline-light nav-section" data-section="customize"><i class="fas fa-palette"></i> Personalizar</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-9 col-lg-10">
+                <!-- DASHBOARD -->
+                <div id="dashboard" class="section active">
+                    <div class="glass-card p-4"><h3><i class="fas fa-chart-simple"></i> Estatísticas</h3>
+                        <div class="row mt-3">
+                            <div class="col-md-3 mb-3"><div class="glass-card p-3 text-center"><i class="fas fa-door-open fa-2x"></i><h4 id="statRooms">0</h4><p>Quartos</p></div></div>
+                            <div class="col-md-3 mb-3"><div class="glass-card p-3 text-center"><i class="fas fa-envelope fa-2x"></i><h4 id="statMessages">0</h4><p>Mensagens</p></div></div>
+                            <div class="col-md-3 mb-3"><div class="glass-card p-3 text-center"><i class="fas fa-eye fa-2x"></i><h4>342</h4><p>Visualizações</p></div></div>
+                            <div class="col-md-3 mb-3"><div class="glass-card p-3 text-center"><i class="fas fa-calendar fa-2x"></i><h4>8</h4><p>Atividades</p></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QUARTOS CRUD -->
+                <div id="rooms" class="section"><div class="glass-card p-4"><h3><i class="fas fa-bed"></i> Gestão de Quartos</h3><button class="btn btn-success mb-3" id="addRoomBtn"><i class="fas fa-plus"></i> Novo Quarto</button><div id="roomsList" class="row"></div></div></div>
+                <!-- GASTRONOMIA -->
+                <div id="gastronomy" class="section"><div class="glass-card p-4"><h3><i class="fas fa-utensils"></i> Gastronomia</h3><button class="btn btn-success mb-3" id="addDishBtn"><i class="fas fa-plus"></i> Adicionar Prato</button><div id="dishesList" class="row"></div></div></div>
+                <!-- SERVIÇOS -->
+                <div id="services" class="section"><div class="glass-card p-4"><h3><i class="fas fa-concierge-bell"></i> Serviços</h3><div id="servicesCheck" class="row"></div><button class="btn btn-primary mt-3" id="saveServicesBtn">Guardar Serviços</button></div></div>
+                <!-- EXPERIÊNCIAS -->
+                <div id="experiences" class="section"><div class="glass-card p-4"><h3><i class="fas fa-tree"></i> Experiências</h3><button class="btn btn-secondary mb-2" id="addExpBtn">+ Adicionar</button><div id="expList" class="row"></div></div></div>
+                <!-- GALERIA -->
+                <div id="gallery" class="section"><div class="glass-card p-4"><h3><i class="fas fa-images"></i> Galeria</h3><input type="file" id="galleryInput" multiple accept="image/*" class="form-control mb-3"><div id="galleryPreview" class="d-flex flex-wrap"></div><button class="btn btn-info mt-2" id="saveGalleryBtn">Guardar Galeria</button></div></div>
+                <!-- MENSAGENS -->
+                <div id="messages" class="section"><div class="glass-card p-4"><h3><i class="fas fa-comment-dots"></i> Mensagens Turistas</h3><div id="msgsContainer" style="max-height:400px; overflow:auto;"></div><div class="mt-3"><input type="text" id="replyMsg" class="form-control" placeholder="Responder..."><button class="btn btn-primary mt-2" id="sendReplyMsgBtn">Enviar Resposta</button></div></div></div>
+                <!-- EQUIPA -->
+                <div id="team" class="section"><div class="glass-card p-4"><h3><i class="fas fa-users"></i> Gestão de Equipa</h3><button class="btn btn-warning mb-2" id="addStaffBtn">+ Novo Utilizador</button><div id="staffListContainer"></div></div></div>
+                <!-- PERSONALIZAÇÃO -->
+                <div id="customize" class="section"><div class="glass-card p-4"><h3><i class="fas fa-palette"></i> Personalização</h3><label>Cor principal:</label><input type="color" id="themeColor" class="form-control w-25 mb-2"><label>Intensidade Glass:</label><input type="range" id="blurRange" min="5" max="30" value="16" class="form-range w-50"><button id="applyThemeBtn" class="btn btn-light mt-2">Aplicar</button></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer class="text-center py-3"><i class="fas fa-database"></i> Backoffice · HotelSphere · Dados sincronizados via localStorage</footer>
+
+<script>
+    // ===================== SISTEMA DE DADOS GLOBAL =====================
+    let db = {
+        rooms: [],
+        dishes: [],
+        services: { pool: true, spa: true, gym: false, restaurant: true, wifi: true, transport: false },
+        experiences: [],
+        gallery: [],
+        messages: [],
+        staff: [{ id: "1", name: "Admin", role: "Admin", password: "admin123" }, { id: "2", name: "Manager", role: "Manager", password: "manager" }],
+        hotelStyle: { primaryColor: "#0a1a2a", blurPx: "16" }
+    };
+    let currentUser = null;
+    let sessionTimeout = null;
+
+    function loadData() {
+        const saved = localStorage.getItem("hotelSphereDB");
+        if(saved) {
+            try { db = JSON.parse(saved); if(!db.messages) db.messages = []; if(!db.gallery) db.gallery = []; if(!db.experiences) db.experiences = []; if(!db.services) db.services = { pool: true, spa: true, gym: false, restaurant: true, wifi: true, transport: false }; if(!db.staff) db.staff = [{ id: "1", name: "Admin", role: "Admin", password: "admin123" }]; } catch(e) {}
+        } else {
+            // Dados iniciais
+            db.rooms = [{ id: "r1", name: "Suite Presidencial", type: "Luxo", price: 250, description: "Vista rio Kwanza", available: true, images: [] }, { id: "r2", name: "Quarto Standard", type: "Standard", price: 90, description: "Conforto básico", available: true, images: [] }];
+            db.dishes = [{ id: "d1", name: "Muamba de Galinha", category: "Angolana", description: "Prato típico", price: 1800, images: [] }];
+            db.experiences = [{ id: "e1", name: "Quedas de Kalandula", description: "Tour de 1 dia", price: 12000 }];
+            db.gallery = ["https://picsum.photos/id/104/300/200", "https://picsum.photos/id/29/300/200"];
+            db.messages = [{ id: "m1", from: "João Viajante", text: "Gostaria de saber se aceitam pets?", date: new Date().toISOString(), replied: false }];
+            saveDB();
+        }
+        refreshUI();
+    }
+    function saveDB() { localStorage.setItem("hotelSphereDB", JSON.stringify(db)); window.dispatchEvent(new Event("storage")); }
+    function refreshUI() {
+        document.getElementById("statRooms").innerText = db.rooms.length;
+        document.getElementById("statMessages").innerText = db.messages.filter(m => !m.replied).length;
+        renderRooms(); renderDishes(); renderServices(); renderExperiences(); renderGallery(); renderMessages(); renderStaff(); applyStyles();
+    }
+    function renderRooms() { const container = document.getElementById("roomsList"); if(!container) return; container.innerHTML = db.rooms.map(r => `<div class="col-md-6 mb-3"><div class="glass-card p-3"><h5>${r.name} (${r.type})</h5><p>💰 ${r.price} KZ | ${r.available ? "✅ Disponível" : "❌ Indisponível"}<br>${r.description}</p><button class="btn btn-sm btn-danger" onclick="window.deleteRoom('${r.id}')"><i class="fas fa-trash"></i></button> <button class="btn btn-sm btn-warning" onclick="window.toggleRoom('${r.id}')">Alternar</button></div></div>`).join(""); }
+    window.deleteRoom = (id) => { db.rooms = db.rooms.filter(r=>r.id!==id); saveDB(); refreshUI(); };
+    window.toggleRoom = (id) => { let room = db.rooms.find(r=>r.id===id); if(room) room.available = !room.available; saveDB(); refreshUI(); };
+    function renderDishes() { const container = document.getElementById("dishesList"); if(container) container.innerHTML = db.dishes.map(d => `<div class="col-md-4 mb-2"><div class="glass-card p-2"><b>${d.name}</b> (${d.category})<br>${d.description} - ${d.price} KZ <button class="btn btn-sm btn-outline-danger" onclick="window.deleteDish('${d.id}')"><i class="fas fa-trash"></i></button></div></div>`).join(""); }
+    window.deleteDish = (id) => { db.dishes = db.dishes.filter(d=>d.id!==id); saveDB(); refreshUI(); };
+    function renderServices() { const div = document.getElementById("servicesCheck"); if(div) div.innerHTML = Object.keys(db.services).map(s => `<div class="col-4 col-md-2"><div class="form-check"><input class="form-check-input" type="checkbox" id="serv_${s}" ${db.services[s] ? "checked":""}><label>${s}</label></div></div>`).join(""); }
+    document.getElementById("saveServicesBtn")?.addEventListener("click",()=>{ const checks = document.querySelectorAll("#servicesCheck input"); checks.forEach(ch => { db.services[ch.id.replace("serv_","")] = ch.checked; }); saveDB(); alert("Serviços atualizados"); });
+    function renderExperiences() { const div = document.getElementById("expList"); if(div) div.innerHTML = db.experiences.map(e => `<div class="col-md-4"><div class="glass-card p-2"><i class="fas fa-hiking"></i> ${e.name}<br>${e.description} - ${e.price} KZ <button class="btn btn-sm btn-danger" onclick="window.deleteExp('${e.id}')">X</button></div></div>`).join(""); }
+    window.deleteExp = (id) => { db.experiences = db.experiences.filter(e=>e.id!==id); saveDB(); refreshUI(); };
+    function renderGallery() { const div = document.getElementById("galleryPreview"); if(div) div.innerHTML = db.gallery.map(img => `<img src="${img}" class="preview-img">`).join(""); }
+    document.getElementById("galleryInput")?.addEventListener("change", (e) => { Array.from(e.target.files).forEach(f => { const reader = new FileReader(); reader.onload = ev => { db.gallery.push(ev.target.result); renderGallery(); saveDB(); }; reader.readAsDataURL(f); }); });
+    document.getElementById("saveGalleryBtn")?.addEventListener("click", () => { saveDB(); alert("Galeria guardada"); });
+    function renderMessages() { const container = document.getElementById("msgsContainer"); if(container) container.innerHTML = db.messages.map(m => `<div class="message-item"><strong>${m.from}:</strong> ${m.text} <small>${new Date(m.date).toLocaleString()}</small> ${m.replied ? '<span class="badge bg-success">Respondida</span>' : '<span class="badge bg-warning">Pendente</span>'}</div>`).join(""); }
+    document.getElementById("sendReplyMsgBtn")?.addEventListener("click", () => { let reply = document.getElementById("replyMsg")?.value; if(reply && db.messages.length){ let last = db.messages[db.messages.length-1]; last.replied = true; db.messages.push({ id:"r"+Date.now(), from: "Hotel", text: `Resposta: ${reply}`, date: new Date().toISOString(), replied: false }); saveDB(); refreshUI(); document.getElementById("replyMsg").value = ""; } });
+    function renderStaff() { const div = document.getElementById("staffListContainer"); if(div) div.innerHTML = db.staff.map(s => `<div class="list-group-item list-group-item-action bg-transparent text-white border-light">${s.name} - ${s.role} ${s.id !== "1" ? `<button class="btn btn-sm btn-danger float-end" onclick="window.deleteStaff('${s.id}')">Remover</button>` : ""}</div>`).join(""); }
+    window.deleteStaff = (id) => { if(id !== "1") { db.staff = db.staff.filter(s=>s.id!==id); saveDB(); refreshUI(); } else alert("Admin principal não pode ser removido"); };
+    document.getElementById("addStaffBtn")?.addEventListener("click",()=>{ let name = prompt("Nome"); let role = prompt("Role (Admin/Manager/Marketing/Reception)"); if(name && role) { db.staff.push({ id:"s"+Date.now(), name, role, password:"temp" }); saveDB(); refreshUI(); } });
+    function applyStyles() { document.body.style.background = `linear-gradient(135deg, ${db.hotelStyle.primaryColor} 0%, #1a3a5a 100%)`; document.querySelectorAll(".glass-card").forEach(card => card.style.backdropFilter = `blur(${db.hotelStyle.blurPx}px)`); }
+    document.getElementById("applyThemeBtn")?.addEventListener("click",()=>{ db.hotelStyle.primaryColor = document.getElementById("themeColor").value; db.hotelStyle.blurPx = document.getElementById("blurRange").value; saveDB(); applyStyles(); });
+    document.getElementById("addRoomBtn")?.addEventListener("click",()=>{ let name = prompt("Nome do quarto"); if(name){ db.rooms.push({ id:"r"+Date.now(), name, type: prompt("Tipo"), price: parseInt(prompt("Preço")), description: prompt("Descrição"), available: true, images: [] }); saveDB(); refreshUI(); } });
+    document.getElementById("addDishBtn")?.addEventListener("click",()=>{ let name = prompt("Prato"); if(name){ db.dishes.push({ id:"d"+Date.now(), name, category: prompt("Categoria"), description: prompt("Descrição"), price: parseInt(prompt("Preço KZ")), images: [] }); saveDB(); refreshUI(); } });
+    document.getElementById("addExpBtn")?.addEventListener("click",()=>{ let name = prompt("Nome da experiência"); if(name){ db.experiences.push({ id:"e"+Date.now(), name, description: prompt("Descrição"), price: parseInt(prompt("Preço"))||0 }); saveDB(); refreshUI(); } });
+
+    // Autenticação
+    document.getElementById("doLoginBtn")?.addEventListener("click",()=>{
+        let user = document.getElementById("loginUser").value;
+        let pass = document.getElementById("loginPass").value;
+        let found = db.staff.find(s => s.name === user && s.password === pass);
+        if(found){
+            currentUser = found;
+            document.getElementById("loginArea").style.display = "none";
+            document.getElementById("mainContent").style.display = "block";
+            document.getElementById("authHeader").style.display = "none";
+            document.getElementById("userHeader").style.display = "block";
+            document.getElementById("currentUserName").innerText = currentUser.name;
+            document.getElementById("currentUserRole").innerText = currentUser.role;
+            if(sessionTimeout) clearTimeout(sessionTimeout);
+            sessionTimeout = setTimeout(()=>{ logout(); alert("Sessão expirada"); }, 30*60*1000);
+            refreshUI();
+        } else alert("Credenciais inválidas");
+    });
+    document.getElementById("showLoginBtn")?.addEventListener("click",()=>{ document.getElementById("loginArea").style.display = "block"; document.getElementById("mainContent").style.display = "none"; });
+    function logout(){ currentUser=null; document.getElementById("loginArea").style.display = "block"; document.getElementById("mainContent").style.display = "none"; document.getElementById("authHeader").style.display = "block"; document.getElementById("userHeader").style.display = "none"; if(sessionTimeout) clearTimeout(sessionTimeout); }
+    document.getElementById("logoutBtn")?.addEventListener("click",logout);
+    // navegação secções
+    document.querySelectorAll(".nav-section").forEach(btn => { btn.addEventListener("click",()=>{ let target = btn.getAttribute("data-section"); document.querySelectorAll(".section").forEach(sec => sec.classList.remove("active")); document.getElementById(target).classList.add("active"); }); });
+    loadData();
+    // Simulação tempo real (polling)
+    setInterval(()=>{ refreshUI(); }, 5000);
+</script>
+</body>
+</html>
