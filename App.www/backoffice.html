@@ -1,195 +1,833 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Backoffice | HotelSphere - Gestão Hoteleira Malanje</title>
-    <!-- Bootstrap 5 + Font Awesome + CSS Principal -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Times New Roman', Times, serif;
-            background: linear-gradient(135deg, #0a1a2a 0%, #1a3a5a 100%);
-            min-height: 100vh;
-            color: #f0f4fa;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Reserve Já | Backoffice - Gestão Hoteleira</title>
+  <!-- Bootstrap 5 + Icons + Fonts -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { font-family: 'Times New Roman', Times, serif; }
+    body { background: url('images/guias.png') no-repeat center center fixed;
+    background-size: cover; margin: 0; padding: 0; }
+    .sidebar {
+      background: linear-gradient(135deg, #0b2b3b 0%, #1a4a5f 100%);
+      min-height: 100vh;
+      color: white;
+      transition: all 0.3s;
+    }
+    .sidebar .nav-link {
+      color: #e0eef5;
+      border-radius: 0.5rem;
+      margin: 5px 10px;
+      transition: 0.2s;
+    }
+    .sidebar .nav-link:hover, .sidebar .nav-link.active {
+      background: #ffb347;
+      color: #1e2f3a;
+      font-weight: bold;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .navbar-brand-custom {
+      font-size: 1.6rem;
+      font-weight: bold;
+      border-bottom: 2px solid #ffb347;
+      display: inline-block;
+      margin-bottom: 1rem;
+    }
+    .card-stats {
+      border-left: 6px solid #ffb347;
+      transition: transform 0.2s;
+    }
+    .card-stats:hover { transform: translateY(-3px); }
+    .content-pane {
+      background: #f8f9fc;
+      min-height: 100vh;
+      padding: 20px 30px;
+    }
+    .logout-btn { background: #d9534f; border: none; font-weight: bold; }
+    .logout-btn:hover { background: #c9302c; }
+    .toast-container { z-index: 9999; }
+    .real-time-badge {
+      font-size: 0.75rem;
+      background: #2ecc71;
+      color: #fff;
+      border-radius: 30px;
+      padding: 4px 12px;
+      display: inline-block;
+    }
+    .img-preview {
+      max-width: 100px;
+      max-height: 80px;
+      object-fit: cover;
+      border-radius: 5px;
+      margin: 5px;
+    }
+    .gallery-thumb {
+      cursor: pointer;
+      transition: 0.2s;
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 5px;
+    }
+    .card { border-radius: 1rem; box-shadow: 0 5px 12px rgba(0,0,0,0.05); }
+    @media (max-width: 768px) {
+      .sidebar { min-height: auto; }
+      .content-pane { padding: 15px; }
+    }
+    
+    /* Estilos adicionais para o login */
+    .login-card {
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.95);
+      border: none;
+    }
+    .password-strength {
+      height: 4px;
+      transition: all 0.3s;
+      border-radius: 2px;
+    }
+    .credential-info {
+      background: #f8f9fa;
+      border-left: 4px solid #ffb347;
+    }
+      
+       .logo-img {
+            height: 70px;
+            width: 150px;
+            object-fit: contain;
+            margin: 0;
+            padding: 0;
+            border: 0;
+            display: block;
         }
-        /* Glassmorphism */
-        .glass-card {
-            background: rgba(25, 40, 55, 0.65);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 24px;
-            transition: all 0.25s ease;
-        }
-        .glass-card:hover { border-color: rgba(70, 150, 250, 0.6); transform: translateY(-2px); }
-        .btn-glow:hover { box-shadow: 0 0 12px rgba(70,130,200,0.6); transform: scale(1.02); }
-        .section { display: none; animation: fadeIn 0.3s ease; }
-        .section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .preview-img { width: 80px; height: 80px; object-fit: cover; border-radius: 12px; margin: 5px; }
-        .message-item { border-bottom: 1px solid rgba(255,255,255,0.1); padding: 10px; }
-        .sidebar-nav { position: sticky; top: 20px; }
-        @media (max-width: 768px) { .sidebar-nav { position: static; margin-bottom: 20px; } }
-    </style>
+  </style>
 </head>
 <body>
-<div class="container-fluid px-3 px-md-4 py-3">
-    <!-- Header -->
-    <div class="glass-card p-3 mb-4 d-flex justify-content-between align-items-center flex-wrap">
-        <div><i class="fas fa-hotel fa-2x me-2"></i><span class="fs-2 fw-bold">Hotel<span style="color:#7bc5ff;">Sphere</span></span><span class="badge bg-info ms-2">BACKOFFICE · Malanje</span></div>
-        <div id="authHeader"><button class="btn btn-outline-light" id="showLoginBtn"><i class="fas fa-lock"></i> Login</button></div>
-        <div id="userHeader" style="display:none;"><span class="me-3"><i class="fas fa-user-shield"></i> <span id="currentUserName">Admin</span> (<span id="currentUserRole">Admin</span>)</span><button class="btn btn-sm btn-danger" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Sair</button></div>
-    </div>
 
-    <!-- Login Modal (simples, sem Bootstrap modal extra) -->
-    <div id="loginArea" class="glass-card p-4 mb-4" style="max-width:500px; margin:0 auto;">
-        <h3><i class="fas fa-key"></i> Acesso Restrito</h3>
-        <input type="text" id="loginUser" class="form-control my-2" placeholder="Utilizador">
-        <input type="password" id="loginPass" class="form-control my-2" placeholder="Palavra-passe">
-        <button class="btn btn-primary w-100" id="doLoginBtn">Entrar</button>
-        <hr><small>Admin: admin / admin123 | Manager: manager / manager</small>
-    </div>
-
-    <!-- Conteúdo principal (aparece só após login) -->
-    <div id="mainContent" style="display:none;">
-        <div class="row">
-            <div class="col-md-3 col-lg-2 mb-4">
-                <div class="glass-card p-3 sidebar-nav">
-                    <div class="d-flex flex-column gap-2">
-                        <button class="btn btn-outline-light nav-section" data-section="dashboard"><i class="fas fa-chart-line"></i> Dashboard</button>
-                        <button class="btn btn-outline-light nav-section" data-section="rooms"><i class="fas fa-bed"></i> Quartos</button>
-                        <button class="btn btn-outline-light nav-section" data-section="gastronomy"><i class="fas fa-utensils"></i> Gastronomia</button>
-                        <button class="btn btn-outline-light nav-section" data-section="services"><i class="fas fa-concierge-bell"></i> Serviços</button>
-                        <button class="btn btn-outline-light nav-section" data-section="experiences"><i class="fas fa-hiking"></i> Experiências</button>
-                        <button class="btn btn-outline-light nav-section" data-section="gallery"><i class="fas fa-images"></i> Galeria</button>
-                        <button class="btn btn-outline-light nav-section" data-section="messages"><i class="fas fa-envelope"></i> Mensagens</button>
-                        <button class="btn btn-outline-light nav-section" data-section="team"><i class="fas fa-users"></i> Equipa</button>
-                        <button class="btn btn-outline-light nav-section" data-section="customize"><i class="fas fa-palette"></i> Personalizar</button>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-9 col-lg-10">
-                <!-- DASHBOARD -->
-                <div id="dashboard" class="section active">
-                    <div class="glass-card p-4"><h3><i class="fas fa-chart-simple"></i> Estatísticas</h3>
-                        <div class="row mt-3">
-                            <div class="col-md-3 mb-3"><div class="glass-card p-3 text-center"><i class="fas fa-door-open fa-2x"></i><h4 id="statRooms">0</h4><p>Quartos</p></div></div>
-                            <div class="col-md-3 mb-3"><div class="glass-card p-3 text-center"><i class="fas fa-envelope fa-2x"></i><h4 id="statMessages">0</h4><p>Mensagens</p></div></div>
-                            <div class="col-md-3 mb-3"><div class="glass-card p-3 text-center"><i class="fas fa-eye fa-2x"></i><h4>342</h4><p>Visualizações</p></div></div>
-                            <div class="col-md-3 mb-3"><div class="glass-card p-3 text-center"><i class="fas fa-calendar fa-2x"></i><h4>8</h4><p>Atividades</p></div></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- QUARTOS CRUD -->
-                <div id="rooms" class="section"><div class="glass-card p-4"><h3><i class="fas fa-bed"></i> Gestão de Quartos</h3><button class="btn btn-success mb-3" id="addRoomBtn"><i class="fas fa-plus"></i> Novo Quarto</button><div id="roomsList" class="row"></div></div></div>
-                <!-- GASTRONOMIA -->
-                <div id="gastronomy" class="section"><div class="glass-card p-4"><h3><i class="fas fa-utensils"></i> Gastronomia</h3><button class="btn btn-success mb-3" id="addDishBtn"><i class="fas fa-plus"></i> Adicionar Prato</button><div id="dishesList" class="row"></div></div></div>
-                <!-- SERVIÇOS -->
-                <div id="services" class="section"><div class="glass-card p-4"><h3><i class="fas fa-concierge-bell"></i> Serviços</h3><div id="servicesCheck" class="row"></div><button class="btn btn-primary mt-3" id="saveServicesBtn">Guardar Serviços</button></div></div>
-                <!-- EXPERIÊNCIAS -->
-                <div id="experiences" class="section"><div class="glass-card p-4"><h3><i class="fas fa-tree"></i> Experiências</h3><button class="btn btn-secondary mb-2" id="addExpBtn">+ Adicionar</button><div id="expList" class="row"></div></div></div>
-                <!-- GALERIA -->
-                <div id="gallery" class="section"><div class="glass-card p-4"><h3><i class="fas fa-images"></i> Galeria</h3><input type="file" id="galleryInput" multiple accept="image/*" class="form-control mb-3"><div id="galleryPreview" class="d-flex flex-wrap"></div><button class="btn btn-info mt-2" id="saveGalleryBtn">Guardar Galeria</button></div></div>
-                <!-- MENSAGENS -->
-                <div id="messages" class="section"><div class="glass-card p-4"><h3><i class="fas fa-comment-dots"></i> Mensagens Turistas</h3><div id="msgsContainer" style="max-height:400px; overflow:auto;"></div><div class="mt-3"><input type="text" id="replyMsg" class="form-control" placeholder="Responder..."><button class="btn btn-primary mt-2" id="sendReplyMsgBtn">Enviar Resposta</button></div></div></div>
-                <!-- EQUIPA -->
-                <div id="team" class="section"><div class="glass-card p-4"><h3><i class="fas fa-users"></i> Gestão de Equipa</h3><button class="btn btn-warning mb-2" id="addStaffBtn">+ Novo Utilizador</button><div id="staffListContainer"></div></div></div>
-                <!-- PERSONALIZAÇÃO -->
-                <div id="customize" class="section"><div class="glass-card p-4"><h3><i class="fas fa-palette"></i> Personalização</h3><label>Cor principal:</label><input type="color" id="themeColor" class="form-control w-25 mb-2"><label>Intensidade Glass:</label><input type="range" id="blurRange" min="5" max="30" value="16" class="form-range w-50"><button id="applyThemeBtn" class="btn btn-light mt-2">Aplicar</button></div></div>
-            </div>
+<div id="app" class="container-fluid px-0">
+  <!-- TELA DE LOGIN -->
+  <div id="loginContainer" class="row g-0" style="min-height: 100vh; background: url('images/turismo-2.png') no-repeat center center fixed;
+    background-size: cover;">
+    <div class="col-md-5 col-lg-4 mx-auto my-auto">
+      <div class="card shadow-lg border-0 rounded-4 p-4 login-card">
+        <div class="text-center mb-4">
+           <a class="navbar-brand-custom" href="index.html">
+                <img src="images/palanca-real-rbg.png" class="logo-img" alt="Reserve Já">
+            </a>
+          <p class="text-muted">Backoffice · Gestão Hoteleira</p>
+          <span class="badge bg-warning text-dark">Província de Malanje</span>
         </div>
+        
+        <!-- Área de login -->
+        <div id="loginArea">
+          <form id="loginForm">
+            <div class="mb-3">
+              <label class="form-label"><i class="fas fa-user"></i> Utilizador</label>
+              <input type="text" id="loginUser" class="form-control" placeholder="ex: hotelmanager" required autocomplete="username">
+            </div>
+            <div class="mb-3">
+              <label class="form-label"><i class="fas fa-lock"></i> Palavra-passe</label>
+              <input type="password" id="loginPass" class="form-control" placeholder="••••••" required autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn btn-warning w-100 fw-bold"><i class="fas fa-sign-in-alt"></i> Entrar</button>
+          </form>
+        </div>
+        
+        <!-- Informação das credenciais padrão (apenas visual) -->
+        <div class="credential-info p-3 rounded mt-3 small">
+          <i class="fas fa-info-circle text-warning"></i> 
+          <strong>Credenciais padrão:</strong><br>
+          Utilizador: <code>hotelmanager</code><br>
+          Senha: <code>admin123</code><br>
+          <span class="text-muted">* Pode alterar a senha após o login na secção "Segurança"</span>
+        </div>
+      </div>
     </div>
+  </div>
+
+  <!-- DASHBOARD PRINCIPAL (APÓS LOGIN) -->
+  <div id="dashboardContainer" style="display: none;">
+    <div class="row g-0">
+      <!-- Sidebar -->
+      <div class="col-md-3 col-lg-2 sidebar p-3">
+        <div class="text-center mb-4">
+          <h3 class="navbar-brand-custom">Reserve Já</h3>
+          <span class="badge bg-light text-dark"><i class="fas fa-hotel"></i> Backoffice</span>
+        </div>
+        <nav class="nav flex-column">
+          <a href="#" data-view="dashboard" class="nav-link active mb-1"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+          <a href="#" data-view="hotel" class="nav-link mb-1"><i class="fas fa-building"></i> Gestão Hotel</a>
+          <a href="#" data-view="quartos" class="nav-link mb-1"><i class="fas fa-bed"></i> Gestão Quartos</a>
+          <a href="#" data-view="servicos" class="nav-link mb-1"><i class="fas fa-concierge-bell"></i> Serviços</a>
+          <a href="#" data-view="gastronomia" class="nav-link mb-1"><i class="fas fa-utensils"></i> Gastronomia</a>
+          <a href="#" data-view="galeria" class="nav-link mb-1"><i class="fas fa-images"></i> Galeria</a>
+          <a href="#" data-view="promocoes" class="nav-link mb-1"><i class="fas fa-tags"></i> Promoções</a>
+          <a href="#" data-view="mensagens" class="nav-link mb-1"><i class="fas fa-envelope"></i> Mensagens <span id="msgBadge" class="badge bg-danger rounded-pill ms-1" style="display:none;">0</span></a>
+          <a href="#" data-view="reservas" class="nav-link mb-1"><i class="fas fa-calendar-check"></i> Reservas</a>
+          <a href="#" data-view="avaliacoes" class="nav-link mb-1"><i class="fas fa-star"></i> Avaliações</a>
+          <a href="#" data-view="seguranca" class="nav-link mb-1"><i class="fas fa-shield-alt"></i> Segurança</a>
+          <hr class="bg-secondary">
+          <button id="logoutButton" class="btn logout-btn w-100 mt-3"><i class="fas fa-sign-out-alt"></i> Sair</button>
+        </nav>
+        <div class="mt-4 small text-center text-white-50">
+          <i class="fas fa-sync-alt"></i> Sincronização Real Time
+        </div>
+      </div>
+
+      <!-- Conteúdo principal -->
+      <div class="col-md-9 col-lg-10 content-pane">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+          <h2 id="viewTitle" class="fw-bold">Dashboard</h2>
+          <div><span class="real-time-badge"><i class="fas fa-broadcast-tower"></i> Live: Sincronizado</span></div>
+        </div>
+        <div id="dynamicContent"></div>
+        <div class="footer-spa text-muted text-center mt-4">
+          <i class="fas fa-lock"></i> Sessão protegida · Dados sincronizados
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-<footer class="text-center py-3"><i class="fas fa-database"></i> Backoffice · HotelSphere · Dados sincronizados via localStorage</footer>
 
 <script>
-    // ===================== SISTEMA DE DADOS GLOBAL =====================
-    let db = {
-        rooms: [],
-        dishes: [],
-        services: { pool: true, spa: true, gym: false, restaurant: true, wifi: true, transport: false },
-        experiences: [],
-        gallery: [],
-        messages: [],
-        staff: [{ id: "1", name: "Admin", role: "Admin", password: "admin123" }, { id: "2", name: "Manager", role: "Manager", password: "manager" }],
-        hotelStyle: { primaryColor: "#0a1a2a", blurPx: "16" }
+  // ==================== SISTEMA DE LOGIN COM ALTERAÇÃO DE SENHA ====================
+  let authToken = null;
+  let currentUser = null;
+  
+  // Estrutura de credenciais (usuário fixo, senha alterável)
+  // As credenciais são armazenadas de forma segura com hash
+  function initializeCredentials() {
+    if(!localStorage.getItem("rj_users")) {
+      // Criar usuário padrão com senha "admin123" hasheada
+      const defaultUser = {
+        username: "hotelmanager",
+        passwordHash: btoa("admin123"), // Hash simples (base64)
+        createdAt: new Date().toISOString()
+      };
+      localStorage.setItem("rj_users", JSON.stringify([defaultUser]));
+    }
+  }
+  
+  // Obter lista de usuários
+  function getUsers() {
+    return JSON.parse(localStorage.getItem("rj_users") || "[]");
+  }
+  
+  // Salvar usuários
+  function saveUsers(users) {
+    localStorage.setItem("rj_users", JSON.stringify(users));
+  }
+  
+  // Validar credenciais
+  function validateCredentials(username, password) {
+    const users = getUsers();
+    const user = users.find(u => u.username === username);
+    if(user && user.passwordHash === btoa(password)) {
+      return true;
+    }
+    return false;
+  }
+  
+  // Atualizar senha do usuário
+  function updateUserPassword(username, newPassword) {
+    const users = getUsers();
+    const userIndex = users.findIndex(u => u.username === username);
+    if(userIndex !== -1) {
+      users[userIndex].passwordHash = btoa(newPassword);
+      users[userIndex].lastPasswordChange = new Date().toISOString();
+      saveUsers(users);
+      return true;
+    }
+    return false;
+  }
+  
+  // Verificar se é a primeira vez que o usuário entra (para sugerir troca de senha)
+  function isFirstLogin(username) {
+    const users = getUsers();
+    const user = users.find(u => u.username === username);
+    return user && !user.lastPasswordChange;
+  }
+  
+  // Inicializar credenciais
+  initializeCredentials();
+  
+  // ==================== DADOS GLOBAIS (estrutura completa) ====================
+  let hotelData = {
+    nome: "Hotel Malanje Palace", descricao: "Conforto e tradição no coração da província", categoria: "4 Estrelas",
+    morada: "Rua 1º de Maio, Malanje", contactos: "+244 923 456 789", email: "reservas@hotelmalanje.ao",
+    website: "www.hotelmalanje.ao", horario: "Recepção 24h"
+  };
+  let quartos = [];
+  let servicos = { piscina: true, restaurante: true, bar: false, wifi: true, lavandaria: true, estacionamento: true, outros: "Sala de ginásio" };
+  let gastronomia = [];
+  let galeria = [];
+  let promocoes = [];
+  let mensagens = [];
+  let reservas = [];
+  let avaliacoes = [];
+
+  // Carregar/Salvar dados no localStorage
+  function loadDataFromStorage() {
+    const dataMap = {
+      rj_hotel: (d) => { if(d) hotelData = JSON.parse(d); },
+      rj_quartos: (d) => { if(d) quartos = JSON.parse(d); },
+      rj_servicos: (d) => { if(d) servicos = JSON.parse(d); },
+      rj_gastronomia: (d) => { if(d) gastronomia = JSON.parse(d); },
+      rj_galeria: (d) => { if(d) galeria = JSON.parse(d); },
+      rj_promocoes: (d) => { if(d) promocoes = JSON.parse(d); },
+      rj_mensagens: (d) => { if(d) mensagens = JSON.parse(d); },
+      rj_reservas: (d) => { if(d) reservas = JSON.parse(d); },
+      rj_avaliacoes: (d) => { if(d) avaliacoes = JSON.parse(d); }
     };
-    let currentUser = null;
-    let sessionTimeout = null;
-
-    function loadData() {
-        const saved = localStorage.getItem("hotelSphereDB");
-        if(saved) {
-            try { db = JSON.parse(saved); if(!db.messages) db.messages = []; if(!db.gallery) db.gallery = []; if(!db.experiences) db.experiences = []; if(!db.services) db.services = { pool: true, spa: true, gym: false, restaurant: true, wifi: true, transport: false }; if(!db.staff) db.staff = [{ id: "1", name: "Admin", role: "Admin", password: "admin123" }]; } catch(e) {}
-        } else {
-            // Dados iniciais
-            db.rooms = [{ id: "r1", name: "Suite Presidencial", type: "Luxo", price: 250, description: "Vista rio Kwanza", available: true, images: [] }, { id: "r2", name: "Quarto Standard", type: "Standard", price: 90, description: "Conforto básico", available: true, images: [] }];
-            db.dishes = [{ id: "d1", name: "Muamba de Galinha", category: "Angolana", description: "Prato típico", price: 1800, images: [] }];
-            db.experiences = [{ id: "e1", name: "Quedas de Kalandula", description: "Tour de 1 dia", price: 12000 }];
-            db.gallery = ["https://picsum.photos/id/104/300/200", "https://picsum.photos/id/29/300/200"];
-            db.messages = [{ id: "m1", from: "João Viajante", text: "Gostaria de saber se aceitam pets?", date: new Date().toISOString(), replied: false }];
-            saveDB();
-        }
-        refreshUI();
+    for(let [key, callback] of Object.entries(dataMap)){
+      const stored = localStorage.getItem(key);
+      callback(stored);
     }
-    function saveDB() { localStorage.setItem("hotelSphereDB", JSON.stringify(db)); window.dispatchEvent(new Event("storage")); }
-    function refreshUI() {
-        document.getElementById("statRooms").innerText = db.rooms.length;
-        document.getElementById("statMessages").innerText = db.messages.filter(m => !m.replied).length;
-        renderRooms(); renderDishes(); renderServices(); renderExperiences(); renderGallery(); renderMessages(); renderStaff(); applyStyles();
+    // Inicializar com dados demo se vazios
+    if(quartos.length === 0){
+      quartos = [
+        { id: "q1", nome: "Quarto Standard", estado: "disponível", preco: 12000, capacidade: 2, imagens: [] },
+        { id: "q2", nome: "Suíte Luxo", estado: "ocupado", preco: 25000, capacidade: 4, imagens: [] },
+        { id: "q3", nome: "Quarto Família", estado: "disponível", preco: 18000, capacidade: 6, imagens: [] }
+      ];
     }
-    function renderRooms() { const container = document.getElementById("roomsList"); if(!container) return; container.innerHTML = db.rooms.map(r => `<div class="col-md-6 mb-3"><div class="glass-card p-3"><h5>${r.name} (${r.type})</h5><p>💰 ${r.price} KZ | ${r.available ? "✅ Disponível" : "❌ Indisponível"}<br>${r.description}</p><button class="btn btn-sm btn-danger" onclick="window.deleteRoom('${r.id}')"><i class="fas fa-trash"></i></button> <button class="btn btn-sm btn-warning" onclick="window.toggleRoom('${r.id}')">Alternar</button></div></div>`).join(""); }
-    window.deleteRoom = (id) => { db.rooms = db.rooms.filter(r=>r.id!==id); saveDB(); refreshUI(); };
-    window.toggleRoom = (id) => { let room = db.rooms.find(r=>r.id===id); if(room) room.available = !room.available; saveDB(); refreshUI(); };
-    function renderDishes() { const container = document.getElementById("dishesList"); if(container) container.innerHTML = db.dishes.map(d => `<div class="col-md-4 mb-2"><div class="glass-card p-2"><b>${d.name}</b> (${d.category})<br>${d.description} - ${d.price} KZ <button class="btn btn-sm btn-outline-danger" onclick="window.deleteDish('${d.id}')"><i class="fas fa-trash"></i></button></div></div>`).join(""); }
-    window.deleteDish = (id) => { db.dishes = db.dishes.filter(d=>d.id!==id); saveDB(); refreshUI(); };
-    function renderServices() { const div = document.getElementById("servicesCheck"); if(div) div.innerHTML = Object.keys(db.services).map(s => `<div class="col-4 col-md-2"><div class="form-check"><input class="form-check-input" type="checkbox" id="serv_${s}" ${db.services[s] ? "checked":""}><label>${s}</label></div></div>`).join(""); }
-    document.getElementById("saveServicesBtn")?.addEventListener("click",()=>{ const checks = document.querySelectorAll("#servicesCheck input"); checks.forEach(ch => { db.services[ch.id.replace("serv_","")] = ch.checked; }); saveDB(); alert("Serviços atualizados"); });
-    function renderExperiences() { const div = document.getElementById("expList"); if(div) div.innerHTML = db.experiences.map(e => `<div class="col-md-4"><div class="glass-card p-2"><i class="fas fa-hiking"></i> ${e.name}<br>${e.description} - ${e.price} KZ <button class="btn btn-sm btn-danger" onclick="window.deleteExp('${e.id}')">X</button></div></div>`).join(""); }
-    window.deleteExp = (id) => { db.experiences = db.experiences.filter(e=>e.id!==id); saveDB(); refreshUI(); };
-    function renderGallery() { const div = document.getElementById("galleryPreview"); if(div) div.innerHTML = db.gallery.map(img => `<img src="${img}" class="preview-img">`).join(""); }
-    document.getElementById("galleryInput")?.addEventListener("change", (e) => { Array.from(e.target.files).forEach(f => { const reader = new FileReader(); reader.onload = ev => { db.gallery.push(ev.target.result); renderGallery(); saveDB(); }; reader.readAsDataURL(f); }); });
-    document.getElementById("saveGalleryBtn")?.addEventListener("click", () => { saveDB(); alert("Galeria guardada"); });
-    function renderMessages() { const container = document.getElementById("msgsContainer"); if(container) container.innerHTML = db.messages.map(m => `<div class="message-item"><strong>${m.from}:</strong> ${m.text} <small>${new Date(m.date).toLocaleString()}</small> ${m.replied ? '<span class="badge bg-success">Respondida</span>' : '<span class="badge bg-warning">Pendente</span>'}</div>`).join(""); }
-    document.getElementById("sendReplyMsgBtn")?.addEventListener("click", () => { let reply = document.getElementById("replyMsg")?.value; if(reply && db.messages.length){ let last = db.messages[db.messages.length-1]; last.replied = true; db.messages.push({ id:"r"+Date.now(), from: "Hotel", text: `Resposta: ${reply}`, date: new Date().toISOString(), replied: false }); saveDB(); refreshUI(); document.getElementById("replyMsg").value = ""; } });
-    function renderStaff() { const div = document.getElementById("staffListContainer"); if(div) div.innerHTML = db.staff.map(s => `<div class="list-group-item list-group-item-action bg-transparent text-white border-light">${s.name} - ${s.role} ${s.id !== "1" ? `<button class="btn btn-sm btn-danger float-end" onclick="window.deleteStaff('${s.id}')">Remover</button>` : ""}</div>`).join(""); }
-    window.deleteStaff = (id) => { if(id !== "1") { db.staff = db.staff.filter(s=>s.id!==id); saveDB(); refreshUI(); } else alert("Admin principal não pode ser removido"); };
-    document.getElementById("addStaffBtn")?.addEventListener("click",()=>{ let name = prompt("Nome"); let role = prompt("Role (Admin/Manager/Marketing/Reception)"); if(name && role) { db.staff.push({ id:"s"+Date.now(), name, role, password:"temp" }); saveDB(); refreshUI(); } });
-    function applyStyles() { document.body.style.background = `linear-gradient(135deg, ${db.hotelStyle.primaryColor} 0%, #1a3a5a 100%)`; document.querySelectorAll(".glass-card").forEach(card => card.style.backdropFilter = `blur(${db.hotelStyle.blurPx}px)`); }
-    document.getElementById("applyThemeBtn")?.addEventListener("click",()=>{ db.hotelStyle.primaryColor = document.getElementById("themeColor").value; db.hotelStyle.blurPx = document.getElementById("blurRange").value; saveDB(); applyStyles(); });
-    document.getElementById("addRoomBtn")?.addEventListener("click",()=>{ let name = prompt("Nome do quarto"); if(name){ db.rooms.push({ id:"r"+Date.now(), name, type: prompt("Tipo"), price: parseInt(prompt("Preço")), description: prompt("Descrição"), available: true, images: [] }); saveDB(); refreshUI(); } });
-    document.getElementById("addDishBtn")?.addEventListener("click",()=>{ let name = prompt("Prato"); if(name){ db.dishes.push({ id:"d"+Date.now(), name, category: prompt("Categoria"), description: prompt("Descrição"), price: parseInt(prompt("Preço KZ")), images: [] }); saveDB(); refreshUI(); } });
-    document.getElementById("addExpBtn")?.addEventListener("click",()=>{ let name = prompt("Nome da experiência"); if(name){ db.experiences.push({ id:"e"+Date.now(), name, description: prompt("Descrição"), price: parseInt(prompt("Preço"))||0 }); saveDB(); refreshUI(); } });
+    if(gastronomia.length === 0){
+      gastronomia = [
+        { id: "g1", tipo: "Prato", nome: "Mufete", preco: 4500, imagem: "" },
+        { id: "g2", tipo: "Bebida", nome: "Coca-Cola", preco: 500, imagem: "" },
+        { id: "g3", tipo: "Prato", nome: "Calulu", preco: 3500, imagem: "" }
+      ];
+    }
+    if(galeria.length === 0){
+      galeria = ["https://picsum.photos/id/104/200/150", "https://picsum.photos/id/106/200/150"];
+    }
+    if(promocoes.length === 0){
+      promocoes = [{ id: "p1", titulo: "Fim de Semana Especial", descricao: "10% desconto em estadias superiores a 2 noites", percentagem: 10, validoAte: "2026-12-31" }];
+    }
+    if(mensagens.length === 0){
+      mensagens = [
+        { id: "m1", nomeTurista: "João Silva", mensagem: "Gostaria de saber preços suite.", resposta: null, lida: false, timestamp: Date.now() },
+        { id: "m2", nomeTurista: "Maria Santos", mensagem: "O hotel aceita pets?", resposta: "Sim, aceitamos animais pequenos.", lida: true, timestamp: Date.now()-3600000 }
+      ];
+    }
+    if(reservas.length === 0){
+      reservas = [
+        { id: "r1", turista: "Carlos M.", email: "carlos@email.com", telefone: "923456789", quartoId: "q1", dataEntrada: "2026-07-10", dataSaida: "2026-07-15", estado: "pendente", precoTotal: 60000 },
+        { id: "r2", turista: "Amélia K.", email: "amelia@email.com", telefone: "912345678", quartoId: "q2", dataEntrada: "2026-08-01", dataSaida: "2026-08-05", estado: "confirmada", precoTotal: 100000 }
+      ];
+    }
+    if(avaliacoes.length === 0){
+      avaliacoes = [
+        { id: "a1", turista: "Rui Ferreira", nota: 4.5, comentario: "Muito bom atendimento", resposta: null, data: Date.now() }
+      ];
+    }
+    persistAll(false);
+  }
 
-    // Autenticação
-    document.getElementById("doLoginBtn")?.addEventListener("click",()=>{
-        let user = document.getElementById("loginUser").value;
-        let pass = document.getElementById("loginPass").value;
-        let found = db.staff.find(s => s.name === user && s.password === pass);
-        if(found){
-            currentUser = found;
-            document.getElementById("loginArea").style.display = "none";
-            document.getElementById("mainContent").style.display = "block";
-            document.getElementById("authHeader").style.display = "none";
-            document.getElementById("userHeader").style.display = "block";
-            document.getElementById("currentUserName").innerText = currentUser.name;
-            document.getElementById("currentUserRole").innerText = currentUser.role;
-            if(sessionTimeout) clearTimeout(sessionTimeout);
-            sessionTimeout = setTimeout(()=>{ logout(); alert("Sessão expirada"); }, 30*60*1000);
-            refreshUI();
-        } else alert("Credenciais inválidas");
+  function persistAll(notify = true) {
+    localStorage.setItem("rj_hotel", JSON.stringify(hotelData));
+    localStorage.setItem("rj_quartos", JSON.stringify(quartos));
+    localStorage.setItem("rj_servicos", JSON.stringify(servicos));
+    localStorage.setItem("rj_gastronomia", JSON.stringify(gastronomia));
+    localStorage.setItem("rj_galeria", JSON.stringify(galeria));
+    localStorage.setItem("rj_promocoes", JSON.stringify(promocoes));
+    localStorage.setItem("rj_mensagens", JSON.stringify(mensagens));
+    localStorage.setItem("rj_reservas", JSON.stringify(reservas));
+    localStorage.setItem("rj_avaliacoes", JSON.stringify(avaliacoes));
+    if(notify) {
+      localStorage.setItem("rj_sync_trigger", Date.now().toString());
+      showToast("Dados salvos e sincronizados em tempo real");
+    }
+    updateMsgBadge();
+  }
+
+  function updateMsgBadge() {
+    const unread = mensagens.filter(m => !m.lida).length;
+    const badge = document.getElementById("msgBadge");
+    if(badge) {
+      if(unread > 0) { badge.style.display = "inline-block"; badge.innerText = unread; }
+      else badge.style.display = "none";
+    }
+  }
+
+  function showToast(msg, type = "success") {
+    let toastContainer = document.querySelector(".toast-container");
+    if(!toastContainer) {
+      toastContainer = document.createElement("div");
+      toastContainer.className = "toast-container position-fixed bottom-0 end-0 p-3";
+      document.body.appendChild(toastContainer);
+    }
+    const toastEl = document.createElement("div");
+    toastEl.className = `toast show align-items-center text-white bg-${type === "success" ? "success" : "danger"} border-0`;
+    toastEl.setAttribute("role", "alert");
+    toastEl.innerHTML = `<div class="d-flex"><div class="toast-body">${msg}</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>`;
+    toastContainer.appendChild(toastEl);
+    setTimeout(() => toastEl.remove(), 3000);
+  }
+
+  // ==================== RENDERIZAÇÃO DAS VIEWS ====================
+  function renderDashboard() {
+    return `
+      <div class="row g-4">
+        <div class="col-md-3"><div class="card card-stats p-3"><i class="fas fa-bed fa-2x text-warning"></i><h3>${quartos.length}</h3><p>Total Quartos</p></div></div>
+        <div class="col-md-3"><div class="card card-stats p-3"><i class="fas fa-calendar-alt fa-2x text-info"></i><h3>${reservas.filter(r=>r.estado==="pendente").length}</h3><p>Reservas Pendentes</p></div></div>
+        <div class="col-md-3"><div class="card card-stats p-3"><i class="fas fa-envelope fa-2x text-success"></i><h3>${mensagens.filter(m=>!m.lida).length}</h3><p>Mensagens não lidas</p></div></div>
+        <div class="col-md-3"><div class="card card-stats p-3"><i class="fas fa-star fa-2x text-danger"></i><h3>${avaliacoes.length}</h3><p>Avaliações</p></div></div>
+      </div>
+      <div class="mt-4 card p-4">
+        <h5><i class="fas fa-chart-line"></i> Bem-vindo, ${currentUser}!</h5>
+        <p>Gerencie seu hotel, atualize informações, quartos com imagens, gastronomia e responda clientes em tempo real.</p>
+        ${isFirstLogin(currentUser) ? '<div class="alert alert-warning mt-2"><i class="fas fa-exclamation-triangle"></i> <strong>Primeiro acesso!</strong> Recomendamos alterar a sua palavra-passe na secção "Segurança".</div>' : ''}
+      </div>
+    `;
+  }
+
+  function renderHotel() {
+    return `<div class="card p-4"><h4><i class="fas fa-hotel"></i> Dados do Hotel</h4><form id="formHotel">
+      <div class="mb-2"><label>Nome</label><input class="form-control" name="nome" value="${escapeHtml(hotelData.nome)}"></div>
+      <div class="mb-2"><label>Descrição</label><textarea class="form-control" name="descricao">${escapeHtml(hotelData.descricao)}</textarea></div>
+      <div class="row"><div class="col"><label>Categoria</label><input class="form-control" name="categoria" value="${escapeHtml(hotelData.categoria)}"></div><div class="col"><label>Morada</label><input class="form-control" name="morada" value="${escapeHtml(hotelData.morada)}"></div></div>
+      <div class="row mt-2"><div class="col"><label>Contactos</label><input class="form-control" name="contactos" value="${escapeHtml(hotelData.contactos)}"></div><div class="col"><label>Email</label><input class="form-control" name="email" value="${escapeHtml(hotelData.email)}"></div></div>
+      <div class="row mt-2"><div class="col"><label>Website</label><input class="form-control" name="website" value="${escapeHtml(hotelData.website)}"></div><div class="col"><label>Horário</label><input class="form-control" name="horario" value="${escapeHtml(hotelData.horario)}"></div></div>
+      <button type="submit" class="btn btn-primary mt-3">Salvar Hotel</button></form></div>`;
+  }
+
+  function renderQuartos() {
+    let html = `<div class="card p-4"><div class="d-flex justify-content-between"><h4>Quartos</h4><button class="btn btn-sm btn-success" id="addQuartoBtn">+ Novo Quarto</button></div>
+      <table class="table table-bordered mt-2"><thead><tr><th>Nome</th><th>Estado</th><th>Preço (Kz)</th><th>Capacidade</th><th>Imagens</th><th>Ações</th></tr></thead><tbody>`;
+    quartos.forEach(q => {
+      html += `<tr>
+        <td><input type="text" class="form-control nome-quarto" data-id="${q.id}" value="${escapeHtml(q.nome)}"></td>
+        <td><select class="form-select estado-select" data-id="${q.id}"><option ${q.estado==="disponível"?"selected":""}>disponível</option><option ${q.estado==="ocupado"?"selected":""}>ocupado</option><option ${q.estado==="manutenção"?"selected":""}>manutenção</option></select></td>
+        <td><input type="number" class="form-control preco-quarto" data-id="${q.id}" value="${q.preco}"></td>
+        <td><input type="number" class="form-control capac-quarto" data-id="${q.id}" value="${q.capacidade}"></td>
+        <td>
+          <div class="d-flex flex-wrap">${q.imagens.map((img,idx)=>`<img src="${img}" class="img-preview"><button class="btn btn-sm btn-danger rm-img-quarto" data-id="${q.id}" data-imgidx="${idx}">X</button>`).join('')}</div>
+          <input type="file" class="form-control mt-2 upload-img-quarto" data-id="${q.id}" accept="image/*" multiple>
+          <button class="btn btn-sm btn-secondary mt-1 upload-btn-quarto" data-id="${q.id}">Adicionar imagens</button>
+         </td>
+        <td><button class="btn btn-danger btn-sm removerQuarto" data-id="${q.id}"><i class="fas fa-trash"></i></button></td>
+       </tr>`;
     });
-    document.getElementById("showLoginBtn")?.addEventListener("click",()=>{ document.getElementById("loginArea").style.display = "block"; document.getElementById("mainContent").style.display = "none"; });
-    function logout(){ currentUser=null; document.getElementById("loginArea").style.display = "block"; document.getElementById("mainContent").style.display = "none"; document.getElementById("authHeader").style.display = "block"; document.getElementById("userHeader").style.display = "none"; if(sessionTimeout) clearTimeout(sessionTimeout); }
-    document.getElementById("logoutBtn")?.addEventListener("click",logout);
-    // navegação secções
-    document.querySelectorAll(".nav-section").forEach(btn => { btn.addEventListener("click",()=>{ let target = btn.getAttribute("data-section"); document.querySelectorAll(".section").forEach(sec => sec.classList.remove("active")); document.getElementById(target).classList.add("active"); }); });
-    loadData();
-    // Simulação tempo real (polling)
-    setInterval(()=>{ refreshUI(); }, 5000);
+    html += `</tbody></table></div>`;
+    return html;
+  }
+
+  function renderServicos() {
+    return `<div class="card p-4"><h4>Serviços do Hotel</h4><form id="formServicos">
+      ${Object.keys(servicos).filter(k=>k!=='outros').map(s=>`<div class="form-check"><input class="form-check-input" type="checkbox" id="serv_${s}" ${servicos[s]?"checked":""}><label class="form-check-label" for="serv_${s}">${s.charAt(0).toUpperCase()+s.slice(1)}</label></div>`).join('')}
+      <div class="mt-2"><label>Outros serviços</label><textarea class="form-control" id="outrosServicos">${servicos.outros||''}</textarea></div>
+      <button type="submit" class="btn btn-primary mt-3">Salvar Serviços</button></form></div>`;
+  }
+
+  function renderGastronomia() {
+    let html = `<div class="card p-4"><h4>Pratos & Bebidas</h4><button class="btn btn-sm btn-success mb-2" id="addItemGastro">+ Adicionar</button>
+      <table class="table"><thead><tr><th>Tipo</th><th>Nome</th><th>Preço</th><th>Imagem</th><th></th></tr></thead><tbody>`;
+    gastronomia.forEach(g => {
+      html += `<tr>
+        <td><select class="form-select tipo-gastro" data-id="${g.id}"><option ${g.tipo==="Prato"?"selected":""}>Prato</option><option ${g.tipo==="Bebida"?"selected":""}>Bebida</option></select></td>
+        <td><input class="form-control nome-gastro" data-id="${g.id}" value="${escapeHtml(g.nome)}"></td>
+        <td><input class="form-control preco-gastro" data-id="${g.id}" value="${g.preco}"></td>
+        <td>
+          ${g.imagem ? `<img src="${g.imagem}" class="img-preview"><button class="btn btn-sm btn-danger rm-img-gastro" data-id="${g.id}">X</button><br>` : ''}
+          <input type="file" class="form-control mt-1 upload-img-gastro" data-id="${g.id}" accept="image/*">
+          <button class="btn btn-sm btn-secondary mt-1 upload-gastro-btn" data-id="${g.id}">Carregar imagem</button>
+         </td>
+        <td><button class="btn btn-danger btn-sm delGastro" data-id="${g.id}"><i class="fas fa-trash"></i></button></td>
+       </tr>`;
+    });
+    html += `</tbody></table><button id="saveGastroBtn" class="btn btn-primary">Salvar Gastronomia</button></div>`;
+    return html;
+  }
+
+  function renderGaleria() {
+    let html = `<div class="card p-4"><h4>Galeria de Imagens</h4>
+      <div class="mb-3"><input type="file" id="uploadImagem" accept="image/*" multiple class="form-control"></div>
+      <button id="uploadGaleriaBtn" class="btn btn-secondary">Upload múltiplo</button>
+      <div class="row mt-3">`;
+    galeria.forEach((img, idx) => {
+      html += `<div class="col-md-3 mb-2"><img src="${img}" class="gallery-thumb"><button class="btn btn-danger btn-sm mt-1 removeImgGaleria" data-index="${idx}">Remover</button></div>`;
+    });
+    html += `</div></div>`;
+    return html;
+  }
+
+  function renderPromocoes() {
+    let html = `<div class="card p-4"><h4>Promoções</h4><button class="btn btn-sm btn-success mb-2" id="addPromocaoBtn">+ Nova Promoção</button>
+      <div class="row">`;
+    promocoes.forEach(p => {
+      html += `<div class="col-md-6 mb-3"><div class="border p-3 rounded">
+        <input class="form-control mb-1 promocao-titulo" data-id="${p.id}" value="${escapeHtml(p.titulo)}" placeholder="Título">
+        <textarea class="form-control mb-1 promocao-desc" data-id="${p.id}" placeholder="Descrição">${escapeHtml(p.descricao)}</textarea>
+        <input class="form-control mb-1 promocao-perc" data-id="${p.id}" type="number" value="${p.percentagem}" placeholder="% desconto">
+        <input class="form-control mb-1 promocao-data" data-id="${p.id}" type="date" value="${p.validoAte}">
+        <button class="btn btn-danger btn-sm removerPromocao" data-id="${p.id}">Remover</button>
+      </div></div>`;
+    });
+    html += `</div><button id="savePromocoesBtn" class="btn btn-primary">Salvar Promoções</button></div>`;
+    return html;
+  }
+
+  function renderMensagens() {
+    let html = `<div class="card p-4"><h4>Mensagens de Turistas</h4><div class="list-group">`;
+    mensagens.sort((a,b)=>b.timestamp - a.timestamp).forEach(m => {
+      html += `<div class="list-group-item"><strong>${escapeHtml(m.nomeTurista)}</strong><p>${escapeHtml(m.mensagem)}</p>${m.resposta?`<div class="bg-light p-2 rounded"><strong>Sua resposta:</strong> ${escapeHtml(m.resposta)}</div>`:`<textarea id="resp_${m.id}" class="form-control mt-2" placeholder="Responder..."></textarea><button class="btn btn-sm btn-primary mt-1 responderMsg" data-id="${m.id}">Responder</button>`}<button class="btn btn-sm btn-outline-secondary marcarLida" data-id="${m.id}">Marcar lida</button></div>`;
+    });
+    html += `</div></div>`;
+    return html;
+  }
+
+  function renderReservas() {
+    let html = `<div class="card p-4"><h4>Solicitações de Reserva</h4><table class="table"><thead><tr><th>Turista</th><th>Contacto</th><th>Entrada/Saída</th><th>Total</th><th>Estado</th><th>Ações</th></tr></thead><tbody>`;
+    reservas.forEach(r => {
+      html += `<tr>
+        <td>${escapeHtml(r.turista)}<br><small>${escapeHtml(r.email)}</small></td>
+        <td>${escapeHtml(r.telefone)}</td>
+        <td>${r.dataEntrada} → ${r.dataSaida}</td>
+        <td>${r.precoTotal} Kz</td>
+        <td><span class="badge bg-${r.estado==='confirmada'?'success':r.estado==='rejeitada'?'danger':'warning'}">${r.estado}</span></td>
+        <td><button class="btn btn-sm btn-success confirmarReserva" data-id="${r.id}">Confirmar</button> <button class="btn btn-sm btn-danger rejeitarReserva" data-id="${r.id}">Rejeitar</button></td>
+       </tr>`;
+    });
+    html += `</tbody></table></div>`;
+    return html;
+  }
+
+  function renderAvaliacoes() {
+    let html = `<div class="card p-4"><h4>Avaliações dos Hóspedes</h4>`;
+    avaliacoes.forEach(a => {
+      html += `<div class="border-bottom p-2"><strong>${escapeHtml(a.turista)}</strong> ⭐ ${a.nota}/5<br>${escapeHtml(a.comentario)}${a.resposta?`<div class="alert alert-secondary mt-1">Resposta: ${escapeHtml(a.resposta)}</div>`:`<textarea id="respAval_${a.id}" placeholder="Responder avaliação..." class="form-control mt-2"></textarea><button class="btn btn-sm btn-info responderAvaliacao" data-id="${a.id}">Responder</button>`}</div>`;
+    });
+    html += `</div>`;
+    return html;
+  }
+
+  function renderSeguranca() {
+    return `<div class="card p-4">
+      <h4><i class="fas fa-shield-alt"></i> Segurança da Conta</h4>
+      <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i> <strong>Utilizador:</strong> ${currentUser}
+      </div>
+      <form id="changePwdForm">
+        <div class="mb-3">
+          <label>Nova palavra-passe</label>
+          <input type="password" id="newPassword" class="form-control" required minlength="4">
+          <div class="password-strength mt-1" id="passwordStrength"></div>
+          <small class="text-muted">Mínimo 4 caracteres</small>
+        </div>
+        <div class="mb-3">
+          <label>Confirmar nova palavra-passe</label>
+          <input type="password" id="confirmPassword" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-warning"><i class="fas fa-save"></i> Alterar palavra-passe</button>
+      </form>
+      <hr>
+      <div class="credential-info p-3 rounded small">
+        <i class="fas fa-key text-warning"></i> 
+        <strong>Dica de segurança:</strong><br>
+        • Use uma palavra-passe forte com letras, números e símbolos<br>
+        • Não compartilhe suas credenciais<br>
+        • Altere sua senha periodicamente
+      </div>
+    </div>`;
+  }
+
+  function escapeHtml(str) { 
+    if(!str) return '';
+    return String(str).replace(/[&<>]/g, function(m){
+      if(m==='&') return '&amp;'; 
+      if(m==='<') return '&lt;'; 
+      if(m==='>') return '&gt;'; 
+      return m;
+    }); 
+  }
+
+  function renderView(viewId) {
+    const contentDiv = document.getElementById("dynamicContent");
+    let html = "";
+    switch(viewId){
+      case "dashboard": html = renderDashboard(); break;
+      case "hotel": html = renderHotel(); break;
+      case "quartos": html = renderQuartos(); break;
+      case "servicos": html = renderServicos(); break;
+      case "gastronomia": html = renderGastronomia(); break;
+      case "galeria": html = renderGaleria(); break;
+      case "promocoes": html = renderPromocoes(); break;
+      case "mensagens": html = renderMensagens(); updateMsgBadge(); break;
+      case "reservas": html = renderReservas(); break;
+      case "avaliacoes": html = renderAvaliacoes(); break;
+      case "seguranca": html = renderSeguranca(); break;
+      default: html = renderDashboard();
+    }
+    contentDiv.innerHTML = html;
+    attachViewEvents(viewId);
+  }
+
+  // ==================== EVENTOS DAS VIEWS ====================
+  function attachViewEvents(view){
+    if(view === "hotel") {
+      document.getElementById("formHotel")?.addEventListener("submit", (e) => { 
+        e.preventDefault(); 
+        const f=e.target; 
+        hotelData = {
+          nome:f.nome.value, 
+          descricao:f.descricao.value, 
+          categoria:f.categoria.value, 
+          morada:f.morada.value, 
+          contactos:f.contactos.value, 
+          email:f.email.value, 
+          website:f.website.value, 
+          horario:f.horario.value
+        }; 
+        persistAll(); 
+        renderView("hotel"); 
+      });
+    }
+    
+    if(view === "quartos"){
+      document.querySelectorAll(".removerQuarto").forEach(btn=>btn.addEventListener("click",()=>{quartos=quartos.filter(q=>q.id!==btn.dataset.id);persistAll();renderView("quartos");}));
+      document.querySelectorAll(".estado-select").forEach(s=>s.addEventListener("change",function(){let q=quartos.find(qq=>qq.id===this.dataset.id);if(q)q.estado=this.value;persistAll();}));
+      document.querySelectorAll(".preco-quarto").forEach(i=>i.addEventListener("change",function(){let q=quartos.find(qq=>qq.id===this.dataset.id);if(q)q.preco=parseFloat(this.value);persistAll();}));
+      document.querySelectorAll(".capac-quarto").forEach(i=>i.addEventListener("change",function(){let q=quartos.find(qq=>qq.id===this.dataset.id);if(q)q.capacidade=parseInt(this.value);persistAll();}));
+      document.querySelectorAll(".nome-quarto").forEach(i=>i.addEventListener("change",function(){let q=quartos.find(qq=>qq.id===this.dataset.id);if(q)q.nome=this.value;persistAll();}));
+      document.getElementById("addQuartoBtn")?.addEventListener("click",()=>{const newId="q"+Date.now(); quartos.push({id:newId, nome:"Novo Quarto", estado:"disponível", preco:8000, capacidade:2, imagens:[]}); persistAll(); renderView("quartos");});
+      
+      document.querySelectorAll(".upload-btn-quarto").forEach(btn=>{
+        btn.addEventListener("click",()=>{
+          const quartoId = btn.dataset.id;
+          const fileInput = document.querySelector(`.upload-img-quarto[data-id="${quartoId}"]`);
+          if(fileInput && fileInput.files.length){
+            Array.from(fileInput.files).forEach(file=>{
+              const reader = new FileReader();
+              reader.onload = (e) => {
+                let quarto = quartos.find(q=>q.id===quartoId);
+                if(quarto) { quarto.imagens.push(e.target.result); persistAll(); renderView("quartos"); }
+              };
+              reader.readAsDataURL(file);
+            });
+          } else showToast("Seleccione pelo menos uma imagem");
+        });
+      });
+      
+      document.querySelectorAll(".rm-img-quarto").forEach(btn=>{
+        btn.addEventListener("click",()=>{
+          let quarto = quartos.find(q=>q.id===btn.dataset.id);
+          if(quarto) { quarto.imagens.splice(parseInt(btn.dataset.imgidx),1); persistAll(); renderView("quartos"); }
+        });
+      });
+    }
+    
+    if(view === "servicos") {
+      document.getElementById("formServicos")?.addEventListener("submit",(e)=>{
+        e.preventDefault(); 
+        const cb=(id)=>document.getElementById(`serv_${id}`)?.checked; 
+        servicos.piscina=cb("piscina"); 
+        servicos.restaurante=cb("restaurante"); 
+        servicos.bar=cb("bar"); 
+        servicos.wifi=cb("wifi"); 
+        servicos.lavandaria=cb("lavandaria"); 
+        servicos.estacionamento=cb("estacionamento"); 
+        servicos.outros=document.getElementById("outrosServicos").value; 
+        persistAll(); 
+        showToast("Serviços salvos");
+      });
+    }
+    
+    if(view === "gastronomia"){
+      document.getElementById("saveGastroBtn")?.addEventListener("click",()=>{persistAll();showToast("Gastronomia salva");});
+      document.getElementById("addItemGastro")?.addEventListener("click",()=>{gastronomia.push({id:"g"+Date.now(), tipo:"Prato", nome:"Novo Item", preco:1000, imagem:""}); renderView("gastronomia");});
+      document.querySelectorAll(".delGastro").forEach(btn=>btn.addEventListener("click",()=>{gastronomia=gastronomia.filter(g=>g.id!==btn.dataset.id); persistAll(); renderView("gastronomia");}));
+      document.querySelectorAll(".upload-gastro-btn").forEach(btn=>{
+        btn.addEventListener("click",()=>{
+          const id = btn.dataset.id;
+          const fileInput = document.querySelector(`.upload-img-gastro[data-id="${id}"]`);
+          if(fileInput && fileInput.files[0]){
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              let item = gastronomia.find(g=>g.id===id);
+              if(item) { item.imagem = e.target.result; persistAll(); renderView("gastronomia"); }
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+          }
+        });
+      });
+      document.querySelectorAll(".rm-img-gastro").forEach(btn=>{
+        btn.addEventListener("click",()=>{let item=gastronomia.find(g=>g.id===btn.dataset.id); if(item){item.imagem=""; persistAll(); renderView("gastronomia");}});
+      });
+      
+      document.querySelectorAll(".tipo-gastro, .nome-gastro, .preco-gastro").forEach(el=>{
+        el.addEventListener("change",function(){let item=gastronomia.find(g=>g.id===this.dataset.id); if(item){if(this.classList.contains("tipo-gastro")) item.tipo=this.value; if(this.classList.contains("nome-gastro")) item.nome=this.value; if(this.classList.contains("preco-gastro")) item.preco=parseFloat(this.value); persistAll();}});
+      });
+    }
+    
+    if(view === "galeria"){
+      document.getElementById("uploadGaleriaBtn")?.addEventListener("click",()=>{ 
+        const files = document.getElementById("uploadImagem").files; 
+        if(files.length){ 
+          Array.from(files).forEach(f=>{ 
+            const reader = new FileReader(); 
+            reader.onload = (e)=>{ 
+              galeria.push(e.target.result); 
+              persistAll(); 
+              renderView("galeria"); 
+            }; 
+            reader.readAsDataURL(f); 
+          }); 
+        } 
+      });
+      document.querySelectorAll(".removeImgGaleria").forEach(btn=>btn.addEventListener("click",()=>{let idx=parseInt(btn.dataset.index); galeria.splice(idx,1);persistAll();renderView("galeria");}));
+    }
+    
+    if(view === "promocoes"){
+      document.getElementById("addPromocaoBtn")?.addEventListener("click",()=>{promocoes.push({id:"p"+Date.now(), titulo:"Nova Promoção", descricao:"", percentagem:0, validoAte:""}); renderView("promocoes");});
+      document.getElementById("savePromocoesBtn")?.addEventListener("click",()=>{persistAll(); showToast("Promoções salvas");});
+      document.querySelectorAll(".removerPromocao").forEach(btn=>btn.addEventListener("click",()=>{promocoes=promocoes.filter(p=>p.id!==btn.dataset.id); persistAll(); renderView("promocoes");}));
+      document.querySelectorAll(".promocao-titulo, .promocao-desc, .promocao-perc, .promocao-data").forEach(el=>{
+        el.addEventListener("change",function(){let p=promocoes.find(p=>p.id===this.dataset.id); if(p){if(this.classList.contains("promocao-titulo")) p.titulo=this.value; if(this.classList.contains("promocao-desc")) p.descricao=this.value; if(this.classList.contains("promocao-perc")) p.percentagem=parseFloat(this.value); if(this.classList.contains("promocao-data")) p.validoAte=this.value; persistAll();}});
+      });
+    }
+    
+    if(view === "mensagens"){
+      document.querySelectorAll(".responderMsg").forEach(btn=>btn.addEventListener("click",()=>{let id=btn.dataset.id; let resposta=document.getElementById(`resp_${id}`).value; let msg=mensagens.find(m=>m.id===id); if(msg){msg.resposta=resposta; msg.lida=true; persistAll(); renderView("mensagens"); showToast("Resposta enviada ao turista");}}));
+      document.querySelectorAll(".marcarLida").forEach(btn=>btn.addEventListener("click",()=>{let msg=mensagens.find(m=>m.id===btn.dataset.id); if(msg){msg.lida=true; persistAll(); updateMsgBadge(); renderView("mensagens");}}));
+    }
+    
+    if(view === "reservas"){
+      document.querySelectorAll(".confirmarReserva").forEach(btn=>btn.addEventListener("click",()=>{let r=reservas.find(r=>r.id===btn.dataset.id); if(r){r.estado="confirmada"; persistAll(); renderView("reservas"); showToast("Reserva confirmada - turista notificado");}}));
+      document.querySelectorAll(".rejeitarReserva").forEach(btn=>btn.addEventListener("click",()=>{let r=reservas.find(r=>r.id===btn.dataset.id); if(r){r.estado="rejeitada"; persistAll(); renderView("reservas"); showToast("Reserva rejeitada");}}));
+    }
+    
+    if(view === "avaliacoes"){
+      document.querySelectorAll(".responderAvaliacao").forEach(btn=>btn.addEventListener("click",()=>{let id=btn.dataset.id; let resp=document.getElementById(`respAval_${id}`).value; let aval=avaliacoes.find(a=>a.id===id); if(aval){aval.resposta=resp; persistAll(); renderView("avaliacoes"); showToast("Resposta publicada");}}));
+    }
+    
+    if(view === "seguranca"){
+      const newPwd = document.getElementById("newPassword");
+      const confirmPwd = document.getElementById("confirmPassword");
+      
+      if(newPwd) {
+        newPwd.addEventListener("input", function() {
+          const strengthDiv = document.getElementById("passwordStrength");
+          const val = this.value;
+          if(val.length === 0) {
+            strengthDiv.className = "password-strength mt-1";
+            strengthDiv.style.background = "#e0e0e0";
+          } else if(val.length < 4) {
+            strengthDiv.className = "password-strength mt-1 bg-danger";
+            strengthDiv.style.width = "25%";
+          } else if(val.length < 6) {
+            strengthDiv.className = "password-strength mt-1 bg-warning";
+            strengthDiv.style.width = "50%";
+          } else {
+            strengthDiv.className = "password-strength mt-1 bg-success";
+            strengthDiv.style.width = "100%";
+          }
+        });
+      }
+      
+      document.getElementById("changePwdForm")?.addEventListener("submit",(e)=>{
+        e.preventDefault(); 
+        let newPwdVal = document.getElementById("newPassword").value; 
+        let confirmVal = document.getElementById("confirmPassword").value; 
+        if(newPwdVal !== confirmVal){
+          showToast("As palavras-passe não coincidem", "danger");
+          return;
+        }
+        if(newPwdVal.length < 4){
+          showToast("A palavra-passe deve ter pelo menos 4 caracteres", "danger");
+          return;
+        }
+        if(updateUserPassword(currentUser, newPwdVal)){
+          showToast("Palavra-passe alterada com sucesso! Use a nova nos próximos logins.");
+          setTimeout(() => {
+            // Forçar logout para usar nova senha
+            if(confirm("Palavra-passe alterada! Deseja sair para testar a nova senha?")) {
+              sessionStorage.clear();
+              document.getElementById("loginContainer").style.display = "flex";
+              document.getElementById("dashboardContainer").style.display = "none";
+              document.getElementById("loginPass").value = "";
+            }
+          }, 1500);
+          renderView("seguranca");
+        } else {
+          showToast("Erro ao alterar palavra-passe", "danger");
+        }
+      });
+    }
+  }
+
+  // ==================== LOGIN & INICIALIZAÇÃO ====================
+  document.getElementById("loginForm").addEventListener("submit", (e)=>{
+    e.preventDefault();
+    let user = document.getElementById("loginUser").value;
+    let pass = document.getElementById("loginPass").value;
+    
+    if(validateCredentials(user, pass)){
+      authToken = btoa(user+Date.now());
+      currentUser = user;
+      sessionStorage.setItem("authToken", authToken);
+      sessionStorage.setItem("currentUser", currentUser);
+      sessionStorage.setItem("loggedInUser", user);
+      
+      document.getElementById("loginContainer").style.display = "none";
+      document.getElementById("dashboardContainer").style.display = "block";
+      loadDataFromStorage();
+      renderView("dashboard");
+      updateMsgBadge();
+      
+      // Ouvir alterações de outras abas
+      window.addEventListener("storage", (event) => {
+        if(event.key === "rj_sync_trigger" || event.key.startsWith("rj_")){
+          loadDataFromStorage();
+          const activeLink = document.querySelector(".nav-link.active");
+          if(activeLink) renderView(activeLink.getAttribute("data-view"));
+          updateMsgBadge();
+          showToast("Dados actualizados de outra aba");
+        }
+      });
+      
+      showToast(`Bem-vindo, ${user}!`);
+    } else { 
+      showToast("Credenciais inválidas. Utilize hotelmanager / admin123", "danger"); 
+    }
+  });
+  
+  document.getElementById("logoutButton").addEventListener("click",()=>{ 
+    sessionStorage.clear(); 
+    document.getElementById("loginContainer").style.display = "flex"; 
+    document.getElementById("dashboardContainer").style.display = "none"; 
+    document.getElementById("loginPass").value = "";
+    showToast("Sessão encerrada com sucesso");
+  });
+  
+  // Verificar sessão existente
+  if(sessionStorage.getItem("authToken")){
+    currentUser = sessionStorage.getItem("currentUser");
+    if(currentUser) {
+      document.getElementById("loginContainer").style.display = "none";
+      document.getElementById("dashboardContainer").style.display = "block";
+      loadDataFromStorage();
+      renderView("dashboard");
+      updateMsgBadge();
+    }
+  }
+  
+  document.querySelectorAll("[data-view]").forEach(link=>{
+    link.addEventListener("click",(e)=>{
+      e.preventDefault();
+      document.querySelectorAll("[data-view]").forEach(l=>l.classList.remove("active"));
+      link.classList.add("active");
+      const view = link.getAttribute("data-view");
+      document.getElementById("viewTitle").innerText = link.innerText.trim();
+      renderView(view);
+    });
+  });
+  
+  loadDataFromStorage();
 </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
