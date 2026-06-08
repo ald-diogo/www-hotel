@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Plataforma Turismo Malanje | Cadastro de Guia</title>
+    <!-- Bootstrap 5 + Icons + Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(135deg, #e0f7e8 0%, #c8e6d9 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Times New Roman', Times, serif;
+            padding: 20px;
+        }
+        .btn-open-modal-outline {
+            background: transparent;
+            border: 2px solid #2c6e2f;
+            color: #1e4a2a;
+            padding: 14px 32px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .btn-open-modal-outline:hover {
+            background-color: #2c6e2f;
+            color: white;
+            border-color: #1e4a2a;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+        }
+        .btn-open-modal-outline i {
+            margin-right: 8px;
+        }
+        .modal-content {
+            border-radius: 28px;
+            border: none;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        .modal-header {
+            background: linear-gradient(98deg, #1b4d2b 0%, #2c7a3e 100%);
+            color: white;
+            border-bottom: none;
+            padding: 1.2rem 1.8rem;
+        }
+        .modal-header .btn-close {
+            filter: brightness(0) invert(1);
+            opacity: 0.8;
+        }
+        .modal-title {
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            font-size: 1.6rem;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .modal-title i {
+            margin-right: 12px;
+        }
+        .modal-body {
+            padding: 1.8rem 2rem;
+            max-height: 75vh;
+            overflow-y: auto;
+            background: #fefef7;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .modal-body::-webkit-scrollbar {
+            width: 6px;
+        }
+        .modal-body::-webkit-scrollbar-track {
+            background: #e2e8e0;
+            border-radius: 10px;
+        }
+        .modal-body::-webkit-scrollbar-thumb {
+            background: #2c7a3e;
+            border-radius: 10px;
+        }
+        h6.section-head {
+            background: #eaf6e6;
+            padding: 10px 15px;
+            border-radius: 40px;
+            font-weight: 700;
+            color: #1c5a2b;
+            margin: 1.5rem 0 1rem 0;
+            font-size: 1.1rem;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        h6.section-head i {
+            margin-right: 10px;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #2d4a2c;
+            margin-bottom: 0.3rem;
+            font-size: 0.85rem;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .form-control, .form-select {
+            border-radius: 14px;
+            border: 1px solid #cfdec9;
+            padding: 10px 14px;
+            transition: 0.2s;
+            background-color: white;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #2c7a3e;
+            box-shadow: 0 0 0 0.2rem rgba(44, 122, 62, 0.25);
+        }
+        .btn-success-custom {
+            background-color: #2a7f3a;
+            border: none;
+            border-radius: 40px;
+            padding: 10px 24px;
+            font-weight: 600;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .btn-success-custom:hover {
+            background-color: #1f622d;
+        }
+        .btn-secondary-custom {
+            background-color: #9aa899;
+            border: none;
+            border-radius: 40px;
+            padding: 10px 24px;
+            font-weight: 600;
+            color: #1e2a1a;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .btn-danger-custom {
+            background-color: #d9534f;
+            border: none;
+            border-radius: 40px;
+            padding: 10px 24px;
+            font-weight: 600;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .btn-preview-custom {
+            background-color: #17a2b8;
+            border: none;
+            border-radius: 40px;
+            padding: 10px 24px;
+            font-weight: 600;
+            color: white;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .btn-preview-custom:hover {
+            background-color: #138496;
+        }
+        .invalid-feedback {
+            font-size: 0.75rem;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .toast-message {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1100;
+            min-width: 260px;
+        }
+        .img-preview {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid #2c7a3e;
+            background: #f2f2f2;
+        }
+        .preview-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .preview-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0f7e8;
+        }
+        .preview-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #2c7a3e;
+            margin-bottom: 15px;
+        }
+        .preview-name {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #1b4d2b;
+            margin-bottom: 5px;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .preview-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .info-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 12px;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #2c7a3e;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .info-value {
+            color: #333;
+            font-size: 0.95rem;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .share-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .share-btn {
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .share-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .share-whatsapp { background: #25D366; color: white; }
+        .share-facebook { background: #1877F2; color: white; }
+        .share-twitter { background: #1DA1F2; color: white; }
+        .share-linkedin { background: #0077B5; color: white; }
+        .share-email { background: #6c757d; color: white; }
+        .share-copy { background: #28a745; color: white; }
+        .data-nascimento-error {
+            font-size: 0.75rem;
+            color: #dc3545;
+            display: none;
+            margin-top: 0.25rem;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .data-nascimento-error.show {
+            display: block;
+        }
+        .badge-custom {
+            background: #eaf6e6;
+            color: #1c5a2b;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin: 3px;
+            display: inline-block;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .modal-xl-custom {
+            max-width: 900px;
+        }
+        .form-check-label {
+            font-family: 'Times New Roman', Times, serif;
+        }
+        textarea, input, select, button {
+            font-family: 'Times New Roman', Times, serif;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container text-center">
+    <button type="button" class="btn btn-open-modal-outline" data-bs-toggle="modal" data-bs-target="#guiaturisticoModal">
+        <i class="fas fa-map-marked-alt"></i> Cadastrar-se como Guia Turístico
+    </button>
+</div>
+
+<!-- MODAL DE CADASTRO DE GUIA TURÍSTICO -->
+<div class="modal fade" id="guiaturisticoModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="guiaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="guiaModalLabel">
+                    <i class="fas fa-chalkboard-user"></i> Cadastro de Guia Turístico
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formCadastroGuia" novalidate>
+                    <h6 class="section-head"><i class="fas fa-user-circle"></i> Dados Pessoais</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nome Completo *</label>
+                            <input type="text" class="form-control" id="nomeCompleto" required>
+                            <div class="invalid-feedback">Nome é obrigatório.</div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Data de Nascimento *</label>
+                            <input type="date" class="form-control" id="dataNasc" required>
+                            <div class="invalid-feedback">Data de nascimento é obrigatória.</div>
+                            <div class="data-nascimento-error" id="dataNascError">
+                                <i class="fas fa-exclamation-circle"></i> A data de nascimento não pode ser hoje ou no futuro.
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Género *</label>
+                            <select class="form-select" id="genero" required>
+                                <option value="">Selecionar</option>
+                                <option>Masculino</option>
+                                <option>Feminino</option>
+                                <option>Outro</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Nº BI/Passaporte *</label>
+                            <input type="text" class="form-control" id="docIdentidade" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Fotografia de Perfil</label>
+                            <input type="file" class="form-control" id="fotoPerfilInput" accept="image/*">
+                            <small class="text-muted"><i class="fas fa-camera"></i> Imagem de perfil opcional</small>
+                            <div class="mt-1"><img id="previewFoto" class="img-preview" src="https://via.placeholder.com/60?text=+"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Telefone *</label>
+                            <input type="tel" class="form-control" id="telefone" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">E-mail *</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Morada</label>
+                            <input type="text" class="form-control" id="morada">
+                        </div>
+                    </div>
+
+                    <h6 class="section-head mt-3"><i class="fas fa-briefcase"></i> Dados Profissionais</h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Nº Licença de Guia *</label>
+                            <input type="text" class="form-control" id="licenca" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Anos de Experiência *</label>
+                            <input type="number" min="0" step="0.5" class="form-control" id="anosExp" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Idiomas Falados *</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                <div class="form-check"><input class="form-check-input" type="checkbox" value="Português" id="langPt"> <label class="form-check-label">Português</label></div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" value="Inglês" id="langEn"> Inglês</div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" value="Francês" id="langFr"> Francês</div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" value="Espanhol" id="langEs"> Espanhol</div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" value="Outros" id="langOut"> Outros</div>
+                            </div>
+                            <input type="text" class="form-control mt-2" placeholder="Especificar outros idiomas" id="outrosIdiomas">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Especialidade *</label>
+                            <div class="row">
+                                <div class="col-md-4"><div class="form-check"><input class="form-check-input" type="checkbox" value="Turismo Cultural" id="espCultural"> Turismo Cultural</div></div>
+                                <div class="col-md-4"><div class="form-check"><input class="form-check-input" type="checkbox" value="Turismo Histórico" id="espHistorico"> Turismo Histórico</div></div>
+                                <div class="col-md-4"><div class="form-check"><input class="form-check-input" type="checkbox" value="Turismo de Natureza" id="espNatureza"> Turismo de Natureza</div></div>
+                                <div class="col-md-4"><div class="form-check"><input class="form-check-input" type="checkbox" value="Turismo de Aventura" id="espAventura"> Turismo de Aventura</div></div>
+                                <div class="col-md-4"><div class="form-check"><input class="form-check-input" type="checkbox" value="Turismo Religioso" id="espReligioso"> Turismo Religioso</div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="section-head"><i class="fas fa-map-pin"></i> Áreas de Atuação</h6>
+                    <div class="row g-2 mb-2">
+                        <div class="col-md-3"><div class="form-check"><input class="form-check-input" type="checkbox" value="Município de Malanje" id="areaMalanje"> Município de Malanje</div></div>
+                        <div class="col-md-3"><div class="form-check"><input class="form-check-input" type="checkbox" value="Pedras Negras de Pungo Andongo" id="areaPedras"> Pedras Negras</div></div>
+                        <div class="col-md-3"><div class="form-check"><input class="form-check-input" type="checkbox" value="Quedas de Calandula" id="areaCalandula"> Quedas de Calandula</div></div>
+                        <div class="col-md-3"><div class="form-check"><input class="form-check-input" type="checkbox" value="Parque Nacional da Cangandala" id="areaCangandala"> Parque da Cangandala</div></div>
+                        <div class="col-md-12"><div class="form-check"><input class="form-check-input" type="checkbox" value="Outros locais turísticos" id="areaOutros"> Outros locais turísticos</div></div>
+                    </div>
+
+                    <h6 class="section-head"><i class="fas fa-calendar-alt"></i> Disponibilidade</h6>
+                    <div class="row g-3">
+                        <div class="col-md-5">
+                            <label>Dias Disponíveis *</label>
+                            <select class="form-select" id="diasDisponiveis" multiple size="2">
+                                <option>Segunda a Sexta</option>
+                                <option>Sábado</option>
+                                <option>Domingo</option>
+                                <option>Fins de semana</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Horário de Atendimento</label>
+                            <input type="text" class="form-control" placeholder="Ex: 08h - 17h" id="horarioAtendimento">
+                        </div>
+                        <div class="col-md-3">
+                            <label>Disponível para Emergências?</label>
+                            <select class="form-select" id="emergencia">
+                                <option value="Sim">Sim</option>
+                                <option value="Não">Não</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <h6 class="section-head"><i class="fas fa-tag"></i> Preços (Kz)</h6>
+                    <div class="row g-3">
+                        <div class="col-md-4"><label>Preço por Hora *</label><input type="number" class="form-control" id="precoHora" required></div>
+                        <div class="col-md-4"><label>Preço por Dia *</label><input type="number" class="form-control" id="precoDia" required></div>
+                        <div class="col-md-4"><label>Preço para Grupos</label><input type="number" class="form-control" id="precoGrupo"></div>
+                    </div>
+
+                    <h6 class="section-head"><i class="fas fa-file-alt"></i> Descrição Profissional</h6>
+                    <textarea class="form-control" rows="3" placeholder="Experiência, formação, serviços oferecidos, diferenciais..." id="descricaoProfissional"></textarea>
+
+                    <h6 class="section-head"><i class="fab fa-facebook"></i> Redes Sociais (Opcional)</h6>
+                    <div class="row g-2">
+                        <div class="col-md-4"><i class="fab fa-facebook me-1"></i> <input type="text" class="form-control" placeholder="Facebook" id="facebookLink"></div>
+                        <div class="col-md-4"><i class="fab fa-instagram me-1"></i> <input type="text" class="form-control" placeholder="Instagram" id="instagramLink"></div>
+                        <div class="col-md-4"><i class="fab fa-whatsapp me-1"></i> <input type="text" class="form-control" placeholder="WhatsApp (link ou número)" id="whatsappLink"></div>
+                    </div>
+
+                    <h6 class="section-head"><i class="fas fa-lock"></i> Segurança</h6>
+                    <div class="row g-3">
+                        <div class="col-md-4"><label>Nome de Utilizador *</label><input type="text" class="form-control" id="username" required></div>
+                        <div class="col-md-4"><label>Palavra-passe *</label><input type="password" class="form-control" id="password" required></div>
+                        <div class="col-md-4"><label>Confirmar Palavra-passe *</label><input type="password" class="form-control" id="confirmPassword" required></div>
+                    </div>
+
+                    <div class="d-flex flex-wrap justify-content-end gap-3 mt-4 pt-3 border-top">
+                        <button type="button" class="btn btn-preview-custom" id="previewBtn">
+                            <i class="fas fa-eye"></i> Pré-visualizar
+                        </button>
+                        <button type="button" class="btn btn-secondary-custom" id="limparDadosBtn"><i class="fas fa-eraser"></i> Limpar Dados</button>
+                        <button type="button" class="btn btn-danger-custom" data-bs-dismiss="modal"><i class="fas fa-times"></i> Cancelar</button>
+                        <button type="submit" class="btn btn-success-custom" id="cadastrarGuiaBtn"><i class="fas fa-save"></i> Cadastrar Guia</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL DE FICHA/RESULTADO DO CADASTRO -->
+<div class="modal fade" id="resultadoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-xl-custom">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="fas fa-id-card"></i> Ficha de Cadastro - Guia Turístico</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="resultadoContent">
+                <!-- Conteúdo gerado dinamicamente -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST PARA MENSAGEM DE SUCESSO -->
+<div class="toast-message" id="liveToast" style="display: none;">
+    <div class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="4000">
+        <div class="d-flex">
+            <div class="toast-body"><i class="fas fa-check-circle me-2"></i> Cadastro realizado com sucesso!</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    (function() {
+        let fotoDataURL = "https://via.placeholder.com/120?text=Sem+Foto";
+        let dadosGuiaAtual = null;
+        
+        // Preview de foto
+        const fotoInput = document.getElementById('fotoPerfilInput');
+        const previewImg = document.getElementById('previewFoto');
+        
+        fotoInput.addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    previewImg.src = ev.target.result;
+                    fotoDataURL = ev.target.result;
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            } else {
+                previewImg.src = "https://via.placeholder.com/60?text=+";
+                fotoDataURL = "https://via.placeholder.com/120?text=Sem+Foto";
+            }
+        });
+
+        // Validação da data de nascimento
+        const dataNascInput = document.getElementById('dataNasc');
+        const dataNascError = document.getElementById('dataNascError');
+        
+        function validarDataNascimento() {
+            const dataSelecionada = dataNascInput.value;
+            if (!dataSelecionada) {
+                dataNascError.classList.remove('show');
+                dataNascInput.classList.remove('is-invalid');
+                return true;
+            }
+            
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0);
+            const dataNasc = new Date(dataSelecionada);
+            dataNasc.setHours(0, 0, 0, 0);
+            
+            if (dataNasc >= hoje) {
+                dataNascError.classList.add('show');
+                dataNascInput.classList.add('is-invalid');
+                return false;
+            } else {
+                dataNascError.classList.remove('show');
+                dataNascInput.classList.remove('is-invalid');
+                return true;
+            }
+        }
+        
+        dataNascInput.addEventListener('change', validarDataNascimento);
+        dataNascInput.addEventListener('input', validarDataNascimento);
+        
+        function setMaxDate() {
+            const hoje = new Date();
+            const ano = hoje.getFullYear();
+            const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+            const dia = String(hoje.getDate()).padStart(2, '0');
+            dataNascInput.setAttribute('max', `${ano}-${mes}-${dia}`);
+        }
+        setMaxDate();
+
+        function getIdiomasSelecionados() {
+            let idiomas = [];
+            if (document.getElementById('langPt').checked) idiomas.push('Português');
+            if (document.getElementById('langEn').checked) idiomas.push('Inglês');
+            if (document.getElementById('langFr').checked) idiomas.push('Francês');
+            if (document.getElementById('langEs').checked) idiomas.push('Espanhol');
+            if (document.getElementById('langOut').checked) {
+                let outros = document.getElementById('outrosIdiomas').value.trim();
+                if(outros) idiomas.push(outros);
+                else idiomas.push('Outros');
+            }
+            return idiomas;
+        }
+
+        function getEspecialidades() {
+            let esp = [];
+            if(document.getElementById('espCultural').checked) esp.push('Turismo Cultural');
+            if(document.getElementById('espHistorico').checked) esp.push('Turismo Histórico');
+            if(document.getElementById('espNatureza').checked) esp.push('Turismo de Natureza');
+            if(document.getElementById('espAventura').checked) esp.push('Turismo de Aventura');
+            if(document.getElementById('espReligioso').checked) esp.push('Turismo Religioso');
+            return esp;
+        }
+
+        function getAreasAtuacao() {
+            let areas = [];
+            if(document.getElementById('areaMalanje').checked) areas.push('Município de Malanje');
+            if(document.getElementById('areaPedras').checked) areas.push('Pedras Negras de Pungo Andongo');
+            if(document.getElementById('areaCalandula').checked) areas.push('Quedas de Calandula');
+            if(document.getElementById('areaCangandala').checked) areas.push('Parque Nacional da Cangandala');
+            if(document.getElementById('areaOutros').checked) areas.push('Outros locais turísticos');
+            return areas;
+        }
+
+        function getDiasSelecionados() {
+            let select = document.getElementById('diasDisponiveis');
+            let selected = [];
+            for(let opt of select.options) if(opt.selected) selected.push(opt.value);
+            return selected.length ? selected.join(', ') : 'Não especificado';
+        }
+
+        function coletarDadosFormulario() {
+            return {
+                nome: document.getElementById('nomeCompleto').value || 'Não informado',
+                dataNasc: document.getElementById('dataNasc').value || 'Não informada',
+                genero: document.getElementById('genero').value || 'Não informado',
+                documento: document.getElementById('docIdentidade').value || 'Não informado',
+                telefone: document.getElementById('telefone').value || 'Não informado',
+                email: document.getElementById('email').value || 'Não informado',
+                morada: document.getElementById('morada').value || 'Não informada',
+                licenca: document.getElementById('licenca').value || 'Não informada',
+                anosExp: document.getElementById('anosExp').value || '0',
+                idiomas: getIdiomasSelecionados(),
+                especialidades: getEspecialidades(),
+                areasAtuacao: getAreasAtuacao(),
+                diasDisponiveis: getDiasSelecionados(),
+                horario: document.getElementById('horarioAtendimento').value || 'Não informado',
+                emergencia: document.getElementById('emergencia').value,
+                precos: {
+                    hora: document.getElementById('precoHora').value || '0',
+                    dia: document.getElementById('precoDia').value || '0',
+                    grupo: document.getElementById('precoGrupo').value || '0'
+                },
+                descricao: document.getElementById('descricaoProfissional').value || 'Sem descrição',
+                redes: {
+                    facebook: document.getElementById('facebookLink').value,
+                    instagram: document.getElementById('instagramLink').value,
+                    whatsapp: document.getElementById('whatsappLink').value
+                },
+                username: document.getElementById('username').value || 'Não informado',
+                foto: fotoDataURL
+            };
+        }
+
+        function gerarFichaHTML(guiaData, fotoUrl) {
+            const dataNascFormatada = guiaData.dataNasc !== 'Não informada' && guiaData.dataNasc ? 
+                new Date(guiaData.dataNasc).toLocaleDateString('pt-PT') : 'Não informada';
+
+            return `
+                <div class="preview-card">
+                    <div class="preview-header">
+                        <img src="${fotoUrl}" alt="Foto de perfil" class="preview-photo" onerror="this.src='https://via.placeholder.com/120?text=Sem+Foto'">
+                        <div class="preview-name">${guiaData.nome}</div>
+                        <div><span class="badge-custom"><i class="fas fa-id-card"></i> Guia Turístico</span></div>
+                        <div><span class="badge-custom"><i class="fas fa-calendar-check"></i> Cadastrado em: ${new Date().toLocaleDateString('pt-PT')}</span></div>
+                    </div>
+                    
+                    <div class="preview-info-grid">
+                        <div class="info-item">
+                            <div class="info-label"><i class="fas fa-calendar"></i> Data de Nascimento</div>
+                            <div class="info-value">${dataNascFormatada}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label"><i class="fas fa-venus-mars"></i> Género</div>
+                            <div class="info-value">${guiaData.genero}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label"><i class="fas fa-id-card"></i> BI/Passaporte</div>
+                            <div class="info-value">${guiaData.documento}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label"><i class="fas fa-phone"></i> Telefone</div>
+                            <div class="info-value">${guiaData.telefone}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label"><i class="fas fa-envelope"></i> E-mail</div>
+                            <div class="info-value">${guiaData.email}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label"><i class="fas fa-map-marker-alt"></i> Morada</div>
+                            <div class="info-value">${guiaData.morada}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label"><i class="fas fa-certificate"></i> Licença</div>
+                            <div class="info-value">${guiaData.licenca}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label"><i class="fas fa-chart-line"></i> Experiência</div>
+                            <div class="info-value">${guiaData.anosExp} anos</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label"><i class="fas fa-language"></i> Idiomas</div>
+                            <div class="info-value">${guiaData.idiomas.length > 0 ? guiaData.idiomas.join(', ') : 'Não informado'}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label"><i class="fas fa-star"></i> Especialidades</div>
+                            <div class="info-value">${guiaData.especialidades.length > 0 ? guiaData.especialidades.join(', ') : 'Não informado'}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label"><i class="fas fa-map-marked-alt"></i> Áreas de Atuação</div>
+                            <div class="info-value">${guiaData.areasAtuacao.length > 0 ? guiaData.areasAtuacao.join(', ') : 'Não informado'}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label"><i class="fas fa-calendar-week"></i> Disponibilidade</div>
+                            <div class="info-value">${guiaData.diasDisponiveis}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label"><i class="fas fa-clock"></i> Horário</div>
+                            <div class="info-value">${guiaData.horario}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label"><i class="fas fa-tags"></i> Preços (Kz)</div>
+                            <div class="info-value">Hora: ${guiaData.precos.hora} | Dia: ${guiaData.precos.dia} | Grupo: ${guiaData.precos.grupo}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label"><i class="fas fa-user"></i> Utilizador</div>
+                            <div class="info-value">${guiaData.username}</div>
+                        </div>
+                    </div>
+                    
+                    ${guiaData.descricao !== 'Sem descrição' && guiaData.descricao ? `
+                    <div class="info-item mb-3">
+                        <div class="info-label"><i class="fas fa-file-alt"></i> Descrição Profissional</div>
+                        <div class="info-value">${guiaData.descricao}</div>
+                    </div>
+                    ` : ''}
+                    
+                    <div class="share-buttons">
+                        <button class="share-btn share-whatsapp" onclick="compartilharFichaWhatsApp()">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
+                        </button>
+                        <button class="share-btn share-facebook" onclick="compartilharFichaFacebook()">
+                            <i class="fab fa-facebook-f"></i> Facebook
+                        </button>
+                        <button class="share-btn share-twitter" onclick="compartilharFichaTwitter()">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </button>
+                        <button class="share-btn share-linkedin" onclick="compartilharFichaLinkedIn()">
+                            <i class="fab fa-linkedin-in"></i> LinkedIn
+                        </button>
+                        <button class="share-btn share-email" onclick="compartilharFichaEmail()">
+                            <i class="fas fa-envelope"></i> E-mail
+                        </button>
+                        <button class="share-btn share-copy" onclick="copiarLinkFicha()">
+                            <i class="fas fa-copy"></i> Copiar Link
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Funções de compartilhamento
+        function getTextoCompartilhamento() {
+            if (!dadosGuiaAtual) return "Plataforma Turismo Malanje - Guia Turístico";
+            const especialidadesTexto = dadosGuiaAtual.especialidades.length > 0 ? dadosGuiaAtual.especialidades.join(', ') : 'Turismo';
+            return `Conheça o guia turístico ${dadosGuiaAtual.nome} - Especialista em ${especialidadesTexto}. Contato: ${dadosGuiaAtual.telefone}`;
+        }
+
+        window.compartilharFichaWhatsApp = function() {
+            const texto = getTextoCompartilhamento();
+            window.open(`https://wa.me/?text=${encodeURIComponent(texto + ' - Plataforma Turismo Malanje')}`, '_blank');
+        }
+
+        window.compartilharFichaFacebook = function() {
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank');
+        }
+
+        window.compartilharFichaTwitter = function() {
+            const texto = getTextoCompartilhamento();
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(texto)}&url=${encodeURIComponent(window.location.href)}`, '_blank');
+        }
+
+        window.compartilharFichaLinkedIn = function() {
+            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`, '_blank');
+        }
+
+        window.compartilharFichaEmail = function() {
+            const assunto = `Guia Turístico - ${dadosGuiaAtual?.nome || 'Plataforma Turismo Malanje'}`;
+            const corpo = getTextoCompartilhamento() + `\n\nAcesse: ${window.location.href}`;
+            window.location.href = `mailto:?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
+        }
+
+        window.copiarLinkFicha = function() {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                alert('Link copiado para a área de transferência!');
+            }).catch(() => {
+                alert('Não foi possível copiar o link.');
+            });
+        }
+
+        function exibirFichaCadastro() {
+            const guiaData = coletarDadosFormulario();
+            dadosGuiaAtual = guiaData;
+            const fichaHTML = gerarFichaHTML(guiaData, fotoDataURL);
+            document.getElementById('resultadoContent').innerHTML = fichaHTML;
+            const resultadoModal = new bootstrap.Modal(document.getElementById('resultadoModal'));
+            resultadoModal.show();
+        }
+
+        function exibirPreview() {
+            const guiaData = coletarDadosFormulario();
+            const fichaHTML = gerarFichaHTML(guiaData, fotoDataURL);
+            document.getElementById('resultadoContent').innerHTML = fichaHTML;
+            const previewModal = new bootstrap.Modal(document.getElementById('resultadoModal'));
+            previewModal.show();
+        }
+
+        document.getElementById('previewBtn').addEventListener('click', exibirPreview);
+
+        function limparTodosCampos() {
+            document.getElementById('formCadastroGuia').reset();
+            previewImg.src = "https://via.placeholder.com/60?text=+";
+            fotoDataURL = "https://via.placeholder.com/120?text=Sem+Foto";
+            const checkboxes = document.querySelectorAll('#formCadastroGuia input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = false);
+            document.getElementById('outrosIdiomas').value = '';
+            const diasSelect = document.getElementById('diasDisponiveis');
+            for(let opt of diasSelect.options) opt.selected = false;
+            document.getElementById('formCadastroGuia').classList.remove('was-validated');
+            dataNascError.classList.remove('show');
+            dataNascInput.classList.remove('is-invalid');
+            if(fotoInput) fotoInput.value = '';
+            setMaxDate();
+        }
+
+        document.getElementById('limparDadosBtn').addEventListener('click', () => {
+            limparTodosCampos();
+        });
+
+        const form = document.getElementById('formCadastroGuia');
+        const modalElement = document.getElementById('guiaturisticoModal');
+        const bootstrapModal = new bootstrap.Modal(modalElement);
+
+        function showSuccessToast() {
+            const toastContainer = document.getElementById('liveToast');
+            toastContainer.style.display = 'block';
+            const toastEl = document.querySelector('#liveToast .toast');
+            const bsToast = new bootstrap.Toast(toastEl, { delay: 4000, autohide: true });
+            bsToast.show();
+            setTimeout(() => {
+                toastContainer.style.display = 'none';
+            }, 4200);
+        }
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const isDataValida = validarDataNascimento();
+            
+            const senha = document.getElementById('password').value;
+            const confirm = document.getElementById('confirmPassword').value;
+            let senhaValid = true;
+            if(senha !== confirm) {
+                document.getElementById('confirmPassword').setCustomValidity('As palavras-passe não coincidem');
+                document.getElementById('confirmPassword').classList.add('is-invalid');
+                senhaValid = false;
+            } else {
+                document.getElementById('confirmPassword').setCustomValidity('');
+                document.getElementById('confirmPassword').classList.remove('is-invalid');
+            }
+
+            const requiredFields = ['nomeCompleto', 'dataNasc', 'genero', 'docIdentidade', 'telefone', 'email', 'licenca', 'anosExp', 'precoHora', 'precoDia', 'username', 'password'];
+            let allValid = true;
+            for(let id of requiredFields) {
+                let field = document.getElementById(id);
+                if(!field.value.trim()) {
+                    field.classList.add('is-invalid');
+                    allValid = false;
+                } else {
+                    field.classList.remove('is-invalid');
+                }
+            }
+            
+            if(!dataNascInput.value.trim()) {
+                dataNascInput.classList.add('is-invalid');
+                allValid = false;
+            }
+            
+            if(!document.getElementById('genero').value) allValid = false;
+            
+            const idiomaChecado = document.getElementById('langPt').checked || document.getElementById('langEn').checked || 
+                                 document.getElementById('langFr').checked || document.getElementById('langEs').checked || 
+                                 document.getElementById('langOut').checked;
+            if(!idiomaChecado) allValid = false;
+            
+            const espChecked = getEspecialidades().length > 0;
+            if(!espChecked) allValid = false;
+            
+            if(!senhaValid) allValid = false;
+            if(!isDataValida) allValid = false;
+
+            if (!allValid) {
+                form.classList.add('was-validated');
+                return;
+            }
+
+            const guiaData = coletarDadosFormulario();
+            console.log("Dados do Guia cadastrado:", guiaData);
+            
+            // Fecha o modal de cadastro
+            bootstrapModal.hide();
+            
+            // Exibe a ficha de cadastro
+            dadosGuiaAtual = guiaData;
+            const fichaHTML = gerarFichaHTML(guiaData, fotoDataURL);
+            document.getElementById('resultadoContent').innerHTML = fichaHTML;
+            const resultadoModal = new bootstrap.Modal(document.getElementById('resultadoModal'));
+            resultadoModal.show();
+            
+            showSuccessToast();
+            limparTodosCampos();
+            form.classList.remove('was-validated');
+        });
+
+        const passConfirm = document.getElementById('confirmPassword');
+        const passField = document.getElementById('password');
+        function resetSenhaInvalid() {
+            passConfirm.setCustomValidity('');
+            if(passConfirm.classList.contains('is-invalid')) passConfirm.classList.remove('is-invalid');
+        }
+        passField.addEventListener('input', resetSenhaInvalid);
+        passConfirm.addEventListener('input', resetSenhaInvalid);
+    })();
+</script>
+</body>
+</html>
