@@ -2,176 +2,350 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tourism Explorer | Hotéis de Malanje - Portal Turístico</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Reserve Já - Turismo Malanje</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Times New Roman', Times, serif;
-            background: radial-gradient(circle at 10% 30%, #0e2a3a, #05161f);
-            min-height: 100vh;
-            color: #f5f9ff;
+        * { font-family: 'Times New Roman', Times, serif; }
+        body { background-color: #f4f7fc; scroll-behavior: smooth; }
+        .page-view { display: none; animation: fadeIn 0.3s ease; }
+        .active-view { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px);} to { opacity: 1; transform: translateY(0);} }
+        .hotel-card { 
+            transition: transform 0.2s; border-radius: 1rem; overflow: hidden; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .hotel-card:hover { transform: translateY(-5px); }
+        .hotel-img { height: 200px; object-fit: cover; width: 100%; }
+        .star-rated { color: #ffb700; }
+        .chat-messages {
+            background: #ffffff; border-radius: 1rem; height: 280px; overflow-y: auto; padding: 1rem; border: 1px solid #dee2e6; }
+        .message-bubble { margin-bottom: 12px; padding: 8px 14px; border-radius: 20px; max-width: 80%; word-wrap: break-word; }
+        .message-tourist { background-color: #0d6efd; color: white; margin-left: auto; border-bottom-right-radius: 4px; }
+        .message-hotel { background-color: #e9ecef; color: #212529; border-bottom-left-radius: 4px; }
+        .map-placeholder { 
+            height: 260px; 
+            background: #cfe2ff;
+            border-radius: 1rem; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .toast-container { z-index: 1100; }
+        .gallery-thumb { width: 80px; height: 80px; object-fit: cover; border-radius: 10px; cursor: pointer; transition: 0.2s; }
+        .gallery-thumb:hover { opacity: 0.7; }
+        footer { background: #eef2f3; }
+        
+         .logo-img {
+            height: 70px;
+            width: 150px;
+            object-fit: contain;
+            margin: 0;
+            padding: 0;
+            border: 0;
+            display: block;
         }
-        .glass-card {
-            background: rgba(20, 40, 55, 0.6);
-            backdrop-filter: blur(18px);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 28px;
-            transition: 0.2s;
-        }
-        .glass-card:hover { border-color: #4c9aff; transform: translateY(-4px); }
-        .hotel-card { cursor: pointer; }
-        .rating-star { color: #ffcc00; }
-        .section-detail { display: none; }
-        .active-detail { display: block; }
-        .preview-img-grid img { width: 100px; height: 80px; object-fit: cover; border-radius: 12px; margin: 5px; }
-        footer { background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); }
     </style>
 </head>
 <body>
-<div class="container-fluid px-3 px-md-4 py-3">
-    <div class="glass-card p-3 mb-4 d-flex justify-content-between align-items-center flex-wrap">
-        <div><i class="fas fa-globe-africa fa-2x me-2"></i><span class="fs-2 fw-bold">Malanje<span style="color:#7bc5ff;">Turismo</span></span><span class="badge bg-warning ms-2"><i class="fas fa-users"></i> Portal do Viajante</span></div>
-        <div><i class="fas fa-tree"></i> Descubra a natureza e cultura</div>
-    </div>
 
-    <!-- LISTA DE HOTÉIS -->
-    <div id="hotelListSection">
-        <div class="row" id="hotelsContainer"></div>
-    </div>
-
-    <!-- DETALHE DO HOTEL (escondido inicialmente) -->
-    <div id="hotelDetailSection" style="display:none;">
-        <button class="btn btn-secondary mb-3" id="backToListBtn"><i class="fas fa-arrow-left"></i> Voltar aos Hotéis</button>
-        <div id="hotelDetailContent"></div>
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToast" class="toast" role="alert" data-bs-autohide="true" data-bs-delay="4000">
+        <div class="toast-header"><i class="fas fa-bell me-2 text-primary"></i><strong class="me-auto">Reserve Já</strong><small>agora</small><button type="button" class="btn-close" data-bs-dismiss="toast"></button></div>
+        <div class="toast-body" id="toastMessageBody">Notificação</div>
     </div>
 </div>
-<footer class="text-center py-3 mt-4"><i class="fas fa-comment-dots"></i> Envie mensagens, avalie e conecte-se com os hotéis em tempo real</footer>
 
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm sticky-top">
+    <div class="container">
+         <a class="navbar-brand-custom" href="index.html">
+                <img src="images/palanca-real-rbg.png" class="logo-img" alt="Reserve Já">
+            </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarMain">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="#" data-nav="home"><i class="fas fa-home"></i> Início</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" data-nav="hotels"><i class="fas fa-building"></i> Hotéis</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main class="container my-4">
+    <div id="viewHome" class="page-view active-view">
+        <div class="p-5 mb-4 rounded-3 text-white" style="background: linear-gradient(135deg, #1e3c72, #2b4e7a);">
+            <div class="container-fluid py-4">
+                <h1 class="display-5 fw-bold"><i class="fas fa-umbrella-beach"></i> Descubra Malanje</h1>
+                <p class="fs-4">Hotéis, pousadas e resorts com conforto e tradição angolana. Reserve já sua estadia!</p>
+            </div>
+        </div>
+        <h3 class="mb-3"><i class="fas fa-hotel"></i> Nosso Hotel</h3>
+        <div id="homeHotelList" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4"></div>
+        <div class="text-center mt-4"><button class="btn btn-primary" data-nav="hotels">Ver detalhes completos →</button></div>
+    </div>
+
+    <div id="viewHotels" class="page-view">
+        <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
+            <h2><i class="fas fa-list-ul"></i> Hotel - Informação detalhada</h2>
+        </div>
+        <div id="fullHotelList" class="row"></div>
+    </div>
+
+    <div id="viewHotelProfile" class="page-view">
+        <button class="btn btn-outline-secondary mb-3" id="backToListBtn"><i class="fas fa-arrow-left"></i> Voltar</button>
+        <div id="hotelProfileContainer"></div>
+    </div>
+</main>
+
+<footer class="text-center text-muted py-4 mt-5 border-top">
+    <small>© 2025 Reserve Já - Turismo Malanje | Sincronização em tempo real com o backoffice</small>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Carrega os mesmos dados do localStorage (partilhado com o backoffice)
-    let hotelData = null;
-    function loadSharedData() {
-        const stored = localStorage.getItem("hotelSphereDB");
-        if(stored) {
-            try { hotelData = JSON.parse(stored); } catch(e) { hotelData = null; }
-        }
-        if(!hotelData) {
-            // Fallback básico caso backoffice ainda não tenha criado dados
-            hotelData = {
-                rooms: [{ id: "r1", name: "Suite Presidencial", type: "Luxo", price: 250, description: "Vista incrível", available: true, images: [] }],
-                dishes: [{ id: "d1", name: "Muamba de Galinha", category: "Angolana", description: "Sabor tradicional", price: 1800, images: [] }],
-                services: { pool: true, spa: true, gym: false, restaurant: true, wifi: true, transport: false },
-                experiences: [{ id: "e1", name: "Quedas Kalandula", description: "Tour guiado", price: 12000 }],
-                gallery: ["https://picsum.photos/id/164/400/250", "https://picsum.photos/id/29/300/200"],
-                messages: [],
-                hotelStyle: { primaryColor: "#0a1a2a", blurPx: "16" }
-            };
-        }
-        renderHotelList();
+    // ==================== DADOS OBTIDOS DO LOCALSTORAGE (publicados pelo backoffice) ====================
+    let hotelData = {};
+    let quartos = [];
+    let servicos = {};
+    let gastronomia = [];
+    let galeria = [];
+    let promocoes = [];
+    let mensagens = [];   // guarda as mensagens do turista para este hotel (único)
+    let reservas = [];
+    let avaliacoes = [];
+
+    // IDs locais para submissões
+    let currentHotelId = 1; // fixo, pois é um único hotel
+
+    function loadFromStorage() {
+        const storedHotel = localStorage.getItem("rj_hotel");
+        if(storedHotel) hotelData = JSON.parse(storedHotel);
+        const storedQuartos = localStorage.getItem("rj_quartos");
+        if(storedQuartos) quartos = JSON.parse(storedQuartos);
+        const storedServicos = localStorage.getItem("rj_servicos");
+        if(storedServicos) servicos = JSON.parse(storedServicos);
+        const storedGastro = localStorage.getItem("rj_gastronomia");
+        if(storedGastro) gastronomia = JSON.parse(storedGastro);
+        const storedGaleria = localStorage.getItem("rj_galeria");
+        if(storedGaleria) galeria = JSON.parse(storedGaleria);
+        const storedPromocoes = localStorage.getItem("rj_promocoes");
+        if(storedPromocoes) promocoes = JSON.parse(storedPromocoes);
+        const storedMensagens = localStorage.getItem("rj_mensagens");
+        if(storedMensagens) mensagens = JSON.parse(storedMensagens);
+        const storedReservas = localStorage.getItem("rj_reservas");
+        if(storedReservas) reservas = JSON.parse(storedReservas);
+        const storedAvaliacoes = localStorage.getItem("rj_avaliacoes");
+        if(storedAvaliacoes) avaliacoes = JSON.parse(storedAvaliacoes);
+        
+        // Garantir arrays vazios se null
+        if(!quartos) quartos = [];
+        if(!gastronomia) gastronomia = [];
+        if(!galeria) galeria = [];
+        if(!promocoes) promocoes = [];
+        if(!mensagens) mensagens = [];
+        if(!reservas) reservas = [];
+        if(!avaliacoes) avaliacoes = [];
+        if(!hotelData) hotelData = { nome: "Hotel Malanje Palace", descricao: "Conforto e tradição" };
     }
 
-    function renderHotelList() {
-        const container = document.getElementById("hotelsContainer");
-        // Simulamos um hotel principal (sistema multi-hotel pode ser expandido)
+    function showToast(msg, type="success"){
+        const toastEl = document.getElementById('liveToast');
+        const toastBody = document.getElementById('toastMessageBody');
+        toastBody.innerText = msg;
+        const bsToast = new bootstrap.Toast(toastEl, { autohide: true, delay: 4000 });
+        bsToast.show();
+    }
+
+    // ==================== RENDERIZAÇÃO ====================
+    function renderHome() {
+        const container = document.getElementById('homeHotelList');
+        if(!hotelData.nome) { container.innerHTML = "<p>A carregar...</p>"; return; }
         container.innerHTML = `
-            <div class="col-md-8 offset-md-2">
-                <div class="glass-card hotel-card p-4 text-center" onclick="showHotelDetail()">
-                    <img src="https://picsum.photos/id/164/600/300" class="img-fluid rounded mb-3" alt="Hotel Vista Kwanza">
-                    <h2><i class="fas fa-hotel"></i> Hotel Vista Kwanza - Malanje</h2>
-                    <div><i class="fas fa-star rating-star"></i><i class="fas fa-star rating-star"></i><i class="fas fa-star rating-star"></i><i class="fas fa-star rating-star"></i><i class="fas fa-star-half-alt rating-star"></i> 4.7 (128 avaliações)</div>
-                    <p class="mt-2">O melhor da hospitalidade angolana, integrado na natureza e cultura local.</p>
-                    <button class="btn btn-outline-light mt-2"><i class="fas fa-binoculars"></i> Explorar Hotel</button>
-                </div>
-            </div>`;
-    }
-
-    window.showHotelDetail = function() {
-        document.getElementById("hotelListSection").style.display = "none";
-        document.getElementById("hotelDetailSection").style.display = "block";
-        const detailDiv = document.getElementById("hotelDetailContent");
-        if(!hotelData) loadSharedData();
-        detailDiv.innerHTML = `
-            <div class="glass-card p-4">
-                <h2><i class="fas fa-building"></i> Hotel Vista Kwanza</h2>
-                <div class="row mt-4">
-                    <div class="col-md-6">
-                        <h4><i class="fas fa-bed"></i> Quartos & Tarifas</h4>
-                        ${hotelData.rooms.map(r => `<div class="mb-2 p-2 glass-card"><b>${r.name}</b> - ${r.type}<br>💰 ${r.price} KZ / noite<br>${r.description}<br>${r.available ? '<span class="badge bg-success">Disponível</span>' : '<span class="badge bg-secondary">Indisponível</span>'}</div>`).join("")}
-                    </div>
-                    <div class="col-md-6">
-                        <h4><i class="fas fa-utensils"></i> Gastronomia Típica</h4>
-                        ${hotelData.dishes.map(d => `<div class="mb-2"><i class="fas fa-drumstick-bite"></i> <strong>${d.name}</strong> (${d.category}) - ${d.price} KZ<br>${d.description}</div>`).join("")}
+            <div class="col">
+                <div class="card hotel-card h-100">
+                    <img src="${galeria[2] || 'images/Hotel-Palace.jpg'}" class="card-img-top hotel-img" alt="${hotelData.nome}">
+                    <div class="card-body">
+                        <h5 class="card-title">${hotelData.nome} <span class="badge bg-secondary">${hotelData.categoria || ''}</span></h5>
+                        <p class="card-text"><i class="fas fa-map-marker-alt"></i> ${hotelData.morada || ''}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-star star-rated"></i> ${(avaliacoes.reduce((a,b)=>a+b.nota,0)/avaliacoes.length || 0).toFixed(1)} / 5</span>
+                            <button class="btn btn-sm btn-primary view-hotel-detail" data-id="1">Ver detalhes</button>
+                        </div>
                     </div>
                 </div>
-                <hr>
-                <h4><i class="fas fa-concierge-bell"></i> Serviços Premium</h4>
-                <div class="d-flex flex-wrap gap-2 mb-3">
-                    ${Object.keys(hotelData.services).filter(s=>hotelData.services[s]).map(s => `<span class="badge bg-info fs-6 p-2"><i class="fas fa-check-circle"></i> ${s.toUpperCase()}</span>`).join("")}
-                </div>
-                <h4><i class="fas fa-hiking"></i> Experiências Turísticas</h4>
-                <div class="row mb-3">
-                    ${hotelData.experiences.map(exp => `<div class="col-md-4"><div class="glass-card p-2 mb-2"><i class="fas fa-tree"></i> ${exp.name}<br>${exp.description}<br><strong>${exp.price} KZ</strong></div></div>`).join("")}
-                </div>
-                <h4><i class="fas fa-images"></i> Galeria do Hotel</h4>
-                <div class="preview-img-grid d-flex flex-wrap mb-3">
-                    ${hotelData.gallery.map(img => `<img src="${img}" class="img-thumbnail me-2" style="width:100px; height:80px; object-fit:cover;">`).join("")}
-                </div>
-                <hr>
-                <h4><i class="fas fa-comment"></i> Interaja connosco</h4>
-                <textarea id="visitorMessage" class="form-control mb-2" rows="3" placeholder="Escreva a sua mensagem para o hotel..."></textarea>
-                <div class="mb-2"><label>Avaliação: </label>
-                    <select id="visitorRating" class="form-select w-25 d-inline-block w-auto"><option>5⭐</option><option>4⭐</option><option>3⭐</option><option>2⭐</option><option>1⭐</option></select>
-                    <button class="btn btn-primary ms-2" id="submitInteractionBtn"><i class="fas fa-paper-plane"></i> Enviar Mensagem</button>
-                    <button class="btn btn-success ms-2" id="simulateBookingBtn"><i class="fas fa-calendar-check"></i> Simular Reserva</button>
-                </div>
-                <div id="frontFeedback" class="mt-2"></div>
-                <div class="mt-3"><small><i class="fas fa-clock"></i> Respostas em tempo real - equipa disponível</small></div>
             </div>
         `;
-        document.getElementById("submitInteractionBtn")?.addEventListener("click", () => {
-            let msg = document.getElementById("visitorMessage").value;
-            let rating = document.getElementById("visitorRating").value;
-            if(msg) {
-                let newMsg = { id: "msg"+Date.now(), from: "Turista Web", text: msg + " [Avaliação: "+rating+"]", date: new Date().toISOString(), replied: false };
-                hotelData.messages.push(newMsg);
-                localStorage.setItem("hotelSphereDB", JSON.stringify(hotelData));
-                document.getElementById("frontFeedback").innerHTML = "<div class='alert alert-success'>✅ Mensagem enviada! O hotel responderá em breve.</div>";
-                document.getElementById("visitorMessage").value = "";
-                // força atualização backoffice via storage event
-                window.dispatchEvent(new Event("storage"));
-            } else alert("Escreva uma mensagem antes de enviar.");
-        });
-        document.getElementById("simulateBookingBtn")?.addEventListener("click",()=>{
-            document.getElementById("frontFeedback").innerHTML = "<div class='alert alert-info'>📅 Pedido de reserva simulado! O hotel recebeu a solicitação.</div>";
-            let notifMsg = { id: "not"+Date.now(), from: "Sistema", text: "Turista solicitou reserva (simulação).", date: new Date().toISOString(), replied: false };
-            hotelData.messages.push(notifMsg);
-            localStorage.setItem("hotelSphereDB", JSON.stringify(hotelData));
-            window.dispatchEvent(new Event("storage"));
-        });
-    };
+        document.querySelectorAll('.view-hotel-detail').forEach(btn => btn.addEventListener('click', ()=> showHotelProfile(1)));
+    }
 
-    document.getElementById("backToListBtn")?.addEventListener("click", () => {
-        document.getElementById("hotelDetailSection").style.display = "none";
-        document.getElementById("hotelListSection").style.display = "block";
-        renderHotelList();
+    function renderFullList() {
+        const container = document.getElementById('fullHotelList');
+        container.innerHTML = `
+            <div class="col-12">
+                <div class="card mb-3">
+                    <div class="row g-0">
+                        <div class="col-md-4"><img src="${galeria[2] || 'images/Hotel-Palace.jpg'}" class="img-fluid rounded-start"></div>
+                        <div class="col-md-8"><div class="card-body"><h3>${hotelData.nome}</h3><p>${hotelData.descricao || ''}</p><p><i class="fas fa-map-marker-alt"></i> ${hotelData.morada} | ${hotelData.contactos}</p><button class="btn btn-primary view-hotel-detail" data-id="1">Ver perfil completo</button></div></div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.querySelectorAll('.view-hotel-detail').forEach(btn => btn.addEventListener('click', ()=> showHotelProfile(1)));
+    }
+
+    function showHotelProfile(id) {
+        window.currentHotelId = id;
+        renderHotelProfile();
+        setActiveView('viewHotelProfile');
+    }
+
+    function renderHotelProfile() {
+        const container = document.getElementById('hotelProfileContainer');
+        if(!hotelData.nome) { container.innerHTML = "<p>Carregando...</p>"; return; }
+        container.innerHTML = `
+            <div class="card mb-4"><div class="card-body">
+                <h2>${hotelData.nome} <span class="badge bg-warning text-dark">${hotelData.categoria || ''}</span></h2>
+                <p><i class="fas fa-location-dot"></i> ${hotelData.morada} | ${hotelData.contactos} | ${hotelData.email}</p>
+                <p><strong>Descrição:</strong> ${hotelData.descricao}</p>
+                <p><strong>Horário:</strong> ${hotelData.horario}</p>
+                <hr>
+                <h5><i class="fas fa-concierge-bell"></i> Serviços</h5>
+                <ul>${Object.entries(servicos).filter(([k,v])=>v===true && k!=='outros').map(([k])=>`<li>${k.charAt(0).toUpperCase()+k.slice(1)}</li>`).join('')}${servicos.outros?`<li>${servicos.outros}</li>`:''}</ul>
+                <h5><i class="fas fa-bed"></i> Quartos</h5>
+                <div class="row">${quartos.map(q=>`<div class="col-md-4 mb-2"><div class="card"><div class="card-body"><h6>${q.nome}</h6><p>Preço: ${q.preco} Kz | Capacidade: ${q.capacidade} | Estado: ${q.estado}</p>${q.imagens.length?`<img src="${q.imagens[0]}" style="width:100%;height:120px;object-fit:cover;">`:''}</div></div></div>`).join('')}</div>
+                <h5><i class="fas fa-utensils"></i> Gastronomia</h5>
+                <div class="row">${gastronomia.map(g=>`<div class="col-md-3 mb-2"><div class="card"><img src="${g.imagem || 'images/mufete.png'}" class="card-img-top" style="height:100px;object-fit:cover;"><div class="card-body"><p class="card-text">${g.nome} - ${g.preco} Kz<br><small>${g.tipo}</small></p></div></div></div>`).join('')}</div>
+                <h5><i class="fas fa-images"></i> Galeria</h5>
+                <div class="d-flex flex-wrap gap-2 mb-3">${galeria.map(img=>`<img src="${img}" class="gallery-thumb" onclick="window.open('${img}','_blank')">`).join('')}</div>
+                <h5><i class="fas fa-tags"></i> Promoções</h5>
+                <div class="row">${promocoes.map(p=>`<div class="col-md-4"><div class="alert alert-info">${p.titulo}: ${p.descricao} (${p.percentagem}% até ${p.validoAte})</div></div>`).join('')}</div>
+            </div></div>
+            <div class="card mb-4"><div class="card-body"><h4><i class="fas fa-calendar-check"></i> Fazer Reserva</h4>
+            <form id="reservationForm"><div class="row"><div class="col-md-6 mb-2"><input type="text" id="resName" class="form-control" placeholder="Nome completo" required></div>
+            <div class="col-md-6 mb-2"><input type="email" id="resEmail" class="form-control" placeholder="E-mail" required></div>
+            <div class="col-md-4 mb-2"><input type="tel" id="resPhone" class="form-control" placeholder="Telefone"></div>
+            <div class="col-md-4 mb-2"><input type="date" id="resCheckin" class="form-control"></div>
+            <div class="col-md-4 mb-2"><input type="date" id="resCheckout" class="form-control"></div>
+            <div class="col-md-4 mb-2"><input type="number" id="resGuests" class="form-control" placeholder="Nº Hóspedes" min="1"></div>
+            <div class="col-md-8 mb-2"><select id="resQuarto" class="form-select"><option value="">Selecione um quarto</option>${quartos.map(q=>`<option value="${q.id}" data-preco="${q.preco}">${q.nome} - ${q.preco} Kz/noite</option>`).join('')}</select></div>
+            <div class="col-12"><button type="submit" class="btn btn-success"><i class="fas fa-paper-plane"></i> Solicitar Reserva</button></div></div></form></div></div>
+            <div class="card mb-4"><div class="card-body"><h4><i class="fas fa-comments"></i> Chat com o hotel</h4><div id="chatMessagesPanel" class="chat-messages d-flex flex-column"></div><div class="input-group mt-2"><input type="text" id="chatInput" class="form-control" placeholder="Escreva sua mensagem..."><button id="sendChatBtn" class="btn btn-primary">Enviar</button></div></div></div>
+            <div class="card"><div class="card-body"><h4><i class="fas fa-star"></i> Avaliações</h4><div id="reviewsList"></div><hr><h6>Deixe sua avaliação</h6><div><select id="reviewStars" class="form-select w-auto d-inline-block"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select> estrelas
+            <input type="text" id="reviewComment" class="form-control mt-2" placeholder="Seu comentário"><input type="text" id="reviewUser" class="form-control mt-2" placeholder="Seu nome (opcional)"><button id="submitReviewBtn" class="btn btn-warning mt-2">Enviar Avaliação</button></div></div></div>
+        `;
+        attachProfileEvents();
+        renderChatMessages();
+        renderReviews();
+    }
+
+    function attachProfileEvents() {
+        document.getElementById('reservationForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const quartoId = document.getElementById('resQuarto').value;
+            if(!quartoId) { alert("Selecione um quarto"); return; }
+            const quarto = quartos.find(q=>q.id===quartoId);
+            const checkin = document.getElementById('resCheckin').value;
+            const checkout = document.getElementById('resCheckout').value;
+            if(!checkin || !checkout) { alert("Datas de entrada e saída são obrigatórias"); return; }
+            const dias = Math.ceil((new Date(checkout)-new Date(checkin))/(1000*3600*24));
+            const precoTotal = dias * quarto.preco;
+            const novaReserva = {
+                id: "r"+Date.now(), turista: document.getElementById('resName').value, email: document.getElementById('resEmail').value,
+                telefone: document.getElementById('resPhone').value, quartoId: quartoId, dataEntrada: checkin, dataSaida: checkout,
+                estado: "pendente", precoTotal: precoTotal
+            };
+            let reservasAtuais = JSON.parse(localStorage.getItem("rj_reservas") || "[]");
+            reservasAtuais.push(novaReserva);
+            localStorage.setItem("rj_reservas", JSON.stringify(reservasAtuais));
+            localStorage.setItem("rj_sync_trigger", Date.now().toString());
+            showToast("Pedido de reserva enviado! Aguarde confirmação do hotel.");
+            document.getElementById('reservationForm').reset();
+            loadFromStorage();
+        });
+        document.getElementById('sendChatBtn')?.addEventListener('click', () => {
+            const input = document.getElementById('chatInput');
+            const msg = input.value.trim();
+            if(!msg) return;
+            const novaMsg = { id: "m"+Date.now(), nomeTurista: "Visitante", mensagem: msg, resposta: null, lida: false, timestamp: Date.now() };
+            let msgs = JSON.parse(localStorage.getItem("rj_mensagens") || "[]");
+            msgs.unshift(novaMsg);
+            localStorage.setItem("rj_mensagens", JSON.stringify(msgs));
+            localStorage.setItem("rj_sync_trigger", Date.now().toString());
+            input.value = '';
+            showToast("Mensagem enviada. O hotel responderá em breve.");
+            renderChatMessages();
+        });
+        document.getElementById('submitReviewBtn')?.addEventListener('click', () => {
+            const stars = parseInt(document.getElementById('reviewStars').value);
+            const comment = document.getElementById('reviewComment').value.trim();
+            const user = document.getElementById('reviewUser').value.trim() || "Anônimo";
+            if(!comment) { alert("Escreva um comentário"); return; }
+            const novaAvaliacao = { id: "a"+Date.now(), turista: user, nota: stars, comentario: comment, resposta: null, data: Date.now() };
+            let avals = JSON.parse(localStorage.getItem("rj_avaliacoes") || "[]");
+            avals.unshift(novaAvaliacao);
+            localStorage.setItem("rj_avaliacoes", JSON.stringify(avals));
+            localStorage.setItem("rj_sync_trigger", Date.now().toString());
+            showToast("Avaliação publicada! Obrigado.");
+            document.getElementById('reviewComment').value = '';
+            renderReviews();
+        });
+    }
+
+    function renderChatMessages() {
+        const container = document.getElementById('chatMessagesPanel');
+        if(!container) return;
+        const msgs = mensagens.filter(m => m.resposta !== undefined).slice(0,30);
+        container.innerHTML = msgs.map(m => `
+            <div class="message-bubble message-tourist"><strong>${escapeHtml(m.nomeTurista)}</strong><br>${escapeHtml(m.mensagem)}<br><small>${new Date(m.timestamp).toLocaleTimeString()}</small></div>
+            ${m.resposta ? `<div class="message-bubble message-hotel"><strong>Hotel:</strong><br>${escapeHtml(m.resposta)}<br><small>respondido</small></div>` : ''}
+        `).join('');
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function renderReviews() {
+        const container = document.getElementById('reviewsList');
+        if(!container) return;
+        container.innerHTML = avaliacoes.map(r => `
+            <div class="border-bottom pb-2 mb-2"><strong>${escapeHtml(r.turista)}</strong> ${'★'.repeat(r.nota)} ${'☆'.repeat(5-r.nota)} <small>${new Date(r.data).toLocaleDateString()}</small><br>${escapeHtml(r.comentario)}${r.resposta?`<div class="bg-light p-2 mt-1"><strong>Resposta do hotel:</strong> ${escapeHtml(r.resposta)}</div>`:''}</div>
+        `).join('');
+    }
+
+    function escapeHtml(str) { return String(str).replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+
+    function setActiveView(viewId) {
+        document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active-view'));
+        document.getElementById(viewId).classList.add('active-view');
+        if(viewId === 'viewHome') renderHome();
+        if(viewId === 'viewHotels') renderFullList();
+    }
+
+    // Navegação e sincronização em tempo real
+    document.querySelectorAll('[data-nav]').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const target = link.getAttribute('data-nav');
+            if(target === 'home') setActiveView('viewHome');
+            if(target === 'hotels') setActiveView('viewHotels');
+        });
     });
+    document.getElementById('navHomeLink')?.addEventListener('click', (e) => { e.preventDefault(); setActiveView('viewHome'); });
+    document.getElementById('backToListBtn')?.addEventListener('click', () => { setActiveView('viewHotels'); });
 
-    // Escuta atualizações em tempo real via storage (quando backoffice altera)
-    window.addEventListener("storage", (e) => {
-        if(e.key === "hotelSphereDB") {
-            loadSharedData();
-            if(document.getElementById("hotelDetailSection").style.display === "block") {
-                showHotelDetail();  // recarrega detalhe com dados frescos
-            }
+    // Sincronização automática quando o backoffice alterar dados
+    function syncFromStorage() {
+        loadFromStorage();
+        if(document.getElementById('viewHotelProfile').classList.contains('active-view')) renderHotelProfile();
+        if(document.getElementById('viewHome').classList.contains('active-view')) renderHome();
+        if(document.getElementById('viewHotels').classList.contains('active-view')) renderFullList();
+        renderChatMessages();
+        renderReviews();
+    }
+    window.addEventListener("storage", (event) => {
+        if(event.key === "rj_sync_trigger" || event.key.startsWith("rj_")){
+            syncFromStorage();
+            showToast("Hotel actualizou informações ou respondeu a uma mensagem!", "info");
         }
     });
-
-    loadSharedData();
-    // Polling extra para sincronia máxima
-    setInterval(() => { loadSharedData(); if(document.getElementById("hotelDetailSection").style.display === "block") showHotelDetail(); }, 4000);
+    // Inicialização
+    loadFromStorage();
+    setActiveView('viewHome');
 </script>
 </body>
 </html>
