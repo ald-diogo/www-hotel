@@ -1,0 +1,1858 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I.N.V.I.T.E.D. – Turismo Malanje</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* ===== RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background: #0a0e1a;
+            color: #e0f0ff;
+            min-height: 100vh;
+            cursor: none;
+            overflow-x: hidden;
+        }
+
+        /* ===== CURSOR PERSONALIZADO ===== */
+        .custom-cursor {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 180, 255, 0.7);
+            background: radial-gradient(circle, rgba(0, 180, 255, 0.15) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            transition: width 0.15s, height 0.15s, border-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(0, 180, 255, 0.3);
+            backdrop-filter: blur(2px);
+        }
+        .custom-cursor::after {
+            content: '\f3c5';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 18px;
+            color: #00b4ff;
+            opacity: 0.9;
+            text-shadow: 0 0 15px #00b4ff;
+        }
+        .custom-cursor .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #00b4ff;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #00b4ff;
+            animation: particleFloat 2s infinite ease-in-out;
+        }
+        .custom-cursor .particle:nth-child(1) { top: -6px; left: 50%; animation-delay: 0s; }
+        .custom-cursor .particle:nth-child(2) { bottom: -6px; left: 50%; animation-delay: 0.7s; }
+        .custom-cursor .particle:nth-child(3) { left: -6px; top: 50%; animation-delay: 1.4s; }
+        .custom-cursor .particle:nth-child(4) { right: -6px; top: 50%; animation-delay: 0.3s; }
+
+        @keyframes particleFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+            50% { transform: translate(0, -8px) scale(1.8); opacity: 1; }
+        }
+
+        /* ===== LOADING ===== */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: #0a0e1a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 1.2s ease, visibility 1.2s ease;
+        }
+        #loading-screen.hide {
+            opacity: 0;
+            visibility: hidden;
+        }
+        .loader-ring {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 4px solid transparent;
+            border-top: 4px solid #00b4ff;
+            border-bottom: 4px solid #00b4ff;
+            animation: spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+            position: relative;
+            margin-bottom: 30px;
+            box-shadow: 0 0 40px rgba(0, 180, 255, 0.2);
+        }
+        .loader-ring::before {
+            content: '';
+            position: absolute;
+            inset: 8px;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 180, 255, 0.2);
+            animation: spin 1.8s linear infinite reverse;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .loader-text {
+            font-size: 14px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #7abfff;
+            font-weight: 300;
+            text-align: center;
+            line-height: 2;
+        }
+        .loader-text span {
+            display: inline-block;
+            opacity: 0;
+            animation: fadeUp 0.4s forwards;
+        }
+        .loader-text span:nth-child(1) { animation-delay: 0.1s; }
+        .loader-text span:nth-child(2) { animation-delay: 0.4s; }
+        .loader-text span:nth-child(3) { animation-delay: 0.7s; }
+        .loader-text span:nth-child(4) { animation-delay: 1.0s; }
+        .loader-text span:nth-child(5) { animation-delay: 1.3s; }
+        .loader-text span:nth-child(6) { animation-delay: 1.6s; }
+        .loader-text span:nth-child(7) { animation-delay: 1.9s; }
+        .loader-text span:nth-child(8) { animation-delay: 2.2s; }
+        .loader-text span:nth-child(9) { animation-delay: 2.5s; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        #app {
+            display: none;
+            padding: 20px 30px 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+        }
+        #app.visible { display: block; }
+
+        /* ===== HOLOGRAM HEADER ===== */
+        .hologram-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px;
+            background: rgba(10, 14, 30, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 180, 255, 0.15);
+            border-radius: 60px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+        }
+        .hologram-header .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .hologram-header .brand i {
+            font-size: 28px;
+            color: #00b4ff;
+            filter: drop-shadow(0 0 12px #00b4ff);
+        }
+        .hologram-header .brand h1 {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, #7abfff, #00b4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hologram-header .brand small {
+            font-size: 11px;
+            font-weight: 300;
+            color: #7abfff;
+            letter-spacing: 1px;
+            -webkit-text-fill-color: #7abfff;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .header-actions .notif-btn {
+            background: transparent;
+            border: none;
+            color: #7abfff;
+            font-size: 22px;
+            cursor: pointer;
+            position: relative;
+            transition: 0.3s;
+        }
+        .header-actions .notif-btn:hover {
+            color: #00b4ff;
+            transform: scale(1.1);
+        }
+        .header-actions .notif-btn .badge {
+            position: absolute;
+            top: -6px;
+            right: -8px;
+            background: #ff4d6d;
+            color: #fff;
+            font-size: 10px;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+        .header-actions .user-greeting {
+            font-size: 14px;
+            color: #b0dfff;
+            background: rgba(0, 180, 255, 0.08);
+            padding: 6px 16px;
+            border-radius: 30px;
+            border: 1px solid rgba(0, 180, 255, 0.15);
+        }
+        .header-actions .user-greeting i {
+            margin-right: 8px;
+            color: #00b4ff;
+        }
+
+        /* ===== MORDOMO (HOLOGRAM) ===== */
+        .mordomo-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px 0 30px;
+            position: relative;
+        }
+        .hologram-container {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .hologram-container img {
+            width: 160px;
+            height: 160px;
+            object-fit: contain;
+            border-radius: 50%;
+            filter: drop-shadow(0 0 40px rgba(0, 180, 255, 0.3)) 
+                    drop-shadow(0 0 80px rgba(0, 180, 255, 0.1));
+            animation: hologramPulse 3s ease-in-out infinite;
+            transition: filter 0.5s;
+            cursor: pointer;
+        }
+        .hologram-container img:hover {
+            filter: drop-shadow(0 0 60px rgba(0, 180, 255, 0.6)) 
+                    drop-shadow(0 0 120px rgba(0, 180, 255, 0.2));
+        }
+        @keyframes hologramPulse {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.02); opacity: 1; }
+        }
+        .hologram-ring {
+            position: absolute;
+            inset: -12px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 180, 255, 0.15);
+            animation: ringRotate 12s linear infinite;
+            box-shadow: 0 0 60px rgba(0, 180, 255, 0.05);
+        }
+        .hologram-ring:nth-child(2) {
+            inset: -24px;
+            border-color: rgba(0, 180, 255, 0.08);
+            animation-duration: 20s;
+            animation-direction: reverse;
+        }
+        @keyframes ringRotate { to { transform: rotate(360deg); } }
+
+        .mordomo-speech {
+            max-width: 720px;
+            text-align: center;
+            margin-top: 16px;
+            padding: 18px 28px;
+            background: rgba(0, 180, 255, 0.04);
+            border: 1px solid rgba(0, 180, 255, 0.08);
+            border-radius: 24px;
+            backdrop-filter: blur(6px);
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #d0ecff;
+            position: relative;
+        }
+        .mordomo-speech .typing-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1em;
+            background: #00b4ff;
+            margin-left: 4px;
+            animation: blink 0.8s step-end infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* ===== TUTORIAL OVERLAY ===== */
+        .tutorial-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            pointer-events: none;
+            background: rgba(10, 14, 26, 0.6);
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+        .tutorial-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .tutorial-step {
+            position: absolute;
+            background: rgba(10, 14, 30, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 180, 255, 0.25);
+            border-radius: 20px;
+            padding: 24px 30px;
+            max-width: 360px;
+            color: #e0f0ff;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+            pointer-events: auto;
+            animation: stepAppear 0.5s ease;
+        }
+        @keyframes stepAppear {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .tutorial-step h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: #00b4ff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .tutorial-step p {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #b0dfff;
+            margin-bottom: 14px;
+        }
+        .tutorial-step .btn-next {
+            background: linear-gradient(135deg, #00b4ff, #0077be);
+            border: none;
+            color: #fff;
+            padding: 8px 22px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.3s;
+            pointer-events: auto;
+        }
+        .tutorial-step .btn-next:hover {
+            transform: scale(1.04);
+            box-shadow: 0 0 30px rgba(0, 180, 255, 0.3);
+        }
+        .tutorial-step .step-counter {
+            font-size: 12px;
+            color: #7abfff;
+            margin-top: 10px;
+            text-align: right;
+            opacity: 0.7;
+        }
+
+        /* ===== CHAT ===== */
+        .chat-section {
+            margin-top: 30px;
+            background: rgba(10, 14, 30, 0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 180, 255, 0.08);
+            border-radius: 28px;
+            padding: 20px 24px 24px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+        }
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 180, 255, 0.06);
+        }
+        .chat-header h3 {
+            font-size: 16px;
+            font-weight: 400;
+            color: #7abfff;
+            letter-spacing: 1px;
+        }
+        .chat-header h3 i {
+            margin-right: 10px;
+            color: #00b4ff;
+        }
+        .chat-messages {
+            max-height: 200px;
+            overflow-y: auto;
+            padding-right: 8px;
+            margin-bottom: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .chat-messages::-webkit-scrollbar {
+            width: 4px;
+        }
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #00b4ff;
+            border-radius: 10px;
+        }
+        .chat-msg {
+            padding: 10px 16px;
+            border-radius: 18px;
+            max-width: 80%;
+            font-size: 14px;
+            line-height: 1.5;
+            animation: msgIn 0.3s ease;
+        }
+        @keyframes msgIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .chat-msg.bot {
+            background: rgba(0, 180, 255, 0.06);
+            border: 1px solid rgba(0, 180, 255, 0.1);
+            align-self: flex-start;
+            color: #c8e6ff;
+        }
+        .chat-msg.user {
+            background: rgba(0, 180, 255, 0.15);
+            border: 1px solid rgba(0, 180, 255, 0.2);
+            align-self: flex-end;
+            color: #fff;
+        }
+        .chat-input-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .chat-input-row input {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 40px;
+            border: 1px solid rgba(0, 180, 255, 0.15);
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: 0.3s;
+        }
+        .chat-input-row input:focus {
+            border-color: #00b4ff;
+            box-shadow: 0 0 20px rgba(0, 180, 255, 0.05);
+        }
+        .chat-input-row input::placeholder {
+            color: #6a8faa;
+        }
+        .chat-input-row button {
+            padding: 12px 22px;
+            border-radius: 40px;
+            border: none;
+            background: linear-gradient(135deg, #00b4ff, #0077be);
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .chat-input-row button:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 30px rgba(0, 180, 255, 0.2);
+        }
+
+        /* ===== NAME INPUT ===== */
+        .name-prompt {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            margin: 20px 0 10px;
+            padding: 24px;
+            background: rgba(0, 180, 255, 0.02);
+            border: 1px dashed rgba(0, 180, 255, 0.15);
+            border-radius: 30px;
+        }
+        .name-prompt label {
+            font-size: 18px;
+            color: #b0dfff;
+            font-weight: 300;
+        }
+        .name-prompt .name-input-group {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .name-prompt input {
+            padding: 12px 24px;
+            border-radius: 40px;
+            border: 1px solid rgba(0, 180, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-size: 16px;
+            min-width: 220px;
+            outline: none;
+            transition: 0.3s;
+        }
+        .name-prompt input:focus {
+            border-color: #00b4ff;
+            box-shadow: 0 0 30px rgba(0, 180, 255, 0.05);
+        }
+        .name-prompt button {
+            padding: 12px 34px;
+            border-radius: 40px;
+            border: none;
+            background: linear-gradient(135deg, #00b4ff, #0077be);
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .name-prompt button:hover {
+            transform: scale(1.04);
+            box-shadow: 0 0 30px rgba(0, 180, 255, 0.2);
+        }
+
+        /* ===== JOGOS ===== */
+        .games-section {
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        .game-card {
+            background: rgba(10, 14, 30, 0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(0, 180, 255, 0.06);
+            border-radius: 20px;
+            padding: 18px 16px 20px;
+            text-align: center;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        .game-card:hover {
+            border-color: rgba(0, 180, 255, 0.2);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        }
+        .game-card i {
+            font-size: 32px;
+            color: #00b4ff;
+            margin-bottom: 8px;
+        }
+        .game-card h4 {
+            font-size: 15px;
+            font-weight: 400;
+            color: #b0dfff;
+        }
+        .game-card p {
+            font-size: 12px;
+            color: #6a8faa;
+            margin-top: 4px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            #app { padding: 12px 16px; }
+            .hologram-header { flex-wrap: wrap; gap: 10px; padding: 12px 18px; }
+            .hologram-header .brand h1 { font-size: 16px; }
+            .mordomo-speech { font-size: 14px; padding: 14px 18px; }
+            .chat-section { padding: 16px; }
+            .tutorial-step { max-width: 280px; padding: 18px 20px; }
+            .games-section { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 480px) {
+            .header-actions .user-greeting { font-size: 12px; padding: 4px 12px; }
+            .games-section { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .name-prompt input { min-width: 160px; }
+        }
+
+        /* ===== UTILITY ===== */
+        .hidden { display: none !important; }
+        .text-glow { text-shadow: 0 0 30px rgba(0, 180, 255, 0.15); }
+        .flex-center { display: flex; align-items: center; justify-content: center; }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0e1a; }
+        ::-webkit-scrollbar-thumb { background: #00b4ff; border-radius: 10px; }
+
+        /* ===== NOTIFICATION PANEL ===== */
+        .notif-panel {
+            position: fixed;
+            right: -380px;
+            top: 0;
+            width: 360px;
+            height: 100%;
+            background: rgba(10, 14, 30, 0.92);
+            backdrop-filter: blur(30px);
+            border-left: 1px solid rgba(0, 180, 255, 0.1);
+            padding: 30px 24px;
+            transition: right 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 300;
+            overflow-y: auto;
+        }
+        .notif-panel.open { right: 0; }
+        .notif-panel h3 {
+            font-weight: 300;
+            font-size: 20px;
+            color: #b0dfff;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .notif-panel h3 button {
+            background: transparent;
+            border: none;
+            color: #7abfff;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .notif-item {
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(0, 180, 255, 0.04);
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
+        .notif-item i { color: #00b4ff; font-size: 18px; margin-top: 2px; }
+        .notif-item .content { font-size: 14px; color: #c8e6ff; }
+        .notif-item .content small { color: #6a8faa; font-size: 12px; display: block; margin-top: 4px; }
+
+        /* Persuasão */
+        .persuasion-banner {
+            background: linear-gradient(135deg, rgba(0, 180, 255, 0.04), rgba(0, 119, 190, 0.04));
+            border: 1px solid rgba(0, 180, 255, 0.1);
+            border-radius: 24px;
+            padding: 20px 28px;
+            margin: 20px 0 10px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .persuasion-banner p {
+            font-size: 15px;
+            color: #b0dfff;
+            flex: 1;
+        }
+        .persuasion-banner .btn-create {
+            background: linear-gradient(135deg, #00b4ff, #0077be);
+            border: none;
+            padding: 12px 32px;
+            border-radius: 40px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+        .persuasion-banner .btn-create:hover {
+            transform: scale(1.04);
+            box-shadow: 0 0 40px rgba(0, 180, 255, 0.15);
+        }
+
+        /* ===== JOGOS IMPLEMENTADOS ===== */
+        .game-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 500;
+            background: rgba(10, 14, 26, 0.85);
+            backdrop-filter: blur(12px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .game-modal.active {
+            display: flex;
+        }
+        .game-modal-content {
+            background: rgba(10, 14, 30, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 180, 255, 0.15);
+            border-radius: 30px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+        }
+        .game-modal-content .close-game {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #7abfff;
+            font-size: 28px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .game-modal-content .close-game:hover {
+            color: #ff4d6d;
+            transform: rotate(90deg);
+        }
+        .game-modal-content h2 {
+            color: #00b4ff;
+            margin-bottom: 20px;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        /* Puzzle */
+        .puzzle-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin: 20px 0;
+            aspect-ratio: 1;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .puzzle-tile {
+            background: #1a2a3a;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #00b4ff;
+            cursor: pointer;
+            transition: 0.2s;
+            aspect-ratio: 1;
+            border: 1px solid rgba(0, 180, 255, 0.1);
+        }
+        .puzzle-tile:hover {
+            background: #2a3a4a;
+            border-color: #00b4ff;
+        }
+        .puzzle-tile.empty {
+            background: transparent;
+            border: 1px dashed rgba(0, 180, 255, 0.2);
+            cursor: default;
+        }
+
+        /* Velha */
+        .velha-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            max-width: 300px;
+            margin: 20px auto;
+        }
+        .velha-cell {
+            background: #1a2a3a;
+            aspect-ratio: 1;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid rgba(0, 180, 255, 0.1);
+            color: #00b4ff;
+        }
+        .velha-cell:hover {
+            background: #2a3a4a;
+            border-color: #00b4ff;
+        }
+        .velha-cell.x { color: #ff6b6b; }
+        .velha-cell.o { color: #4ecdc4; }
+        .velha-status {
+            text-align: center;
+            font-size: 18px;
+            color: #b0dfff;
+            margin: 15px 0;
+        }
+
+        /* Memória */
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            max-width: 400px;
+            margin: 20px auto;
+        }
+        .memory-card {
+            aspect-ratio: 1;
+            background: #1a2a3a;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 1px solid rgba(0, 180, 255, 0.1);
+        }
+        .memory-card.flipped {
+            background: #0a1a2a;
+            border-color: #00b4ff;
+            transform: rotateY(180deg);
+        }
+        .memory-card.matched {
+            background: rgba(0, 180, 255, 0.15);
+            border-color: #00b4ff;
+            cursor: default;
+            opacity: 0.6;
+        }
+        .memory-card:hover:not(.matched):not(.flipped) {
+            background: #2a3a4a;
+            border-color: #00b4ff;
+        }
+
+        /* Xadrez */
+        .chess-board {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 2px;
+            max-width: 400px;
+            margin: 20px auto;
+            aspect-ratio: 1;
+        }
+        .chess-square {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+        .chess-square.light { background: #e8e0d0; }
+        .chess-square.dark { background: #5a4a3a; }
+        .chess-square.selected { box-shadow: inset 0 0 0 3px #00b4ff; }
+        .chess-square:hover { opacity: 0.8; }
+
+        /* Enigmas */
+        .enigma-box {
+            background: rgba(0, 180, 255, 0.04);
+            border: 1px solid rgba(0, 180, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        .enigma-box p { color: #c8e6ff; line-height: 1.6; }
+        .enigma-box input {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 180, 255, 0.15);
+            border-radius: 30px;
+            padding: 10px 20px;
+            color: #fff;
+            width: 100%;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        .enigma-box input:focus {
+            border-color: #00b4ff;
+            outline: none;
+        }
+        .enigma-box .btn-check {
+            background: #00b4ff;
+            border: none;
+            color: #fff;
+            padding: 8px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .enigma-box .btn-check:hover { transform: scale(1.04); }
+
+        /* Quiz */
+        .quiz-option {
+            display: block;
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            background: rgba(0, 180, 255, 0.04);
+            border: 1px solid rgba(0, 180, 255, 0.08);
+            border-radius: 12px;
+            color: #c8e6ff;
+            cursor: pointer;
+            transition: 0.3s;
+            text-align: left;
+            font-size: 14px;
+        }
+        .quiz-option:hover {
+            background: rgba(0, 180, 255, 0.12);
+            border-color: #00b4ff;
+        }
+        .quiz-option.correct {
+            background: rgba(0, 200, 100, 0.2);
+            border-color: #00c864;
+            color: #00c864;
+        }
+        .quiz-option.wrong {
+            background: rgba(255, 50, 50, 0.2);
+            border-color: #ff4d4d;
+            color: #ff4d4d;
+        }
+        .quiz-option:disabled {
+            cursor: default;
+            opacity: 0.6;
+        }
+        .quiz-score {
+            text-align: center;
+            font-size: 20px;
+            color: #00b4ff;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== CURSOR ===== -->
+    <div class="custom-cursor" id="cursor">
+        <span class="particle"></span>
+        <span class="particle"></span>
+        <span class="particle"></span>
+        <span class="particle"></span>
+    </div>
+
+    <!-- ===== LOADING ===== -->
+    <div id="loading-screen">
+        <div class="loader-ring"></div>
+        <div class="loader-text">
+            <span>I</span><span>n</span><span>i</span><span>c</span><span>i</span><span>a</span><span>l</span><span>i</span><span>z</span><span>a</span><span>n</span><span>d</span><span>o</span>
+            <span style="display:block; margin-top:6px;">
+                <span>I</span><span>.</span><span>N</span><span>.</span><span>V</span><span>.</span><span>I</span><span>.</span><span>T</span><span>.</span><span>E</span><span>.</span><span>D</span><span>.</span><span>.</span><span>.</span>
+            </span>
+            <span style="display:block; margin-top:10px; font-size:12px; color:#4a7a9a;">
+                <span>C</span><span>a</span><span>r</span><span>r</span><span>e</span><span>g</span><span>a</span><span>n</span><span>d</span><span>o</span>
+                <span> </span>
+                <span>I</span><span>A</span><span>.</span><span>.</span><span>.</span>
+            </span>
+        </div>
+    </div>
+
+    <!-- ===== NOTIFICAÇÕES ===== -->
+    <div class="notif-panel" id="notifPanel">
+        <h3>
+            <span><i class="fas fa-bell" style="margin-right:10px;"></i>Central</span>
+            <button id="closeNotif"><i class="fas fa-times"></i></button>
+        </h3>
+        <div class="notif-item">
+            <i class="fas fa-star"></i>
+            <div class="content">Bem-vindo à plataforma! <small>agora mesmo</small></div>
+        </div>
+        <div class="notif-item">
+            <i class="fas fa-calendar-alt"></i>
+            <div class="content">Evento: Festival da Cultura em Malanje <small>12 Dez</small></div>
+        </div>
+        <div class="notif-item">
+            <i class="fas fa-hotel"></i>
+            <div class="content">Novo hotel: Palácio do Kalandula <small>2 dias atrás</small></div>
+        </div>
+        <div class="notif-item">
+            <i class="fas fa-umbrella-beach"></i>
+            <div class="content">Promoção: 20% em tours guiados <small>válido até 30/12</small></div>
+        </div>
+    </div>
+
+    <!-- ===== TUTORIAL OVERLAY ===== -->
+    <div class="tutorial-overlay" id="tutorialOverlay">
+        <!-- steps serão injetados via JS -->
+    </div>
+
+    <!-- ===== APP ===== -->
+    <div id="app">
+        <!-- HEADER -->
+        <header class="hologram-header">
+            <div class="brand">
+                <i class="fas fa-robot"></i>
+                <div>
+                    <h1>I.N.V.I.T.E.D.</h1>
+                    <small>assistente virtual · turismo</small>
+                </div>
+            </div>
+            <div class="header-actions">
+                <span class="user-greeting" id="greetingDisplay">
+                    <i class="fas fa-user-circle"></i> Visitante
+                </span>
+                <button class="notif-btn" id="notifToggle">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">4</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- MORDOMO (HOLOGRAMA) -->
+        <section class="mordomo-section">
+            <div class="hologram-container">
+                <div class="hologram-ring"></div>
+                <div class="hologram-ring"></div>
+                <img src="images/invited.png" alt="Mordomo I.N.V.I.T.E.D." id="mordomoImg">
+            </div>
+            <div class="mordomo-speech" id="mordomoSpeech">
+                <span id="speechText">Carregando...</span>
+                <span class="typing-cursor"></span>
+            </div>
+        </section>
+
+        <!-- NOME -->
+        <div class="name-prompt" id="namePrompt">
+            <label><i class="fas fa-pen-fancy" style="margin-right:10px;color:#00b4ff;"></i>Como gostaria que eu o tratasse?</label>
+            <div class="name-input-group">
+                <input type="text" id="userNameInput" placeholder="Digite o seu nome..." maxlength="30">
+                <button id="nameSubmitBtn">Continuar <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- PERSUASÃO -->
+        <div class="persuasion-banner" id="persuasionBanner">
+            <p><i class="fas fa-rocket" style="color:#00b4ff;margin-right:10px;"></i>Notei o seu interesse pelos destinos turísticos. Ao criar uma conta poderá guardar favoritos, criar roteiros, contactar hotéis e muito mais!</p>
+            <button class="btn-create" id="createAccountBtn"><i class="fas fa-user-plus"></i> Criar Conta</button>
+        </div>
+
+        <!-- CHAT -->
+        <section class="chat-section">
+            <div class="chat-header">
+                <h3><i class="fas fa-comment-dots"></i>Chat Inteligente</h3>
+                <span style="font-size:12px;color:#6a8faa;"><i class="fas fa-globe"></i> PT · EN · FR · ES</span>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="chat-msg bot">Olá! Sou o I.N.V.I.T.E.D. Estou aqui para ajudar com turismo, hotéis, eventos e muito mais. Pergunte à vontade.</div>
+            </div>
+            <div class="chat-input-row">
+                <input type="text" id="chatInput" placeholder="Escreva a sua mensagem...">
+                <button id="chatSendBtn"><i class="fas fa-paper-plane"></i> Enviar</button>
+            </div>
+        </section>
+
+        <!-- JOGOS -->
+        <section class="games-section">
+            <div class="game-card" data-game="puzzle">
+                <i class="fas fa-puzzle-piece"></i>
+                <h4>Puzzle</h4>
+                <p>Monte a imagem</p>
+            </div>
+            <div class="game-card" data-game="velha">
+                <i class="fas fa-hashtag"></i>
+                <h4>Jogo da Velha</h4>
+                <p>Desafie a IA</p>
+            </div>
+            <div class="game-card" data-game="memoria">
+                <i class="fas fa-brain"></i>
+                <h4>Jogo da Memória</h4>
+                <p>Encontre os pares</p>
+            </div>
+            <div class="game-card" data-game="xadrez">
+                <i class="fas fa-chess-king"></i>
+                <h4>Xadrez</h4>
+                <p>Modo estratégia</p>
+            </div>
+            <div class="game-card" data-game="enigmas">
+                <i class="fas fa-skull"></i>
+                <h4>Enigmas & Forense</h4>
+                <p>Casos criminais</p>
+            </div>
+            <div class="game-card" data-game="quiz">
+                <i class="fas fa-question-circle"></i>
+                <h4>Quiz Malanje</h4>
+                <p>Teste os seus conhecimentos</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- ===== GAME MODAL ===== -->
+    <div class="game-modal" id="gameModal">
+        <div class="game-modal-content" id="gameModalContent">
+            <button class="close-game" id="closeGameModal"><i class="fas fa-times"></i></button>
+            <h2 id="gameTitle">Jogo</h2>
+            <div id="gameContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        //  CÓDIGO JAVASCRIPT COMPLETO – I.N.V.I.T.E.D.
+        // ============================================================
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // ---------- ELEMENTOS ----------
+            const cursor = document.getElementById('cursor');
+            const loadingScreen = document.getElementById('loading-screen');
+            const app = document.getElementById('app');
+            const speechText = document.getElementById('speechText');
+            const mordomoImg = document.getElementById('mordomoImg');
+            const namePrompt = document.getElementById('namePrompt');
+            const userNameInput = document.getElementById('userNameInput');
+            const nameSubmitBtn = document.getElementById('nameSubmitBtn');
+            const greetingDisplay = document.getElementById('greetingDisplay');
+            const chatMessages = document.getElementById('chatMessages');
+            const chatInput = document.getElementById('chatInput');
+            const chatSendBtn = document.getElementById('chatSendBtn');
+            const notifToggle = document.getElementById('notifToggle');
+            const notifPanel = document.getElementById('notifPanel');
+            const closeNotif = document.getElementById('closeNotif');
+            const tutorialOverlay = document.getElementById('tutorialOverlay');
+            const createAccountBtn = document.getElementById('createAccountBtn');
+            const gameModal = document.getElementById('gameModal');
+            const gameModalContent = document.getElementById('gameModalContent');
+            const gameTitle = document.getElementById('gameTitle');
+            const gameContent = document.getElementById('gameContent');
+            const closeGameModal = document.getElementById('closeGameModal');
+
+            // ---------- ESTADO ----------
+            let userName = localStorage.getItem('invited_user') || '';
+            let lastVisit = localStorage.getItem('invited_lastvisit') || '';
+            const lang = navigator.language.startsWith('pt') ? 'pt' : 'en';
+            let currentStep = 0;
+            let isTutorialActive = false;
+            let nameSet = false;
+
+            // ---------- CURSOR PERSONALIZADO ----------
+            document.addEventListener('mousemove', (e) => {
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+            });
+            document.addEventListener('mouseleave', () => {
+                cursor.style.opacity = '0';
+            });
+            document.addEventListener('mouseenter', () => {
+                cursor.style.opacity = '1';
+            });
+
+            // ---------- LOADING ----------
+            setTimeout(() => {
+                loadingScreen.classList.add('hide');
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                    app.classList.add('visible');
+                    initApp();
+                }, 1200);
+            }, 4000);
+
+            // ---------- INICIALIZAÇÃO ----------
+            function initApp() {
+                const period = getPeriod();
+                let greeting = period === 'manhã' ? 'Bom dia.' :
+                              period === 'tarde' ? 'Boa tarde.' : 'Boa noite.';
+                if (userName) {
+                    greeting += ` Seja muito bem-vindo novamente, ${userName}.`;
+                } else {
+                    greeting += ` Seja muito bem-vindo à Plataforma de Turismo Inteligente da Província de Malanje.`;
+                }
+                typeText(greeting, () => {
+                    if (!userName) {
+                        setTimeout(() => {
+                            typeText('O meu nome é I.N.V.I.T.E.D. Sou o assistente virtual inteligente desta plataforma. Fui desenvolvido para orientar visitantes, turistas, investigadores e cidadãos interessados em conhecer as maravilhas da Província de Malanje.', () => {
+                                setTimeout(() => {
+                                    typeText('I.N.V.I.T.E.D. significa: Intruso Neural Virtual Inteligente Tecnológico Emocional Dinâmico. Em inglês: Intruder Neural Virtual Intelligent Technological Emotional Dynamic.', () => {
+                                        setTimeout(startTutorial, 800);
+                                    });
+                                }, 500);
+                            });
+                        }, 400);
+                    } else {
+                        const visitMsg = lastVisit ? ` A sua última visita foi em ${lastVisit}.` : '';
+                        typeText(`${greeting} ${visitMsg} Como posso ajudá-lo hoje?`, () => {});
+                        nameSet = true;
+                        updateGreeting();
+                        namePrompt.style.display = 'none';
+                    }
+                });
+            }
+
+            // ---------- PERÍODO DO DIA ----------
+            function getPeriod() {
+                const h = new Date().getHours();
+                if (h < 12) return 'manhã';
+                if (h < 18) return 'tarde';
+                return 'noite';
+            }
+
+            // ---------- EFEITO DE DIGITAÇÃO ----------
+            function typeText(text, callback) {
+                speechText.textContent = '';
+                let idx = 0;
+                const interval = setInterval(() => {
+                    if (idx < text.length) {
+                        speechText.textContent += text.charAt(idx);
+                        idx++;
+                    } else {
+                        clearInterval(interval);
+                        if (callback) setTimeout(callback, 300);
+                    }
+                }, 25);
+            }
+
+            // ---------- TUTORIAL ----------
+            const tutorialSteps = [
+                { title: '🏠 Página Inicial', desc: 'Aqui encontra o resumo da plataforma, destaques e acesso rápido a todas as secções.' },
+                { title: '📍 Destinos Turísticos', desc: 'Explore pontos turísticos, paisagens, monumentos e locais históricos de Malanje.' },
+                { title: '🏨 Hotéis', desc: 'Consulte hotéis, pousadas e alojamentos com avaliações, fotos e contacto.' },
+                { title: '🍽️ Restaurantes', desc: 'Descubra a gastronomia local, restaurantes típicos e menus especiais.' },
+                { title: '🧭 Guias Turísticos', desc: 'Guias credenciados para acompanhá-lo nas suas aventuras.' },
+                { title: '🎭 Eventos', desc: 'Festivais, exposições, feiras e eventos culturais em Malanje.' },
+                { title: '🚌 Transportes', desc: 'Informações sobre táxis, autocarros, aluguer de viaturas e transfers.' },
+                { title: '🖼️ Galeria', desc: 'Fotografias e vídeos das belezas naturais e culturais da província.' },
+                { title: '📞 Contactos', desc: 'Contactos úteis: turismo, emergência, hotéis e guias.' },
+                { title: '🔍 Pesquisa Inteligente', desc: 'Pesquise por destinos, hotéis, eventos e muito mais com IA.' },
+                { title: '👤 Conta do Utilizador', desc: 'Crie a sua conta para guardar favoritos, criar roteiros e receber promoções.' },
+                { title: '💬 Chat', desc: 'Converse comigo! Estou aqui para responder todas as suas perguntas.' }
+            ];
+
+            function startTutorial() {
+                if (isTutorialActive) return;
+                isTutorialActive = true;
+                currentStep = 0;
+                tutorialOverlay.classList.add('active');
+                showTutorialStep();
+            }
+
+            function showTutorialStep() {
+                if (currentStep >= tutorialSteps.length) {
+                    endTutorial();
+                    return;
+                }
+                const step = tutorialSteps[currentStep];
+                const existing = tutorialOverlay.querySelector('.tutorial-step');
+                if (existing) existing.remove();
+
+                const div = document.createElement('div');
+                div.className = 'tutorial-step';
+                const x = 20 + Math.random() * 40;
+                const y = 20 + Math.random() * 40;
+                div.style.left = x + '%';
+                div.style.top = y + '%';
+                div.innerHTML = `
+                    <h3>${step.title}</h3>
+                    <p>${step.desc}</p>
+                    <button class="btn-next" id="tutorialNext">${currentStep === tutorialSteps.length - 1 ? 'Concluir' : 'Próximo →'}</button>
+                    <div class="step-counter">${currentStep+1} / ${tutorialSteps.length}</div>
+                `;
+                tutorialOverlay.appendChild(div);
+
+                document.getElementById('tutorialNext').addEventListener('click', () => {
+                    currentStep++;
+                    showTutorialStep();
+                });
+            }
+
+            function endTutorial() {
+                tutorialOverlay.classList.remove('active');
+                const existing = tutorialOverlay.querySelector('.tutorial-step');
+                if (existing) existing.remove();
+                isTutorialActive = false;
+                if (!userName) {
+                    namePrompt.style.display = 'flex';
+                    typeText('Como gostaria que eu o tratasse?', () => {});
+                } else {
+                    typeText(`Que bom ter concluído o tutorial! ${userName}, estou à disposição.`, () => {});
+                }
+            }
+
+            // ---------- NOME ----------
+            nameSubmitBtn.addEventListener('click', () => {
+                const name = userNameInput.value.trim();
+                if (name.length < 2) {
+                    typeText('Por favor, insira um nome válido (pelo menos 2 caracteres).', () => {});
+                    return;
+                }
+                userName = name;
+                localStorage.setItem('invited_user', name);
+                localStorage.setItem('invited_lastvisit', new Date().toLocaleDateString('pt-PT'));
+                nameSet = true;
+                namePrompt.style.display = 'none';
+                updateGreeting();
+                typeText(`Muito prazer, ${userName}! Como posso ajudá-lo hoje?`, () => {});
+            });
+
+            userNameInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') nameSubmitBtn.click();
+            });
+
+            function updateGreeting() {
+                if (userName) {
+                    greetingDisplay.innerHTML = `<i class="fas fa-user-circle"></i> ${userName}`;
+                }
+            }
+
+            // ---------- CHAT ----------
+            function addChatMessage(text, sender = 'bot') {
+                const div = document.createElement('div');
+                div.className = `chat-msg ${sender}`;
+                div.textContent = text;
+                chatMessages.appendChild(div);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            function processUserInput(input) {
+                const lower = input.toLowerCase();
+                const name = userName || 'Visitante';
+
+                const badWords = ['foda', 'caralho', 'merda', 'porra', 'puta', 'palavrão', 'insulto', 'odio', 'spam', 'assédio'];
+                if (badWords.some(w => lower.includes(w))) {
+                    addChatMessage(`${name}, por favor, mantenha uma conversa respeitosa. Estou aqui para ajudar.`, 'bot');
+                    return;
+                }
+
+                if (lower.includes('hotel') || lower.includes('pousada')) {
+                    addChatMessage(`${name}, temos excelentes hotéis em Malanje, como o Palácio do Kalandula e o Hotel Malanje. Posso dar mais detalhes se desejar.`, 'bot');
+                } else if (lower.includes('restaurante') || lower.includes('comida')) {
+                    addChatMessage(`${name}, a gastronomia local é fantástica! Recomendo o restaurante "Sabor da Terra" e a "Churrascaria do Kwanza".`, 'bot');
+                } else if (lower.includes('evento') || lower.includes('festival')) {
+                    addChatMessage(`${name}, em Dezembro temos o Festival da Cultura de Malanje com danças, música e artesanato. Gostaria de saber mais?`, 'bot');
+                } else if (lower.includes('transporte') || lower.includes('táxi')) {
+                    addChatMessage(`${name}, há táxis e autocarros disponíveis. Também pode alugar viaturas com motorista. Preciso de ajuda com reserva?`, 'bot');
+                } else if (lower.includes('guia') || lower.includes('tour')) {
+                    addChatMessage(`${name}, temos guias certificados que falam português, inglês e francês. Posso sugerir um guia para si.`, 'bot');
+                } else if (lower.includes('história') || lower.includes('cultura')) {
+                    addChatMessage(`${name}, Malanje é rica em história. As pedras do Pungo Andongo são um dos locais mais emblemáticos. Deseja mais informações?`, 'bot');
+                } else if (lower.includes('meteorologia') || lower.includes('clima')) {
+                    addChatMessage(`${name}, atualmente a temperatura está agradável, em torno de 25°C. A época seca vai de Maio a Setembro.`, 'bot');
+                } else if (lower.includes('obrigado') || lower.includes('obrigada')) {
+                    addChatMessage(`De nada, ${name}! Estou sempre à disposição.`, 'bot');
+                } else if (lower.includes('ajuda') || lower.includes('socorro')) {
+                    addChatMessage(`Claro, ${name}! Posso ajudar com turismo, hotéis, restaurantes, eventos, transportes, guias, história e muito mais. O que deseja?`, 'bot');
+                } else {
+                    addChatMessage(`Interessante, ${name}. Pode me dar mais detalhes para que eu possa ajudá-lo da melhor forma?`, 'bot');
+                }
+            }
+
+            chatSendBtn.addEventListener('click', () => {
+                const msg = chatInput.value.trim();
+                if (!msg) return;
+                addChatMessage(msg, 'user');
+                chatInput.value = '';
+                processUserInput(msg);
+            });
+
+            chatInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') chatSendBtn.click();
+            });
+
+            // ---------- NOTIFICAÇÕES ----------
+            notifToggle.addEventListener('click', () => {
+                notifPanel.classList.toggle('open');
+            });
+            closeNotif.addEventListener('click', () => {
+                notifPanel.classList.remove('open');
+            });
+            document.addEventListener('click', (e) => {
+                if (!notifPanel.contains(e.target) && e.target !== notifToggle && !notifToggle.contains(e.target)) {
+                    notifPanel.classList.remove('open');
+                }
+            });
+
+            // ---------- PERSUASÃO: CRIAR CONTA ----------
+            createAccountBtn.addEventListener('click', () => {
+                alert('🚀 A funcionalidade de criação de conta será implementada na próxima fase.\nObrigado pelo interesse!');
+            });
+
+            // ---------- JOGOS ----------
+            // Estado dos jogos
+            let puzzleState = [];
+            let velhaState = ['', '', '', '', '', '', '', '', ''];
+            let velhaTurn = 'X';
+            let velhaGameOver = false;
+            let memoryCards = [];
+            let memoryFlipped = [];
+            let memoryMatched = [];
+            let memoryLocked = false;
+            let chessSelected = null;
+            let chessBoard = [];
+            let enigmaIndex = 0;
+            let quizIndex = 0;
+            let quizScore = 0;
+
+            function openGame(title, content) {
+                gameTitle.textContent = title;
+                gameContent.innerHTML = content;
+                gameModal.classList.add('active');
+            }
+
+            closeGameModal.addEventListener('click', () => {
+                gameModal.classList.remove('active');
+            });
+
+            gameModal.addEventListener('click', (e) => {
+                if (e.target === gameModal) {
+                    gameModal.classList.remove('active');
+                }
+            });
+
+            // ---------- PUZZLE ----------
+            function initPuzzle() {
+                const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, null];
+                // Embaralhar
+                for (let i = numbers.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
+                }
+                puzzleState = numbers;
+                renderPuzzle();
+            }
+
+            function renderPuzzle() {
+                let html = '<div class="puzzle-grid">';
+                puzzleState.forEach((num, idx) => {
+                    const isEmpty = num === null;
+                    html += `<div class="puzzle-tile ${isEmpty ? 'empty' : ''}" data-index="${idx}">${isEmpty ? '' : num}</div>`;
+                });
+                html += '</div>';
+                html += '<p style="text-align:center;color:#7abfff;font-size:14px;margin-top:10px;">Clique no número adjacente ao espaço vazio para mover.</p>';
+                gameContent.innerHTML = html;
+
+                document.querySelectorAll('.puzzle-tile:not(.empty)').forEach(tile => {
+                    tile.addEventListener('click', () => {
+                        const idx = parseInt(tile.dataset.index);
+                        movePuzzle(idx);
+                    });
+                });
+            }
+
+            function movePuzzle(idx) {
+                const emptyIdx = puzzleState.indexOf(null);
+                const row = Math.floor(idx / 4);
+                const col = idx % 4;
+                const emptyRow = Math.floor(emptyIdx / 4);
+                const emptyCol = emptyIdx % 4;
+
+                if ((Math.abs(row - emptyRow) === 1 && col === emptyCol) || 
+                    (Math.abs(col - emptyCol) === 1 && row === emptyRow)) {
+                    [puzzleState[idx], puzzleState[emptyIdx]] = [puzzleState[emptyIdx], puzzleState[idx]];
+                    renderPuzzle();
+                    checkPuzzleWin();
+                }
+            }
+
+            function checkPuzzleWin() {
+                const win = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, null];
+                if (puzzleState.every((v, i) => v === win[i])) {
+                    setTimeout(() => {
+                        alert('🎉 Parabéns! Completou o puzzle!');
+                        initPuzzle();
+                    }, 300);
+                }
+            }
+
+            // ---------- VELHA ----------
+            function initVelha() {
+                velhaState = ['', '', '', '', '', '', '', '', ''];
+                velhaTurn = 'X';
+                velhaGameOver = false;
+                renderVelha();
+            }
+
+            function renderVelha() {
+                let html = '<div class="velha-grid">';
+                velhaState.forEach((cell, idx) => {
+                    html += `<div class="velha-cell ${cell.toLowerCase()}" data-index="${idx}">${cell}</div>`;
+                });
+                html += '</div>';
+                html += `<div class="velha-status">${velhaGameOver ? 'Fim de jogo!' : `Vez do jogador: ${velhaTurn}`}</div>`;
+                if (velhaGameOver) {
+                    html += `<div style="text-align:center;"><button id="velhaReset" style="background:#00b4ff;border:none;color:#fff;padding:10px 30px;border-radius:30px;cursor:pointer;font-weight:600;">Jogar Novamente</button></div>`;
+                }
+                gameContent.innerHTML = html;
+
+                document.querySelectorAll('.velha-cell:not(.x):not(.o)').forEach(cell => {
+                    cell.addEventListener('click', () => {
+                        const idx = parseInt(cell.dataset.index);
+                        playVelha(idx);
+                    });
+                });
+
+                const resetBtn = document.getElementById('velhaReset');
+                if (resetBtn) resetBtn.addEventListener('click', initVelha);
+            }
+
+            function playVelha(idx) {
+                if (velhaState[idx] || velhaGameOver) return;
+                velhaState[idx] = velhaTurn;
+                if (checkVelhaWin()) {
+                    velhaGameOver = true;
+                    renderVelha();
+                    return;
+                }
+                if (velhaState.every(c => c)) {
+                    velhaGameOver = true;
+                    renderVelha();
+                    return;
+                }
+                velhaTurn = velhaTurn === 'X' ? 'O' : 'X';
+                renderVelha();
+                if (velhaTurn === 'O' && !velhaGameOver) {
+                    setTimeout(playVelhaAI, 500);
+                }
+            }
+
+            function playVelhaAI() {
+                if (velhaGameOver) return;
+                // IA simples: escolher aleatório
+                const empty = velhaState.map((v, i) => v ? -1 : i).filter(v => v >= 0);
+                if (empty.length === 0) return;
+                const idx = empty[Math.floor(Math.random() * empty.length)];
+                velhaState[idx] = 'O';
+                if (checkVelhaWin()) {
+                    velhaGameOver = true;
+                    renderVelha();
+                    return;
+                }
+                if (velhaState.every(c => c)) {
+                    velhaGameOver = true;
+                    renderVelha();
+                    return;
+                }
+                velhaTurn = 'X';
+                renderVelha();
+            }
+
+            function checkVelhaWin() {
+                const lines = [
+                    [0,1,2], [3,4,5], [6,7,8],
+                    [0,3,6], [1,4,7], [2,5,8],
+                    [0,4,8], [2,4,6]
+                ];
+                for (const line of lines) {
+                    const [a,b,c] = line;
+                    if (velhaState[a] && velhaState[a] === velhaState[b] && velhaState[a] === velhaState[c]) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            // ---------- MEMÓRIA ----------
+            function initMemory() {
+                const emojis = ['🌍', '🏝️', '🌴', '🏛️', '🌊', '⛰️', '🌺', '🦁'];
+                const doubled = [...emojis, ...emojis];
+                for (let i = doubled.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [doubled[i], doubled[j]] = [doubled[j], doubled[i]];
+                }
+                memoryCards = doubled;
+                memoryFlipped = [];
+                memoryMatched = [];
+                memoryLocked = false;
+                renderMemory();
+            }
+
+            function renderMemory() {
+                let html = '<div class="memory-grid">';
+                memoryCards.forEach((emoji, idx) => {
+                    const isFlipped = memoryFlipped.includes(idx) || memoryMatched.includes(idx);
+                    html += `<div class="memory-card ${isFlipped ? 'flipped' : ''} ${memoryMatched.includes(idx) ? 'matched' : ''}" data-index="${idx}">${isFlipped ? emoji : '❓'}</div>`;
+                });
+                html += '</div>';
+                html += `<div style="text-align:center;color:#7abfff;font-size:14px;">Pares encontrados: ${memoryMatched.length / 2} / ${memoryCards.length / 2}</div>`;
+                gameContent.innerHTML = html;
+
+                document.querySelectorAll('.memory-card:not(.matched)').forEach(card => {
+                    card.addEventListener('click', () => {
+                        const idx = parseInt(card.dataset.index);
+                        flipMemory(idx);
+                    });
+                });
+            }
+
+            function flipMemory(idx) {
+                if (memoryLocked) return;
+                if (memoryFlipped.includes(idx) || memoryMatched.includes(idx)) return;
+                if (memoryFlipped.length >= 2) return;
+
+                memoryFlipped.push(idx);
+                renderMemory();
+
+                if (memoryFlipped.length === 2) {
+                    memoryLocked = true;
+                    const [i1, i2] = memoryFlipped;
+                    if (memoryCards[i1] === memoryCards[i2]) {
+                        memoryMatched.push(i1, i2);
+                        memoryFlipped = [];
+                        memoryLocked = false;
+                        renderMemory();
+                        if (memoryMatched.length === memoryCards.length) {
+                            setTimeout(() => alert('🎉 Parabéns! Encontrou todos os pares!'), 300);
+                        }
+                    } else {
+                        setTimeout(() => {
+                            memoryFlipped = [];
+                            memoryLocked = false;
+                            renderMemory();
+                        }, 800);
+                    }
+                }
+            }
+
+            // ---------- XADREZ ----------
+            function initChess() {
+                chessBoard = [
+                    ['♜', '♞', '♝', '♛', '♚', '♝', '♞', '♜'],
+                    ['♟', '♟', '♟', '♟', '♟', '♟', '♟', '♟'],
+                    ['', '', '', '', '', '', '', ''],
+                    ['', '', '', '', '', '', '', ''],
+                    ['', '', '', '', '', '', '', ''],
+                    ['', '', '', '', '', '', '', ''],
+                    ['♙', '♙', '♙', '♙', '♙', '♙', '♙', '♙'],
+                    ['♖', '♘', '♗', '♕', '♔', '♗', '♘', '♖']
+                ];
+                chessSelected = null;
+                renderChess();
+            }
+
+            function renderChess() {
+                let html = '<div class="chess-board">';
+                chessBoard.forEach((row, r) => {
+                    row.forEach((piece, c) => {
+                        const isLight = (r + c) % 2 === 0;
+                        const isSelected = chessSelected && chessSelected[0] === r && chessSelected[1] === c;
+                        html += `<div class="chess-square ${isLight ? 'light' : 'dark'} ${isSelected ? 'selected' : ''}" data-row="${r}" data-col="${c}">${piece}</div>`;
+                    });
+                });
+                html += '</div>';
+                html += '<div style="text-align:center;color:#7abfff;font-size:14px;margin-top:10px;">Clique numa peça para selecionar, depois no destino para mover.</div>';
+                gameContent.innerHTML = html;
+
+                document.querySelectorAll('.chess-square').forEach(sq => {
+                    sq.addEventListener('click', () => {
+                        const r = parseInt(sq.dataset.row);
+                        const c = parseInt(sq.dataset.col);
+                        handleChessClick(r, c);
+                    });
+                });
+            }
+
+            function handleChessClick(r, c) {
+                const piece = chessBoard[r][c];
+                if (chessSelected) {
+                    const [sr, sc] = chessSelected;
+                    const selectedPiece = chessBoard[sr][sc];
+                    if (selectedPiece && selectedPiece === piece) {
+                        chessSelected = null;
+                        renderChess();
+                        return;
+                    }
+                    // Movimento simples (apenas para demo)
+                    if (selectedPiece && !piece) {
+                        chessBoard[r][c] = selectedPiece;
+                        chessBoard[sr][sc] = '';
+                        chessSelected = null;
+                        renderChess();
+                        return;
+                    }
+                    if (selectedPiece && piece && selectedPiece !== piece) {
+                        chessBoard[r][c] = selectedPiece;
+                        chessBoard[sr][sc] = '';
+                        chessSelected = null;
+                        renderChess();
+                        return;
+                    }
+                    chessSelected = null;
+                    renderChess();
+                } else {
+                    if (piece) {
+                        chessSelected = [r, c];
+                        renderChess();
+                    }
+                }
+            }
+
+            // ---------- ENIGMAS ----------
+            const enigmas = [
+                { q: 'Fui enviado por um remetente desconhecido. Devo ser analisado para encontrar pistas. O que sou?', a: 'carta', hint: 'Chega pelo correio.' },
+                { q: 'No local do crime, deixei uma marca invisível que só brilha sob luz negra. O que sou?', a: 'fluido', hint: 'Também encontrado em certas lâmpadas.' },
+                { q: 'Sou o que resta de um cigarro. Posso conter ADN do criminoso.', a: 'bituca', hint: 'É o que sobra após fumar.' }
+            ];
+
+            function initEnigmas() {
+                enigmaIndex = 0;
+                renderEnigma();
+            }
+
+            function renderEnigma() {
+                if (enigmaIndex >= enigmas.length) {
+                    gameContent.innerHTML = '<div style="text-align:center;padding:40px 0;"><h3 style="color:#00b4ff;">🔎 Todos os enigmas resolvidos!</h3><p style="color:#7abfff;margin-top:10px;">Excelente trabalho, detetive!</p></div>';
+                    return;
+                }
+                const e = enigmas[enigmaIndex];
+                let html = `<div class="enigma-box">
+                    <h3 style="color:#00b4ff;font-weight:300;">Caso #${enigmaIndex + 1}</h3>
+                    <p><strong>🔍 Enigma:</strong> ${e.q}</p>
+                    <p style="color:#6a8faa;font-size:13px;">💡 Dica: ${e.hint}</p>
+                    <input type="text" id="enigmaInput" placeholder="Digite a sua resposta..." style="background:rgba(0,0,0,0.3);border:1px solid rgba(0,180,255,0.15);border-radius:30px;padding:10px 20px;color:#fff;width:100%;margin:10px 0;font-size:14px;">
+                    <button class="btn-check" id="enigmaCheck">Verificar</button>
+                </div>`;
+                gameContent.innerHTML = html;
+
+                document.getElementById('enigmaCheck').addEventListener('click', () => {
+                    const input = document.getElementById('enigmaInput').value.trim().toLowerCase();
+                    if (input === e.a) {
+                        alert('✅ Correto! Avançando para o próximo enigma...');
+                        enigmaIndex++;
+                        renderEnigma();
+                    } else {
+                        alert('❌ Resposta incorreta. Tente novamente!');
+                    }
+                });
+                document.getElementById('enigmaInput').addEventListener('keydown', (ev) => {
+                    if (ev.key === 'Enter') document.getElementById('enigmaCheck').click();
+                });
+            }
+
+            // ---------- QUIZ ----------
+            const quizQuestions = [
+                { q: 'Qual é a capital da província de Malanje?', options: ['Malanje', 'Luanda', 'Huambo', 'Benguela'], correct: 0 },
+                { q: 'Qual é a queda de água mais famosa de Malanje?', options: ['Kalandula', 'Cahora Bassa', 'Kalandula (Malanje)', 'Ruacana'], correct: 2 },
+                { q: 'As pedras do Pungo Andongo ficam em que província?', options: ['Luanda', 'Malanje', 'Huíla', 'Namibe'], correct: 1 },
+                { q: 'Qual é o rio principal que atravessa Malanje?', options: ['Kwanza', 'Zaire', 'Cunene', 'Limpopo'], correct: 0 }
+            ];
+
+            function initQuiz() {
+                quizIndex = 0;
+                quizScore = 0;
+                renderQuiz();
+            }
+
+            function renderQuiz() {
+                if (quizIndex >= quizQuestions.length) {
+                    gameContent.innerHTML = `<div style="text-align:center;padding:40px 0;">
+                        <h3 style="color:#00b4ff;">🏆 Quiz Concluído!</h3>
+                        <p style="color:#7abfff;margin-top:10px;">Pontuação: ${quizScore} / ${quizQuestions.length}</p>
+                        <p style="color:#6a8faa;font-size:14px;margin-top:5px;">${quizScore === quizQuestions.length ? 'Perfeito! Você é um especialista em Malanje!' : 'Continue aprendendo sobre esta bela província!'}</p>
+                        <button id="quizReset" style="background:#00b4ff;border:none;color:#fff;padding:10px 30px;border-radius:30px;cursor:pointer;font-weight:600;margin-top:15px;">Reiniciar Quiz</button>
+                    </div>`;
+                    document.getElementById('quizReset').addEventListener('click', initQuiz);
+                    return;
+                }
+
+                const q = quizQuestions[quizIndex];
+                let html = `<div class="quiz-score">Questão ${quizIndex + 1} de ${quizQuestions.length}</div>
+                    <div style="background:rgba(0,180,255,0.04);border-radius:16px;padding:20px;margin:10px 0;">
+                        <p style="font-size:18px;color:#b0dfff;">${q.q}</p>
+                    </div>`;
+                q.options.forEach((opt, idx) => {
+                    html += `<button class="quiz-option" data-index="${idx}">${opt}</button>`;
+                });
+                gameContent.innerHTML = html;
+
+                document.querySelectorAll('.quiz-option').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const idx = parseInt(btn.dataset.index);
+                        const correct = idx === q.correct;
+                        if (correct) quizScore++;
+                        btn.classList.add(correct ? 'correct' : 'wrong');
+                        document.querySelectorAll('.quiz-option').forEach(b => b.disabled = true);
+                        setTimeout(() => {
+                            quizIndex++;
+                            renderQuiz();
+                        }, 1200);
+                    });
+                });
+            }
+
+            // ---------- GAME CARDS ----------
+            document.querySelectorAll('.game-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const game = card.dataset.game;
+                    let title = '';
+                    let initFn = null;
+
+                    switch (game) {
+                        case 'puzzle':
+                            title = '🧩 Puzzle';
+                            initFn = initPuzzle;
+                            break;
+                        case 'velha':
+                            title = '❌⭕ Jogo da Velha';
+                            initFn = initVelha;
+                            break;
+                        case 'memoria':
+                            title = '🧠 Jogo da Memória';
+                            initFn = initMemory;
+                            break;
+                        case 'xadrez':
+                            title = '♟️ Xadrez';
+                            initFn = initChess;
+                            break;
+                        case 'enigmas':
+                            title = '🔎 Enigmas & Forense';
+                            initFn = initEnigmas;
+                            break;
+                        case 'quiz':
+                            title = '❓ Quiz Malanje';
+                            initFn = initQuiz;
+                            break;
+                        default:
+                            return;
+                    }
+
+                    openGame(title, '');
+                    if (initFn) initFn();
+                });
+            });
+
+            // ---------- TROCAR IMAGEM DO MORDOMO ----------
+            mordomoImg.addEventListener('click', () => {
+                const images = [
+                    'images/invited.png',
+                    'images/invited2.png',
+                    'images/invited3.png'
+                ];
+                const currentSrc = mordomoImg.src;
+                let next = images.find(img => !currentSrc.includes(img));
+                if (!next) next = images[0];
+                mordomoImg.src = next;
+                typeText('A minha aparência pode ser alterada. Esta é uma das minhas formas holográficas.', () => {});
+            });
+
+            // ---------- RESTAURAR ESTADO ----------
+            if (userName) {
+                updateGreeting();
+                namePrompt.style.display = 'none';
+            }
+
+            console.log('Idioma detectado:', lang);
+
+        }); // end DOMContentLoaded
+    </script>
+</body>
+</html>
